@@ -1,2 +1,86 @@
-<h1>Progresso e estatisticas</h1>
-<p>ProgressDashboard - skeleton</p>
+<div class="page-header animate-fade-in-up">
+  <h1>Meu Progresso</h1>
+  <p class="page-subtitle">Acompanhe sua evolução nos estudos</p>
+</div>
+
+<div class="stats-grid">
+  <mat-card class="stat-card stagger-1">
+    <mat-card-content>
+      <mat-icon class="stat-icon pink">help_outline</mat-icon>
+      <span class="stat-value">{{ progress().totalAnswered }}</span>
+      <span class="stat-label">Questões respondidas</span>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="stat-card stagger-2">
+    <mat-card-content>
+      <mat-icon class="stat-icon green">check_circle</mat-icon>
+      <span class="stat-value">{{ progress().totalCorrect }}</span>
+      <span class="stat-label">Respostas corretas</span>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="stat-card stagger-3">
+    <mat-card-content>
+      <mat-icon class="stat-icon violet">percent</mat-icon>
+      <span class="stat-value">{{ accuracy }}%</span>
+      <span class="stat-label">Taxa de acerto</span>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="stat-card stagger-4">
+    <mat-card-content>
+      <mat-icon class="stat-icon orange">local_fire_department</mat-icon>
+      <span class="stat-value">{{ progress().streak }}</span>
+      <span class="stat-label">Dias seguidos</span>
+    </mat-card-content>
+  </mat-card>
+</div>
+
+<section class="section">
+  <h2 class="section-title">
+    <mat-icon>bar_chart</mat-icon>
+    Desempenho por matéria
+  </h2>
+
+  <div class="subjects-list">
+    @for (sub of progress().bySubject; track sub.subjectId; let i = $index) {
+      <mat-card class="subject-progress-card stagger-{{ i + 5 }}">
+        <mat-card-content>
+          <div class="subject-header">
+            <div class="subject-color" [style.background-color]="sub.color"></div>
+            <div class="subject-info">
+              <span class="subject-name">{{ sub.subjectName }}</span>
+              <span class="subject-stats">
+                {{ sub.correct }}/{{ sub.answered }} corretas
+              </span>
+            </div>
+            <span class="subject-percent" [style.color]="sub.color">
+              {{ getSubjectAccuracy(sub.answered, sub.correct) }}%
+            </span>
+          </div>
+          <mat-progress-bar
+            mode="determinate"
+            [value]="getSubjectAccuracy(sub.answered, sub.correct)"
+            [style.--mdc-linear-progress-active-indicator-color]="sub.color"
+          ></mat-progress-bar>
+        </mat-card-content>
+      </mat-card>
+    }
+  </div>
+</section>
+
+<section class="section">
+  <mat-card class="tip-card animate-fade-in">
+    <mat-card-content>
+      <div class="tip-content">
+        <mat-icon class="tip-icon">lightbulb</mat-icon>
+        <div>
+          <h3>Continue assim!</h3>
+          <p>Você está com {{ accuracy }}% de acerto geral. Foque um pouco mais em
+            <strong>Geografia</strong> para equilibrar suas notas.</p>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</section>

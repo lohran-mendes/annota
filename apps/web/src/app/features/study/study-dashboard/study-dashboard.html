@@ -1,2 +1,64 @@
-<h1>Materias e topicos</h1>
-<p>StudyDashboard - skeleton</p>
+<div class="page-header animate-fade-in-up">
+  <h1>Vestibulinho ETEC 2025</h1>
+  <p class="page-subtitle">Escolha uma matéria e um tópico para começar a resolver questões</p>
+</div>
+
+<div class="subjects-grid">
+  @for (subject of subjects(); track subject.id; let i = $index) {
+    <mat-card class="subject-card stagger-{{ i + 1 }}">
+      <mat-card-header>
+        <div mat-card-avatar class="subject-avatar" [style.background-color]="subject.color">
+          <mat-icon>{{ subject.icon }}</mat-icon>
+        </div>
+        <mat-card-title>{{ subject.name }}</mat-card-title>
+        <mat-card-subtitle>
+          {{ subject.completedCount }}/{{ subject.questionCount }} questões feitas
+        </mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="progress-section">
+          <div class="progress-label">
+            <span>Progresso</span>
+            <span class="progress-percent">{{ getSubjectProgress(subject) }}%</span>
+          </div>
+          <mat-progress-bar
+            mode="determinate"
+            [value]="getSubjectProgress(subject)"
+            [style.--mdc-linear-progress-active-indicator-color]="subject.color"
+          ></mat-progress-bar>
+        </div>
+
+        <mat-accordion>
+          @for (topic of getTopicsForSubject(subject.id); track topic.id) {
+            <mat-expansion-panel>
+              <mat-expansion-panel-header>
+                <mat-panel-title>{{ topic.name }}</mat-panel-title>
+                <mat-panel-description>
+                  {{ topic.completedCount }}/{{ topic.questionCount }}
+                </mat-panel-description>
+              </mat-expansion-panel-header>
+
+              <div class="topic-content">
+                <mat-progress-bar
+                  mode="determinate"
+                  [value]="getTopicProgress(topic)"
+                  class="topic-progress"
+                ></mat-progress-bar>
+                <a
+                  mat-flat-button
+                  color="primary"
+                  [routerLink]="['/study', '1', subject.id, topic.id]"
+                  class="study-btn"
+                >
+                  <mat-icon>play_arrow</mat-icon>
+                  Resolver questões
+                </a>
+              </div>
+            </mat-expansion-panel>
+          }
+        </mat-accordion>
+      </mat-card-content>
+    </mat-card>
+  }
+</div>

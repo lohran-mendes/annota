@@ -1,3 +1,183 @@
 :host {
   display: block;
 }
+
+.welcome-section {
+  background: linear-gradient(135deg, var(--annota-pink-400), var(--annota-violet-300));
+  border-radius: var(--annota-radius-lg);
+  padding: 32px;
+  color: white;
+  margin-bottom: 32px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.welcome-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+
+.welcome-subtitle {
+  font-size: 1.1rem;
+  margin: 0;
+  opacity: 0.9;
+}
+
+.quick-stats {
+  display: flex;
+  gap: 24px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: var(--annota-radius);
+  padding: 12px 20px;
+  backdrop-filter: blur(8px);
+
+  mat-icon {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+    margin-bottom: 4px;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+    opacity: 0.85;
+  }
+}
+
+.section {
+  margin-bottom: 32px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--annota-text);
+  margin-bottom: 16px;
+
+  mat-icon {
+    color: var(--annota-pink-500);
+  }
+}
+
+.exam-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.exam-card {
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color 0.3s ease, transform 0.3s ease;
+
+  &:hover {
+    border-color: var(--annota-pink-200);
+    transform: translateY(-4px);
+  }
+
+  mat-card-actions {
+    padding: 8px 16px 16px;
+  }
+}
+
+.exam-icon {
+  background: linear-gradient(135deg, var(--annota-pink-400), var(--annota-violet-300));
+  color: white;
+  border-radius: var(--annota-radius-sm);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.exam-description {
+  color: var(--annota-text-light);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 12px 0;
+}
+
+.exam-chips {
+  margin-top: 8px;
+}
+
+.motivation-card {
+  background: linear-gradient(135deg, var(--annota-pink-50), var(--annota-violet-50));
+  border: 1px solid var(--annota-pink-100);
+}
+
+.motivation-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  h3 {
+    margin: 0 0 4px;
+    font-weight: 600;
+    color: var(--annota-pink-600);
+  }
+
+  p {
+    margin: 0;
+    color: var(--annota-text);
+    line-height: 1.5;
+  }
+}
+
+.motivation-icon {
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
+  color: var(--annota-pink-400);
+  flex-shrink: 0;
+}
+
+@media (max-width: 599px) {
+  .welcome-section {
+    padding: 20px;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .welcome-title {
+    font-size: 1.5rem;
+  }
+
+  .quick-stats {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .stat-item {
+    padding: 10px 14px;
+  }
+
+  .exam-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .motivation-content {
+    flex-direction: column;
+    text-align: center;
+  }
+}

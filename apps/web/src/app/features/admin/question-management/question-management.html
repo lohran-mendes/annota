@@ -1,2 +1,35 @@
-<h1>Gerenciar questoes</h1>
-<p>QuestionManagement - skeleton</p>
+<div class="page-header animate-fade-in-up">
+  <div>
+    <h1>Gerenciar Questões</h1>
+    <p class="page-subtitle">Cadastre e edite as questões do banco</p>
+  </div>
+  <button mat-flat-button color="primary" class="add-btn">
+    <mat-icon>add</mat-icon>
+    Nova Questão
+  </button>
+</div>
+
+<div class="question-list">
+  @for (q of questions(); track q.id; let i = $index) {
+    <mat-card class="question-card stagger-{{ i + 1 }}">
+      <mat-card-content>
+        <div class="question-header">
+          <mat-chip-set>
+            <mat-chip class="subject-chip">{{ q.subjectName }}</mat-chip>
+            <mat-chip class="topic-chip">{{ q.topicName }}</mat-chip>
+          </mat-chip-set>
+          <div class="question-actions">
+            <button mat-icon-button color="primary">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button color="warn">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+        <p class="question-text">{{ q.statement }}</p>
+        <span class="alt-count">{{ q.alternativeCount }} alternativas</span>
+      </mat-card-content>
+    </mat-card>
+  }
+</div>

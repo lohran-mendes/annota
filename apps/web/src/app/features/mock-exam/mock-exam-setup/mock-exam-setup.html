@@ -1,2 +1,75 @@
-<h1>Configurar simulado</h1>
-<p>MockExamSetup - skeleton</p>
+<div class="page-header animate-fade-in-up">
+  <h1>Simulados</h1>
+  <p class="page-subtitle">Teste seus conhecimentos em condições reais de prova</p>
+</div>
+
+<section class="section">
+  <h2 class="section-title">
+    <mat-icon>play_circle</mat-icon>
+    Simulados disponíveis
+  </h2>
+
+  <div class="exams-grid">
+    @for (exam of mockExams(); track exam.id; let i = $index) {
+      <mat-card class="exam-card stagger-{{ i + 1 }}" [class.completed]="exam.status === 'completed'">
+        <mat-card-header>
+          @if (exam.status === 'completed') {
+            <mat-icon mat-card-avatar class="status-icon completed">check_circle</mat-icon>
+          } @else {
+            <mat-icon mat-card-avatar class="status-icon available">play_circle_filled</mat-icon>
+          }
+          <mat-card-title>{{ exam.name }}</mat-card-title>
+          <mat-card-subtitle>
+            @if (exam.status === 'completed') {
+              Finalizado em {{ exam.completedAt }}
+            } @else {
+              Pronto para começar
+            }
+          </mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+          <div class="exam-details">
+            <mat-chip-set>
+              <mat-chip>
+                <mat-icon matChipAvatar>help_outline</mat-icon>
+                {{ exam.questionCount }} questões
+              </mat-chip>
+              <mat-chip>
+                <mat-icon matChipAvatar>timer</mat-icon>
+                {{ formatDuration(exam.duration) }}
+              </mat-chip>
+            </mat-chip-set>
+
+            @if (exam.status === 'completed' && exam.score !== undefined) {
+              <div class="score-display">
+                <span class="score-label">Nota:</span>
+                <span class="score-value" [class.high]="exam.score >= 70" [class.low]="exam.score < 70">
+                  {{ exam.score }}%
+                </span>
+              </div>
+            }
+          </div>
+        </mat-card-content>
+
+        <mat-card-actions>
+          @if (exam.status === 'completed') {
+            <button mat-stroked-button (click)="viewResult(exam)">
+              <mat-icon>visibility</mat-icon>
+              Ver resultado
+            </button>
+            <button mat-flat-button color="primary" (click)="startExam(exam)">
+              <mat-icon>replay</mat-icon>
+              Refazer
+            </button>
+          } @else {
+            <button mat-flat-button color="primary" (click)="startExam(exam)">
+              <mat-icon>play_arrow</mat-icon>
+              Iniciar simulado
+            </button>
+          }
+        </mat-card-actions>
+      </mat-card>
+    }
+  </div>
+</section>

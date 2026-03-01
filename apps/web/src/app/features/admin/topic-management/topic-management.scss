@@ -1,3 +1,65 @@
 :host {
   display: block;
 }
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+
+  h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--annota-text);
+    margin: 0 0 8px;
+  }
+
+  .page-subtitle {
+    color: var(--annota-text-light);
+    margin: 0;
+  }
+}
+
+.add-btn {
+  border-radius: var(--annota-radius-sm);
+}
+
+.table-card {
+  overflow: auto;
+}
+
+.data-table {
+  width: 100%;
+
+  .cell-primary {
+    font-weight: 600;
+    color: var(--annota-text);
+  }
+
+  th {
+    font-weight: 600;
+    color: var(--annota-text-light);
+    font-size: 0.85rem;
+  }
+
+  td {
+    color: var(--annota-text);
+  }
+
+  tr.mat-mdc-row:hover {
+    background-color: var(--annota-violet-50);
+  }
+}
+
+@media (max-width: 599px) {
+  .page-header {
+    flex-direction: column;
+  }
+
+  .add-btn {
+    width: 100%;
+  }
+}

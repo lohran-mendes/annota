@@ -1,31 +1,75 @@
-<mat-toolbar color="primary">
-  <span>Annota Admin</span>
+<mat-toolbar class="toolbar">
+  <button mat-icon-button (click)="sidenav.toggle()" class="menu-btn">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <mat-icon class="toolbar-icon">admin_panel_settings</mat-icon>
+  <span class="toolbar-title">Annota Admin</span>
   <span class="spacer"></span>
-  <a mat-button routerLink="/">Voltar ao app</a>
+  <a mat-button routerLink="/" class="back-btn">
+    <mat-icon>arrow_back</mat-icon>
+    <span class="back-text">Voltar ao app</span>
+  </a>
 </mat-toolbar>
 
 <mat-sidenav-container>
-  <mat-sidenav mode="side" opened>
+  <mat-sidenav
+    #sidenav
+    [mode]="isMobile() ? 'over' : 'side'"
+    [opened]="!isMobile()"
+    class="sidenav"
+  >
+    <div class="sidenav-header">
+      <mat-icon class="admin-icon">shield</mat-icon>
+      <span class="sidenav-brand">Painel Admin</span>
+      <p class="sidenav-subtitle">Gerenciar conteúdo</p>
+    </div>
+
     <mat-nav-list>
-      <a mat-list-item routerLink="/admin" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+      <a
+        mat-list-item
+        routerLink="/admin"
+        routerLinkActive="active-link"
+        [routerLinkActiveOptions]="{ exact: true }"
+        (click)="closeSidenavOnMobile()"
+      >
         <mat-icon matListItemIcon>dashboard</mat-icon>
         <span>Dashboard</span>
       </a>
-      <a mat-list-item routerLink="/admin/exams" routerLinkActive="active">
+      <a
+        mat-list-item
+        routerLink="/admin/exams"
+        routerLinkActive="active-link"
+        (click)="closeSidenavOnMobile()"
+      >
         <mat-icon matListItemIcon>school</mat-icon>
         <span>Provas</span>
       </a>
-      <a mat-list-item routerLink="/admin/subjects" routerLinkActive="active">
+      <a
+        mat-list-item
+        routerLink="/admin/subjects"
+        routerLinkActive="active-link"
+        (click)="closeSidenavOnMobile()"
+      >
         <mat-icon matListItemIcon>menu_book</mat-icon>
-        <span>Materias</span>
+        <span>Matérias</span>
       </a>
-      <a mat-list-item routerLink="/admin/topics" routerLinkActive="active">
+      <a
+        mat-list-item
+        routerLink="/admin/topics"
+        routerLinkActive="active-link"
+        (click)="closeSidenavOnMobile()"
+      >
         <mat-icon matListItemIcon>topic</mat-icon>
-        <span>Topicos</span>
+        <span>Tópicos</span>
       </a>
-      <a mat-list-item routerLink="/admin/questions" routerLinkActive="active">
+      <a
+        mat-list-item
+        routerLink="/admin/questions"
+        routerLinkActive="active-link"
+        (click)="closeSidenavOnMobile()"
+      >
         <mat-icon matListItemIcon>help_outline</mat-icon>
-        <span>Questoes</span>
+        <span>Questões</span>
       </a>
     </mat-nav-list>
   </mat-sidenav>

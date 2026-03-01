@@ -6,10 +6,10 @@ html {
     (
       color: (
         theme-type: light,
-        primary: mat.$violet-palette,
-        tertiary: mat.$azure-palette,
+        primary: mat.$rose-palette,
+        tertiary: mat.$violet-palette,
       ),
-      typography: Roboto,
+      typography: Nunito,
       density: 0,
     )
   );
@@ -17,9 +17,103 @@ html {
 
 body {
   color-scheme: light;
-  background-color: var(--mat-sys-surface);
+  background-color: #fdf2f4;
   color: var(--mat-sys-on-surface);
-  font: var(--mat-sys-body-medium);
+  font-family: 'Nunito', sans-serif;
   margin: 0;
   height: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+:root {
+  --annota-bg: #fdf2f4;
+  --annota-bg-card: #ffffff;
+  --annota-bg-sidebar: #fff5f7;
+  --annota-pink-50: #fce4ec;
+  --annota-pink-100: #f8bbd0;
+  --annota-pink-200: #f48fb1;
+  --annota-pink-300: #f06292;
+  --annota-pink-400: #ec407a;
+  --annota-pink-500: #e91e63;
+  --annota-pink-600: #d81b60;
+  --annota-pink-700: #c2185b;
+  --annota-violet-50: #f3e5f5;
+  --annota-violet-100: #e1bee7;
+  --annota-violet-200: #ce93d8;
+  --annota-violet-300: #ba68c8;
+  --annota-violet-400: #ab47bc;
+  --annota-violet-500: #9c27b0;
+  --annota-coral: #ff7043;
+  --annota-mint: #80cbc4;
+  --annota-gold: #ffd54f;
+  --annota-text: #37474f;
+  --annota-text-light: #78909c;
+  --annota-shadow: 0 2px 12px rgba(233, 30, 99, 0.08);
+  --annota-shadow-hover: 0 4px 20px rgba(233, 30, 99, 0.15);
+  --annota-radius: 16px;
+  --annota-radius-sm: 12px;
+  --annota-radius-lg: 24px;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--annota-pink-200);
+  border-radius: 3px;
+}
+
+.mat-mdc-card {
+  border-radius: var(--annota-radius) !important;
+  box-shadow: var(--annota-shadow) !important;
+  transition: box-shadow 0.3s ease, transform 0.3s ease !important;
+
+  &:hover {
+    box-shadow: var(--annota-shadow-hover) !important;
+  }
+}
+
+.mat-mdc-fab,
+.mat-mdc-mini-fab {
+  border-radius: var(--annota-radius) !important;
+}
+
+.mat-mdc-chip {
+  border-radius: var(--annota-radius-sm) !important;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out;
+}
+
+@for $i from 1 through 12 {
+  .stagger-#{$i} {
+    animation: fadeInUp 0.4s ease-out #{$i * 0.08}s both;
+  }
 }

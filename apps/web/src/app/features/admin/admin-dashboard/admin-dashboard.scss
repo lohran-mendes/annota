@@ -1,3 +1,137 @@
 :host {
   display: block;
 }
+
+.page-header {
+  margin-bottom: 28px;
+
+  h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--annota-text);
+    margin: 0 0 8px;
+  }
+
+  .page-subtitle {
+    color: var(--annota-text-light);
+    margin: 0;
+  }
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.stat-card {
+  cursor: pointer;
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+  }
+
+  mat-card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 24px 16px;
+  }
+}
+
+.stat-icon-wrapper {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--annota-radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  mat-icon {
+    color: white;
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+  }
+}
+
+.stat-count {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--annota-text);
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: var(--annota-text-light);
+  font-weight: 500;
+}
+
+.section {
+  margin-bottom: 32px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--annota-text);
+  margin-bottom: 16px;
+
+  mat-icon {
+    color: var(--annota-violet-400);
+  }
+}
+
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.action-card {
+  cursor: pointer;
+  border: 2px dashed var(--annota-violet-100);
+  background: var(--annota-violet-50);
+  transition: border-color 0.3s ease, transform 0.3s ease;
+
+  &:hover {
+    border-color: var(--annota-violet-300);
+    transform: translateY(-2px);
+  }
+
+  mat-card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 24px;
+
+    span {
+      font-weight: 600;
+      color: var(--annota-violet-500);
+    }
+  }
+}
+
+.action-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+  color: var(--annota-violet-400);
+}
+
+@media (max-width: 599px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .actions-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

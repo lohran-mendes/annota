@@ -1,3 +1,114 @@
 :host {
   display: block;
 }
+
+.page-header {
+  margin-bottom: 28px;
+
+  h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--annota-text);
+    margin: 0 0 8px;
+  }
+
+  .page-subtitle {
+    color: var(--annota-text-light);
+    margin: 0;
+  }
+}
+
+.section {
+  margin-bottom: 32px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--annota-text);
+  margin-bottom: 16px;
+
+  mat-icon {
+    color: var(--annota-pink-500);
+  }
+}
+
+.exams-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.exam-card {
+  &.completed {
+    border-left: 4px solid #4caf50;
+  }
+
+  mat-card-actions {
+    padding: 8px 16px 16px;
+    display: flex;
+    gap: 8px;
+
+    button {
+      border-radius: var(--annota-radius-sm);
+    }
+  }
+}
+
+.status-icon {
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
+
+  &.completed {
+    color: #4caf50;
+  }
+
+  &.available {
+    color: var(--annota-pink-500);
+  }
+}
+
+.exam-details {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.score-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--annota-pink-50);
+  border-radius: var(--annota-radius-sm);
+  width: fit-content;
+}
+
+.score-label {
+  font-size: 0.9rem;
+  color: var(--annota-text-light);
+}
+
+.score-value {
+  font-size: 1.3rem;
+  font-weight: 700;
+
+  &.high {
+    color: #4caf50;
+  }
+
+  &.low {
+    color: var(--annota-coral);
+  }
+}
+
+@media (max-width: 599px) {
+  .exams-grid {
+    grid-template-columns: 1fr;
+  }
+}

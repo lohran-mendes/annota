@@ -1,2 +1,77 @@
-<h1>Selecione uma prova</h1>
-<p>Home - skeleton</p>
+<div class="welcome-section animate-fade-in-up">
+  <div class="welcome-content">
+    <h1 class="welcome-title">Oi, Anna!</h1>
+    <p class="welcome-subtitle">Pronta para estudar hoje? Você está indo super bem!</p>
+  </div>
+  <div class="quick-stats">
+    <div class="stat-item">
+      <mat-icon>local_fire_department</mat-icon>
+      <span class="stat-value">{{ progress().streak }}</span>
+      <span class="stat-label">dias seguidos</span>
+    </div>
+    <div class="stat-item">
+      <mat-icon>check_circle</mat-icon>
+      <span class="stat-value">{{ progress().totalAnswered }}</span>
+      <span class="stat-label">questões</span>
+    </div>
+    <div class="stat-item">
+      <mat-icon>emoji_events</mat-icon>
+      <span class="stat-value">{{ accuracyPercent }}%</span>
+      <span class="stat-label">acerto</span>
+    </div>
+  </div>
+</div>
+
+<section class="section">
+  <h2 class="section-title">
+    <mat-icon>school</mat-icon>
+    Escolha uma prova para estudar
+  </h2>
+
+  <div class="exam-grid">
+    @for (exam of exams(); track exam.id; let i = $index) {
+      <mat-card class="exam-card stagger-{{ i + 1 }}" [routerLink]="['/study', exam.id]">
+        <mat-card-header>
+          <mat-icon mat-card-avatar class="exam-icon">description</mat-icon>
+          <mat-card-title>{{ exam.name }}</mat-card-title>
+          <mat-card-subtitle>{{ exam.institution }} - {{ exam.year }}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p class="exam-description">{{ exam.description }}</p>
+          <div class="exam-chips">
+            <mat-chip-set>
+              <mat-chip>
+                <mat-icon matChipAvatar>help_outline</mat-icon>
+                {{ exam.questionCount }} questões
+              </mat-chip>
+              <mat-chip>
+                <mat-icon matChipAvatar>category</mat-icon>
+                {{ exam.subjectCount }} matérias
+              </mat-chip>
+            </mat-chip-set>
+          </div>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-flat-button color="primary">
+            <mat-icon>play_arrow</mat-icon>
+            Começar a estudar
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    }
+  </div>
+</section>
+
+<section class="section motivational">
+  <mat-card class="motivation-card animate-fade-in">
+    <mat-card-content>
+      <div class="motivation-content">
+        <mat-icon class="motivation-icon">favorite</mat-icon>
+        <div>
+          <h3>Dica do dia</h3>
+          <p>Estudar um pouquinho todos os dias é melhor do que estudar muito de uma vez só. Consistência é a chave!</p>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</section>

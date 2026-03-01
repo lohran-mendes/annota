@@ -1,2 +1,51 @@
-<h1>Admin Dashboard</h1>
-<p>AdminDashboard - skeleton</p>
+<div class="page-header animate-fade-in-up">
+  <h1>Dashboard</h1>
+  <p class="page-subtitle">Visão geral do conteúdo cadastrado</p>
+</div>
+
+<div class="stats-grid">
+  @for (stat of stats(); track stat.label; let i = $index) {
+    <mat-card class="stat-card stagger-{{ i + 1 }}" [routerLink]="stat.route">
+      <mat-card-content>
+        <div class="stat-icon-wrapper" [style.background-color]="stat.color">
+          <mat-icon>{{ stat.icon }}</mat-icon>
+        </div>
+        <span class="stat-count">{{ stat.count }}</span>
+        <span class="stat-label">{{ stat.label }}</span>
+      </mat-card-content>
+    </mat-card>
+  }
+</div>
+
+<section class="section">
+  <h2 class="section-title">
+    <mat-icon>bolt</mat-icon>
+    Ações rápidas
+  </h2>
+  <div class="actions-grid">
+    <mat-card class="action-card" routerLink="/admin/questions">
+      <mat-card-content>
+        <mat-icon class="action-icon">add_circle</mat-icon>
+        <span>Nova questão</span>
+      </mat-card-content>
+    </mat-card>
+    <mat-card class="action-card" routerLink="/admin/exams">
+      <mat-card-content>
+        <mat-icon class="action-icon">note_add</mat-icon>
+        <span>Nova prova</span>
+      </mat-card-content>
+    </mat-card>
+    <mat-card class="action-card" routerLink="/admin/subjects">
+      <mat-card-content>
+        <mat-icon class="action-icon">library_add</mat-icon>
+        <span>Nova matéria</span>
+      </mat-card-content>
+    </mat-card>
+    <mat-card class="action-card" routerLink="/admin/topics">
+      <mat-card-content>
+        <mat-icon class="action-icon">playlist_add</mat-icon>
+        <span>Novo tópico</span>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

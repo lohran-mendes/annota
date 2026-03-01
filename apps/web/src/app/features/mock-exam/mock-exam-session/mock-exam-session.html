@@ -1,2 +1,80 @@
-<h1>Simulado em andamento</h1>
-<p>MockExamSession - skeleton</p>
+<div class="session-header animate-fade-in-up">
+  <div class="timer" [class.warning]="timeRemaining() < 600">
+    <mat-icon>timer</mat-icon>
+    <span>{{ formattedTime }}</span>
+  </div>
+  <div class="session-info">
+    <span>Questão {{ currentIndex() + 1 }}/{{ questions().length }}</span>
+    <span class="answered-count">{{ answeredCount() }} respondidas</span>
+  </div>
+  <button mat-stroked-button color="warn" (click)="finishExam()" class="finish-btn">
+    <mat-icon>flag</mat-icon>
+    Finalizar
+  </button>
+</div>
+
+<div class="session-progress">
+  <div
+    class="progress-fill"
+    [style.width.%]="(answeredCount() / questions().length) * 100"
+  ></div>
+</div>
+
+<div class="session-body">
+  <div class="question-nav-panel">
+    <h3>Navegação</h3>
+    <div class="question-grid">
+      @for (q of questions(); track q.id; let i = $index) {
+        <button
+          class="nav-btn"
+          [class.current]="i === currentIndex()"
+          [class.answered]="isAnswered(i)"
+          (click)="goToQuestion(i)"
+        >
+          {{ i + 1 }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="question-area">
+    <mat-card class="question-card animate-fade-in">
+      <mat-card-content>
+        <p class="question-statement">{{ currentQuestion().statement }}</p>
+        <mat-divider></mat-divider>
+        <div class="alternatives">
+          @for (alt of currentQuestion().alternatives; track alt.label; let i = $index) {
+            <button
+              class="alternative-btn"
+              [class.selected]="getSelectedAnswer() === i"
+              (click)="selectAnswer(i)"
+            >
+              <span class="alt-label">{{ alt.label }}</span>
+              <span class="alt-text">{{ alt.text }}</span>
+            </button>
+          }
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <div class="question-actions">
+      <button
+        mat-stroked-button
+        (click)="previousQuestion()"
+        [disabled]="currentIndex() === 0"
+      >
+        <mat-icon>arrow_back</mat-icon>
+        Anterior
+      </button>
+      <button
+        mat-flat-button
+        color="primary"
+        (click)="nextQuestion()"
+        [disabled]="currentIndex() >= questions().length - 1"
+      >
+        Próxima
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+    </div>
+  </div>
+</div>

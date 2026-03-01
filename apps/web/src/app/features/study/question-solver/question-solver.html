@@ -1,2 +1,97 @@
-<h1>Resolver questoes</h1>
-<p>QuestionSolver - skeleton</p>
+<div class="solver-header animate-fade-in-up">
+  <a mat-button routerLink="/study/1" class="back-link">
+    <mat-icon>arrow_back</mat-icon>
+    Voltar às matérias
+  </a>
+  <div class="question-counter">
+    <mat-icon>help_outline</mat-icon>
+    Questão {{ currentIndex() + 1 }} de {{ totalQuestions }}
+  </div>
+</div>
+
+<div class="question-progress">
+  <div
+    class="progress-fill"
+    [style.width.%]="((currentIndex() + 1) / totalQuestions) * 100"
+  ></div>
+</div>
+
+<mat-card class="question-card animate-fade-in-up">
+  <mat-card-content>
+    <p class="question-statement">{{ currentQuestion().statement }}</p>
+
+    <mat-divider></mat-divider>
+
+    <div class="alternatives">
+      @for (alt of currentQuestion().alternatives; track alt.label; let i = $index) {
+        <button
+          class="alternative-btn"
+          [class]="getAlternativeClass(i)"
+          (click)="selectAnswer(i)"
+          [disabled]="answered()"
+        >
+          <span class="alt-label">{{ alt.label }}</span>
+          <span class="alt-text">{{ alt.text }}</span>
+          @if (answered() && i === currentQuestion().correctAnswerIndex) {
+            <mat-icon class="alt-icon correct-icon">check_circle</mat-icon>
+          }
+          @if (answered() && selectedAnswer() === i && i !== currentQuestion().correctAnswerIndex) {
+            <mat-icon class="alt-icon incorrect-icon">cancel</mat-icon>
+          }
+        </button>
+      }
+    </div>
+  </mat-card-content>
+</mat-card>
+
+@if (!answered()) {
+  <div class="action-area animate-fade-in">
+    <button
+      mat-flat-button
+      color="primary"
+      (click)="checkAnswer()"
+      [disabled]="selectedAnswer() === null"
+      class="check-btn"
+    >
+      <mat-icon>check</mat-icon>
+      Verificar resposta
+    </button>
+  </div>
+}
+
+@if (answered()) {
+  <mat-card class="explanation-card animate-fade-in-up" [class.correct]="isCorrect" [class.incorrect]="!isCorrect">
+    <mat-card-content>
+      <div class="explanation-header">
+        @if (isCorrect) {
+          <mat-icon class="result-icon correct">celebration</mat-icon>
+          <h3 class="correct">Parabéns! Resposta correta!</h3>
+        } @else {
+          <mat-icon class="result-icon incorrect">sentiment_dissatisfied</mat-icon>
+          <h3 class="incorrect">Não foi dessa vez...</h3>
+        }
+      </div>
+      <p class="explanation-text">{{ currentQuestion().explanation }}</p>
+    </mat-card-content>
+  </mat-card>
+
+  <div class="navigation-area animate-fade-in">
+    <button
+      mat-stroked-button
+      (click)="previousQuestion()"
+      [disabled]="currentIndex() === 0"
+    >
+      <mat-icon>arrow_back</mat-icon>
+      Anterior
+    </button>
+    <button
+      mat-flat-button
+      color="primary"
+      (click)="nextQuestion()"
+      [disabled]="currentIndex() >= totalQuestions - 1"
+    >
+      Próxima
+      <mat-icon>arrow_forward</mat-icon>
+    </button>
+  </div>
+}

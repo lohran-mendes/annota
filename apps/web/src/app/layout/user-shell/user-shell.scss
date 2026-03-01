@@ -4,14 +4,144 @@
   height: 100vh;
 }
 
-mat-sidenav-container {
+.toolbar {
+  background: linear-gradient(135deg, var(--annota-pink-500), var(--annota-violet-400));
+  color: white;
+  box-shadow: 0 2px 8px rgba(233, 30, 99, 0.3);
+  z-index: 10;
+  gap: 8px;
+}
+
+.toolbar-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+}
+
+.toolbar-title {
+  font-weight: 700;
+  font-size: 1.3rem;
+  letter-spacing: -0.5px;
+}
+
+.spacer {
   flex: 1;
 }
 
-mat-sidenav {
-  width: 240px;
+.toolbar-greeting {
+  font-size: 0.9rem;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+.menu-btn {
+  color: white;
+}
+
+mat-sidenav-container {
+  flex: 1;
+  background-color: var(--annota-bg);
+}
+
+.sidenav {
+  width: 260px;
+  background-color: var(--annota-bg-sidebar);
+  border-right: 1px solid var(--annota-pink-50);
+  display: flex;
+  flex-direction: column;
+}
+
+.sidenav-header {
+  padding: 24px 20px 16px;
+  text-align: center;
+  border-bottom: 1px solid var(--annota-pink-50);
+}
+
+.sidenav-logo {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  margin-bottom: 8px;
+}
+
+.sidenav-brand {
+  display: block;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--annota-pink-600);
+}
+
+.sidenav-subtitle {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+  color: var(--annota-text-light);
+}
+
+.sidenav-footer {
+  margin-top: auto;
+  border-top: 1px solid var(--annota-pink-50);
+}
+
+mat-nav-list {
+  padding-top: 8px;
+
+  a[mat-list-item] {
+    margin: 4px 12px;
+    border-radius: var(--annota-radius-sm);
+    transition: background-color 0.2s ease;
+
+    mat-icon {
+      color: var(--annota-text-light);
+      transition: color 0.2s ease;
+    }
+
+    span {
+      font-weight: 500;
+      color: var(--annota-text);
+    }
+
+    &:hover {
+      background-color: var(--annota-pink-50);
+
+      mat-icon {
+        color: var(--annota-pink-500);
+      }
+    }
+
+    &.active-link {
+      background-color: var(--annota-pink-50);
+
+      mat-icon {
+        color: var(--annota-pink-500);
+      }
+
+      span {
+        color: var(--annota-pink-600);
+        font-weight: 600;
+      }
+    }
+  }
 }
 
 .content-area {
   padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 599px) {
+  .toolbar-greeting {
+    display: none;
+  }
+
+  .toolbar-logo {
+    width: 28px;
+    height: 28px;
+  }
+
+  .content-area {
+    padding: 16px;
+  }
 }

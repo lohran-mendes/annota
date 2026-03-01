@@ -1,2 +1,85 @@
-<h1>Resultado do simulado</h1>
-<p>MockExamResult - skeleton</p>
+<div class="result-hero animate-fade-in-up" [class.pass]="score() >= 60" [class.fail]="score() < 60">
+  <mat-icon class="result-hero-icon">
+    @if (score() >= 60) { emoji_events } @else { sentiment_dissatisfied }
+  </mat-icon>
+  <h1>
+    @if (score() >= 70) {
+      Parabéns, Anna!
+    } @else if (score() >= 60) {
+      Bom trabalho!
+    } @else {
+      Continue tentando!
+    }
+  </h1>
+  <div class="score-circle">
+    <span class="score-number">{{ score() }}%</span>
+    <span class="score-label">de acerto</span>
+  </div>
+  <p class="result-summary">
+    Você acertou {{ correctAnswers() }} de {{ totalQuestions() }} questões em {{ timeSpent() }}
+  </p>
+</div>
+
+<div class="stats-row">
+  <mat-card class="mini-stat stagger-1">
+    <mat-card-content>
+      <mat-icon class="green">check_circle</mat-icon>
+      <span class="mini-stat-value">{{ correctAnswers() }}</span>
+      <span class="mini-stat-label">Acertos</span>
+    </mat-card-content>
+  </mat-card>
+  <mat-card class="mini-stat stagger-2">
+    <mat-card-content>
+      <mat-icon class="red">cancel</mat-icon>
+      <span class="mini-stat-value">{{ totalQuestions() - correctAnswers() }}</span>
+      <span class="mini-stat-label">Erros</span>
+    </mat-card-content>
+  </mat-card>
+  <mat-card class="mini-stat stagger-3">
+    <mat-card-content>
+      <mat-icon class="blue">timer</mat-icon>
+      <span class="mini-stat-value">{{ timeSpent() }}</span>
+      <span class="mini-stat-label">Tempo</span>
+    </mat-card-content>
+  </mat-card>
+</div>
+
+<section class="section">
+  <h2 class="section-title">
+    <mat-icon>bar_chart</mat-icon>
+    Resultado por matéria
+  </h2>
+
+  <div class="subject-results">
+    @for (sub of subjectResults(); track sub.name; let i = $index) {
+      <mat-card class="subject-result-card stagger-{{ i + 4 }}">
+        <mat-card-content>
+          <div class="subject-result-header">
+            <div class="subject-color" [style.background-color]="sub.color"></div>
+            <span class="subject-name">{{ sub.name }}</span>
+            <span class="subject-score" [style.color]="sub.color">
+              {{ sub.correct }}/{{ sub.total }}
+            </span>
+            <span class="subject-percent">{{ getPercent(sub.correct, sub.total) }}%</span>
+          </div>
+          <mat-progress-bar
+            mode="determinate"
+            [value]="getPercent(sub.correct, sub.total)"
+            [style.--mdc-linear-progress-active-indicator-color]="sub.color"
+          ></mat-progress-bar>
+        </mat-card-content>
+      </mat-card>
+    }
+  </div>
+</section>
+
+<div class="action-area animate-fade-in">
+  <a mat-stroked-button routerLink="/mock-exam" class="action-btn">
+    <mat-icon>arrow_back</mat-icon>
+    Voltar aos simulados
+  </a>
+  <a mat-flat-button color="primary" routerLink="/study/1" class="action-btn">
+    <mat-icon>auto_stories</mat-icon>
+    Continuar estudando
+  </a>
+</div>

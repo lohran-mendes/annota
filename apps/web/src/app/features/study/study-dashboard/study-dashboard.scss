@@ -1,3 +1,97 @@
 :host {
   display: block;
 }
+
+.page-header {
+  margin-bottom: 28px;
+
+  h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--annota-text);
+    margin: 0 0 8px;
+  }
+
+  .page-subtitle {
+    color: var(--annota-text-light);
+    margin: 0;
+    font-size: 1rem;
+  }
+}
+
+.subjects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 20px;
+}
+
+.subject-card {
+  overflow: visible;
+}
+
+.subject-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--annota-radius-sm);
+  width: 40px;
+  height: 40px;
+
+  mat-icon {
+    color: white;
+  }
+}
+
+.progress-section {
+  margin: 16px 0;
+}
+
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 0.85rem;
+  color: var(--annota-text-light);
+}
+
+.progress-percent {
+  font-weight: 600;
+  color: var(--annota-text);
+}
+
+mat-accordion {
+  margin-top: 8px;
+}
+
+mat-expansion-panel {
+  border-radius: var(--annota-radius-sm) !important;
+  margin-bottom: 8px;
+  box-shadow: none !important;
+  border: 1px solid var(--annota-pink-50);
+}
+
+.topic-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 8px;
+}
+
+.topic-progress {
+  border-radius: 4px;
+}
+
+.study-btn {
+  align-self: flex-start;
+  border-radius: var(--annota-radius-sm);
+}
+
+@media (max-width: 599px) {
+  .subjects-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .page-header h1 {
+    font-size: 1.3rem;
+  }
+}

@@ -1,3 +1,42 @@
 :host {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+}
+
+.not-found-container {
+  text-align: center;
+  padding: 40px;
+}
+
+.not-found-icon {
+  font-size: 80px;
+  width: 80px;
+  height: 80px;
+  color: var(--annota-pink-200);
+  margin-bottom: 16px;
+}
+
+h1 {
+  font-size: 4rem;
+  font-weight: 700;
+  color: var(--annota-pink-300);
+  margin: 0;
+}
+
+h2 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--annota-text);
+  margin: 8px 0 16px;
+}
+
+p {
+  color: var(--annota-text-light);
+  margin: 0 0 24px;
+}
+
+.home-btn {
+  border-radius: var(--annota-radius-sm);
 }
