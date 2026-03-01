@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ExamModule } from './exam/exam.module';
 import { SubjectModule } from './subject/subject.module';
+import { TopicModule } from './topic/topic.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { SubjectModule } from './subject/subject.module';
     }),
     ExamModule,
     SubjectModule,
+    TopicModule,
   ],
 })
 export class AppModule {}
