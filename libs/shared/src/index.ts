@@ -1,5 +1,31 @@
 // @annota/shared - Tipos e interfaces compartilhados entre frontend e backend
 
+export type {
+  ApiResponse,
+  ApiListResponse,
+  ApiErrorResponse,
+  CreateExamDto,
+  UpdateExamDto,
+  CreateSubjectDto,
+  UpdateSubjectDto,
+  CreateTopicDto,
+  UpdateTopicDto,
+  CreateQuestionDto,
+  UpdateQuestionDto,
+  SubmitAnswerDto,
+  AnswerResult,
+  ExamProgress,
+  TopicProgress,
+  CreateMockExamDto,
+  MockExamSession,
+  MockExamQuestion,
+  SubmitMockExamDto,
+  MockExamAnswer,
+  MockExamResult,
+  MockExamSubjectResult,
+  MockExamQuestionResult,
+} from './api-contracts';
+
 export interface Exam {
   id: string;
   name: string;
