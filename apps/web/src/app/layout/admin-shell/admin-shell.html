@@ -1,0 +1,38 @@
+<mat-toolbar color="primary">
+  <span>Annota Admin</span>
+  <span class="spacer"></span>
+  <a mat-button routerLink="/">Voltar ao app</a>
+</mat-toolbar>
+
+<mat-sidenav-container>
+  <mat-sidenav mode="side" opened>
+    <mat-nav-list>
+      <a mat-list-item routerLink="/admin" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+        <mat-icon matListItemIcon>dashboard</mat-icon>
+        <span>Dashboard</span>
+      </a>
+      <a mat-list-item routerLink="/admin/exams" routerLinkActive="active">
+        <mat-icon matListItemIcon>school</mat-icon>
+        <span>Provas</span>
+      </a>
+      <a mat-list-item routerLink="/admin/subjects" routerLinkActive="active">
+        <mat-icon matListItemIcon>menu_book</mat-icon>
+        <span>Materias</span>
+      </a>
+      <a mat-list-item routerLink="/admin/topics" routerLinkActive="active">
+        <mat-icon matListItemIcon>topic</mat-icon>
+        <span>Topicos</span>
+      </a>
+      <a mat-list-item routerLink="/admin/questions" routerLinkActive="active">
+        <mat-icon matListItemIcon>help_outline</mat-icon>
+        <span>Questoes</span>
+      </a>
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <main class="content-area">
+      <router-outlet />
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>

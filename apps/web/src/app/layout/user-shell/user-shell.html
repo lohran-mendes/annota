@@ -1,0 +1,35 @@
+<mat-toolbar color="primary">
+  <button mat-icon-button (click)="sidenav.toggle()">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <span>Annota</span>
+</mat-toolbar>
+
+<mat-sidenav-container>
+  <mat-sidenav #sidenav mode="side" opened>
+    <mat-nav-list>
+      <a mat-list-item routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+        <mat-icon matListItemIcon>home</mat-icon>
+        <span>Inicio</span>
+      </a>
+      <a mat-list-item routerLink="/progress" routerLinkActive="active">
+        <mat-icon matListItemIcon>bar_chart</mat-icon>
+        <span>Progresso</span>
+      </a>
+      <a mat-list-item routerLink="/mock-exam" routerLinkActive="active">
+        <mat-icon matListItemIcon>quiz</mat-icon>
+        <span>Simulados</span>
+      </a>
+      <a mat-list-item routerLink="/admin" routerLinkActive="active">
+        <mat-icon matListItemIcon>admin_panel_settings</mat-icon>
+        <span>Admin</span>
+      </a>
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <main class="content-area">
+      <router-outlet />
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>
