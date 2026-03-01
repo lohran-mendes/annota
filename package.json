@@ -1,0 +1,19 @@
+{
+  "name": "annota",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Aplicacao web de estudos focada na aprendizagem por resolucao de exercicios",
+  "workspaces": [
+    "apps/*",
+    "libs/*"
+  ],
+  "scripts": {
+    "dev:web": "npm run start -w @annota/web",
+    "dev:api": "npm run start:dev -w @annota/api",
+    "dev": "npm run dev:web & npm run dev:api",
+    "build:web": "npm run build -w @annota/web",
+    "build:api": "npm run build -w @annota/api",
+    "test:web": "npm run test -w @annota/web",
+    "test:api": "npm run test -w @annota/api"
+  }
+}

@@ -10,24 +10,29 @@ O nome "Annota" e uma homenagem a Anna Beatriz, irma do criador do projeto, que 
 
 | Camada     | Tecnologia         | Versao minima |
 | ---------- | ------------------ | ------------- |
-| Frontend   | Angular            | 20+           |
-| UI/CSS     | Angular Material   | 20+           |
+| Frontend   | Angular            | 21+           |
+| UI/CSS     | Angular Material   | 21+           |
 | Backend    | NestJS             | 11+           |
 | Banco      | MongoDB            | 7+            |
 | ODM        | Mongoose           | 8+            |
 | Runtime    | Node.js            | 22+           |
 | Pacotes    | npm                | 10+           |
-| Linguagem  | TypeScript         | 5.5+          |
+| Linguagem  | TypeScript         | 5.9+          |
+| Testes web | Vitest             | 4+            |
+| Testes api | Jest               | 30+           |
 
 ## Estrutura do monorepo
 
 ```
 annota/
+  package.json          # raiz com npm workspaces
   apps/
-    web/          # Angular frontend
-    api/          # NestJS backend
-  libs/           # Codigo compartilhado (tipos, interfaces, DTOs)
-  CLAUDE.md       # Este arquivo
+    web/                # Angular 21 frontend (standalone, zoneless, signals)
+    api/                # NestJS 11 backend
+  libs/
+    shared/             # @annota/shared - tipos e interfaces compartilhados
+      src/index.ts      # barrel export
+  CLAUDE.md             # este arquivo
 ```
 
 ## Modelo de dados (hierarquia de conteudo)
@@ -92,7 +97,7 @@ Prova (Exam)
 - Commits em ingles, seguindo conventional commits (feat:, fix:, chore:, etc.)
 
 ### Frontend (Angular)
-- Usar standalone components (padrao Angular 20+)
+- Usar standalone components (padrao Angular 21+)
 - Signals para gerenciamento de estado reativo
 - Rotas com lazy loading
 - Angular Material para todos componentes de UI
@@ -111,7 +116,22 @@ Prova (Exam)
 ## Comandos uteis
 
 ```bash
-# Ainda nao configurados - serao adicionados apos setup do monorepo
+# Desenvolvimento
+npm run dev:web          # Angular dev server (localhost:4200)
+npm run dev:api          # NestJS dev server com watch (localhost:3000)
+npm run dev              # Ambos em paralelo
+
+# Build
+npm run build:web        # Build do Angular
+npm run build:api        # Build do NestJS
+
+# Testes
+npm run test:web         # Vitest (Angular)
+npm run test:api         # Jest (NestJS)
+
+# Executar comando em workspace especifico
+npm run <script> -w @annota/web
+npm run <script> -w @annota/api
 ```
 
 ## Notas para o Claude Code
