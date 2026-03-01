@@ -25,14 +25,24 @@ O nome "Annota" e uma homenagem a Anna Beatriz, irma do criador do projeto, que 
 
 ```
 annota/
-  package.json          # raiz com npm workspaces
+  package.json            # raiz com npm workspaces
+  README.md               # documentacao do projeto
+  CLAUDE.md               # este arquivo (instrucoes para Claude Code)
+  .github/
+    workflows/
+      deploy.yml          # GitHub Actions - deploy automatico no GitHub Pages
   apps/
-    web/                # Angular 21 frontend (standalone, zoneless, signals)
-    api/                # NestJS 11 backend
+    web/                  # @annota/web - Angular 21 frontend (standalone, signals)
+      src/
+        app/
+          core/           # mock-data, services (skeleton)
+          features/       # home, study, progress, mock-exam, admin
+          layout/         # user-shell, admin-shell
+          shared/         # not-found
+    api/                  # @annota/api - NestJS 11 backend (scaffold minimo)
   libs/
-    shared/             # @annota/shared - tipos e interfaces compartilhados
-      src/index.ts      # barrel export
-  CLAUDE.md             # este arquivo
+    shared/               # @annota/shared - tipos e interfaces compartilhados
+      src/index.ts        # barrel export
 ```
 
 ## Modelo de dados (hierarquia de conteudo)
@@ -87,7 +97,11 @@ Prova (Exam)
 - Suporte a imagens (upload) desde o inicio.
 
 ### Deploy
-- Ainda nao definido. Foco no desenvolvimento local.
+- **Frontend**: GitHub Pages com deploy automatico via GitHub Actions (`.github/workflows/deploy.yml`).
+- Build com `--base-href /annota/` para subpath do GitHub Pages.
+- SPA routing via `404.html` customizado que redireciona para `index.html`.
+- URL: https://lohran-mendes.github.io/annota/
+- **Backend**: Ainda nao definido.
 
 ## Convencoes de codigo
 
@@ -123,6 +137,7 @@ npm run dev              # Ambos em paralelo
 
 # Build
 npm run build:web        # Build do Angular
+npm run build:ghpages    # Build do Angular para GitHub Pages (com base-href)
 npm run build:api        # Build do NestJS
 
 # Testes
