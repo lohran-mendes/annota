@@ -1,50 +1,39 @@
 <div class="welcome-section animate-fade-in-up">
-  <div class="welcome-content">
-    <h1 class="welcome-title">Oi, Anna!</h1>
-    <p class="welcome-subtitle">Pronta para estudar hoje? Você está indo super bem!</p>
-  </div>
-  <div class="quick-stats">
-    <div class="stat-item">
-      <mat-icon>local_fire_department</mat-icon>
-      <span class="stat-value">{{ progress().streak }}</span>
-      <span class="stat-label">dias seguidos</span>
+  <div class="welcome-top">
+    <div class="welcome-intro">
+      <img src="anna-com-livros.png" alt="Anna Beatriz segurando livros" class="anna-avatar" />
+      <div class="welcome-content">
+        <h1 class="welcome-title">Oi, Anna!</h1>
+        <p class="welcome-subtitle">
+          Acredito no seu potencial. Você é inteligente, dedicada e capaz de conquistar
+          tudo o que quiser. Este app foi feito especialmente pra te ajudar a brilhar nos seus
+          próximos desafios!
+        </p>
+        <p class="welcome-signature">
+          <mat-icon>favorite</mat-icon>
+          Com todo o amor, do seu irmão
+        </p>
+      </div>
     </div>
-    <div class="stat-item">
-      <mat-icon>check_circle</mat-icon>
-      <span class="stat-value">{{ progress().totalAnswered }}</span>
-      <span class="stat-label">questões</span>
-    </div>
-    <div class="stat-item">
-      <mat-icon>emoji_events</mat-icon>
-      <span class="stat-value">{{ accuracyPercent }}%</span>
-      <span class="stat-label">acerto</span>
-    </div>
-  </div>
-</div>
-
-<section class="anna-section animate-fade-in-up">
-  <div class="anna-card">
-    <div class="anna-image-wrapper">
-      <img src="anna-com-livros.png" alt="Anna Beatriz segurando livros" class="anna-image" />
-    </div>
-    <div class="anna-text">
-      <h2 class="anna-title">Feito com carinho para você, Anna!</h2>
-      <p class="anna-message">
-        Eu acredito muito no seu potencial. Você é inteligente, dedicada e capaz de conquistar tudo
-        o que quiser. Este app foi criado especialmente para te ajudar a se preparar para suas
-        próximas avaliações — porque você merece as melhores ferramentas para brilhar.
-      </p>
-      <p class="anna-message">
-        Cada questão que você resolve aqui é um passo a mais rumo à sua aprovação.
-        Continue firme, estude no seu ritmo, e lembre-se: eu estarei sempre torcendo por você!
-      </p>
-      <div class="anna-signature">
-        <mat-icon>favorite</mat-icon>
-        <span>Com todo o amor do seu irmão</span>
+    <div class="quick-stats">
+      <div class="stat-item">
+        <mat-icon>local_fire_department</mat-icon>
+        <span class="stat-value">{{ progress().streak }}</span>
+        <span class="stat-label">dias seguidos</span>
+      </div>
+      <div class="stat-item">
+        <mat-icon>check_circle</mat-icon>
+        <span class="stat-value">{{ progress().totalAnswered }}</span>
+        <span class="stat-label">questões</span>
+      </div>
+      <div class="stat-item">
+        <mat-icon>emoji_events</mat-icon>
+        <span class="stat-value">{{ accuracyPercent }}%</span>
+        <span class="stat-label">acerto</span>
       </div>
     </div>
   </div>
-</section>
+</div>
 
 <section class="section">
   <h2 class="section-title">

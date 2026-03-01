@@ -21,6 +21,26 @@ export const MOCK_EXAMS: Exam[] = [
     questionCount: 180,
     subjectCount: 4,
   },
+  {
+    id: '3',
+    name: 'A Criar',
+    description:
+      'Ainda sem descrição, é necessário adicionar o novo exame.',
+    year: 2026,
+    institution: 'A Criar',
+    questionCount: 0,
+    subjectCount: 0,
+  },
+  {
+    id: '4',
+    name: 'A Criar',
+    description:
+      'Ainda sem descrição, é necessário adicionar o novo exame.',
+    year: 2026,
+    institution: 'A Criar',
+    questionCount: 0,
+    subjectCount: 0,
+  },
 ];
 
 export const MOCK_SUBJECTS: Subject[] = [
