@@ -7,6 +7,7 @@ import { TopicModule } from './topic/topic.module';
 import { QuestionModule } from './question/question.module';
 import { AnswerModule } from './answer/answer.module';
 import { ProgressModule } from './progress/progress.module';
+import { MockExamModule } from './mock-exam/mock-exam.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { ProgressModule } from './progress/progress.module';
     QuestionModule,
     AnswerModule,
     ProgressModule,
+    MockExamModule,
   ],
 })
 export class AppModule {}
