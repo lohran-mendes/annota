@@ -39,10 +39,26 @@ annota/
           features/       # home, study, progress, mock-exam, admin
           layout/         # user-shell, admin-shell
           shared/         # not-found
-    api/                  # @annota/api - NestJS 11 backend (scaffold minimo)
+    api/                  # @annota/api - NestJS 11 backend
+      src/
+        main.ts           # bootstrap (prefix /api, CORS, validation)
+        app.module.ts     # root module
+        common/           # filters (MongoException), pipes (ParseObjectId)
+        exam/             # ExamModule - CRUD de provas
+        subject/          # SubjectModule - CRUD de materias (ref Exam)
+        topic/            # TopicModule - CRUD de topicos (ref Subject)
+        question/         # QuestionModule - CRUD de questoes (ref Topic, Subject)
+        answer/           # AnswerModule - submissao de respostas
+        progress/         # ProgressModule - progresso do usuario
+        mock-exam/        # MockExamModule - simulados com timer
+        seed.ts           # script de seed do banco
+      .env                # variaveis de ambiente (nao commitado)
+      .env.example        # exemplo de variaveis
   libs/
     shared/               # @annota/shared - tipos e interfaces compartilhados
-      src/index.ts        # barrel export
+      src/
+        index.ts          # barrel export (entidades)
+        api-contracts.ts  # DTOs e tipos de request/response da API
 ```
 
 ## Modelo de dados (hierarquia de conteudo)
@@ -101,7 +117,7 @@ Prova (Exam)
 - Build com `--base-href /annota/` para subpath do GitHub Pages.
 - SPA routing via `404.html` customizado que redireciona para `index.html`.
 - URL: https://lohran-mendes.github.io/annota/
-- **Backend**: Ainda nao definido.
+- **Backend**: MongoDB Atlas (cluster gratuito). Conexao via MONGODB_URI no `.env`.
 
 ## Convencoes de codigo
 
@@ -147,6 +163,9 @@ npm run test:api         # Jest (NestJS)
 # Executar comando em workspace especifico
 npm run <script> -w @annota/web
 npm run <script> -w @annota/api
+
+# Seed do banco de dados
+npm run seed -w @annota/api    # Popular MongoDB com dados de exemplo
 ```
 
 ## Notas para o Claude Code
