@@ -13,6 +13,10 @@ export class SubjectService {
     private readonly examService: ExamService,
   ) {}
 
+  async findAll(): Promise<Subject[]> {
+    return this.subjectModel.find().exec();
+  }
+
   async findByExam(examId: string): Promise<Subject[]> {
     return this.subjectModel.find({ examId }).exec();
   }

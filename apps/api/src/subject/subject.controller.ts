@@ -17,6 +17,12 @@ import { UpdateSubjectDto } from './dto/update-subject.dto';
 export class SubjectController {
   constructor(private readonly subjectService: SubjectService) {}
 
+  @Get('subjects')
+  async findAll() {
+    const subjects = await this.subjectService.findAll();
+    return { data: subjects, total: subjects.length };
+  }
+
   @Get('exams/:examId/subjects')
   async findByExam(@Param('examId') examId: string) {
     const subjects = await this.subjectService.findByExam(examId);

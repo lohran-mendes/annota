@@ -3,33 +3,45 @@
     <h1>Gerenciar Questões</h1>
     <p class="page-subtitle">Cadastre e edite as questões do banco</p>
   </div>
-  <button mat-flat-button color="primary" class="add-btn">
+  <button mat-flat-button color="primary" class="add-btn" (click)="openCreateDialog()">
     <mat-icon>add</mat-icon>
     Nova Questão
   </button>
 </div>
 
-<div class="question-list">
-  @for (q of questions(); track q.id; let i = $index) {
-    <mat-card class="question-card stagger-{{ i + 1 }}">
-      <mat-card-content>
-        <div class="question-header">
-          <mat-chip-set>
-            <mat-chip class="subject-chip">{{ q.subjectName }}</mat-chip>
-            <mat-chip class="topic-chip">{{ q.topicName }}</mat-chip>
-          </mat-chip-set>
-          <div class="question-actions">
-            <button mat-icon-button color="primary">
-              <mat-icon>edit</mat-icon>
-            </button>
-            <button mat-icon-button color="warn">
-              <mat-icon>delete</mat-icon>
-            </button>
+@if (loading()) {
+  <div class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+} @else if (questions().length === 0) {
+  <mat-card class="empty-state">
+    <mat-icon>help_outline</mat-icon>
+    <p>Nenhuma questão cadastrada ainda.</p>
+    <button mat-stroked-button color="primary" (click)="openCreateDialog()">Criar primeira questão</button>
+  </mat-card>
+} @else {
+  <div class="question-list">
+    @for (q of questions(); track q.id; let i = $index) {
+      <mat-card class="question-card stagger-{{ i + 1 }}">
+        <mat-card-content>
+          <div class="question-header">
+            <mat-chip-set>
+              <mat-chip class="subject-chip">{{ q.subjectName }}</mat-chip>
+              <mat-chip class="topic-chip">{{ q.topicName }}</mat-chip>
+            </mat-chip-set>
+            <div class="question-actions">
+              <button mat-icon-button color="primary" (click)="openEditDialog(q)">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" (click)="confirmDelete(q)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
           </div>
-        </div>
-        <p class="question-text">{{ q.statement }}</p>
-        <span class="alt-count">{{ q.alternativeCount }} alternativas</span>
-      </mat-card-content>
-    </mat-card>
-  }
-</div>
+          <p class="question-text">{{ q.statement }}</p>
+          <span class="alt-count">{{ q.alternativeCount }} alternativas</span>
+        </mat-card-content>
+      </mat-card>
+    }
+  </div>
+}

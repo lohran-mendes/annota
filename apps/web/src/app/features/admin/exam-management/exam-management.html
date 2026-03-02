@@ -3,49 +3,63 @@
     <h1>Gerenciar Provas</h1>
     <p class="page-subtitle">Cadastre e edite as provas disponíveis</p>
   </div>
-  <button mat-flat-button color="primary" class="add-btn">
+  <button mat-flat-button color="primary" class="add-btn" (click)="openCreateDialog()">
     <mat-icon>add</mat-icon>
     Nova Prova
   </button>
 </div>
 
-<mat-card class="table-card animate-fade-in-up">
-  <table mat-table [dataSource]="exams()" class="data-table">
-    <ng-container matColumnDef="name">
-      <th mat-header-cell *matHeaderCellDef>Nome</th>
-      <td mat-cell *matCellDef="let exam">
-        <span class="cell-primary">{{ exam.name }}</span>
-      </td>
-    </ng-container>
+@if (loading()) {
+  <div class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+} @else {
+  <mat-card class="table-card animate-fade-in-up">
+    @if (exams().length === 0) {
+      <div class="empty-state">
+        <mat-icon>school</mat-icon>
+        <p>Nenhuma prova cadastrada ainda.</p>
+        <button mat-stroked-button color="primary" (click)="openCreateDialog()">Criar primeira prova</button>
+      </div>
+    } @else {
+      <table mat-table [dataSource]="exams()" class="data-table">
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>Nome</th>
+          <td mat-cell *matCellDef="let exam">
+            <span class="cell-primary">{{ exam.name }}</span>
+          </td>
+        </ng-container>
 
-    <ng-container matColumnDef="institution">
-      <th mat-header-cell *matHeaderCellDef>Instituição</th>
-      <td mat-cell *matCellDef="let exam">{{ exam.institution }}</td>
-    </ng-container>
+        <ng-container matColumnDef="institution">
+          <th mat-header-cell *matHeaderCellDef>Instituição</th>
+          <td mat-cell *matCellDef="let exam">{{ exam.institution }}</td>
+        </ng-container>
 
-    <ng-container matColumnDef="year">
-      <th mat-header-cell *matHeaderCellDef>Ano</th>
-      <td mat-cell *matCellDef="let exam">{{ exam.year }}</td>
-    </ng-container>
+        <ng-container matColumnDef="year">
+          <th mat-header-cell *matHeaderCellDef>Ano</th>
+          <td mat-cell *matCellDef="let exam">{{ exam.year }}</td>
+        </ng-container>
 
-    <ng-container matColumnDef="questions">
-      <th mat-header-cell *matHeaderCellDef>Questões</th>
-      <td mat-cell *matCellDef="let exam">{{ exam.questionCount }}</td>
-    </ng-container>
+        <ng-container matColumnDef="questions">
+          <th mat-header-cell *matHeaderCellDef>Questões</th>
+          <td mat-cell *matCellDef="let exam">{{ exam.questionCount }}</td>
+        </ng-container>
 
-    <ng-container matColumnDef="actions">
-      <th mat-header-cell *matHeaderCellDef>Ações</th>
-      <td mat-cell *matCellDef="let exam">
-        <button mat-icon-button color="primary">
-          <mat-icon>edit</mat-icon>
-        </button>
-        <button mat-icon-button color="warn">
-          <mat-icon>delete</mat-icon>
-        </button>
-      </td>
-    </ng-container>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Ações</th>
+          <td mat-cell *matCellDef="let exam">
+            <button mat-icon-button color="primary" (click)="openEditDialog(exam)">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="confirmDelete(exam)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
 
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-  </table>
-</mat-card>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    }
+  </mat-card>
+}

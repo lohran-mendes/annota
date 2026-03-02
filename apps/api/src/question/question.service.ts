@@ -18,6 +18,10 @@ export class QuestionService {
     private readonly examService: ExamService,
   ) {}
 
+  async findAll(): Promise<Question[]> {
+    return this.questionModel.find().exec();
+  }
+
   async findByTopic(topicId: string): Promise<Question[]> {
     return this.questionModel.find({ topicId }).exec();
   }

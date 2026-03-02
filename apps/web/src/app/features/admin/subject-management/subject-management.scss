@@ -60,6 +60,31 @@
   border-radius: 50%;
 }
 
+.loading-container {
+  display: flex;
+  justify-content: center;
+  padding: 48px 0;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 24px;
+  color: var(--annota-text-light);
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px;
+  }
+
+  p {
+    margin: 0 0 16px;
+  }
+}
+
 @media (max-width: 599px) {
   .page-header {
     flex-direction: column;

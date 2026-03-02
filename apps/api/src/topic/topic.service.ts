@@ -11,6 +11,10 @@ export class TopicService {
     @InjectModel(Topic.name) private topicModel: Model<TopicDocument>,
   ) {}
 
+  async findAll(): Promise<Topic[]> {
+    return this.topicModel.find().exec();
+  }
+
   async findBySubject(subjectId: string): Promise<Topic[]> {
     return this.topicModel.find({ subjectId }).exec();
   }

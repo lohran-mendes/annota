@@ -3,53 +3,67 @@
     <h1>Gerenciar Matérias</h1>
     <p class="page-subtitle">Cadastre e edite as matérias de cada prova</p>
   </div>
-  <button mat-flat-button color="primary" class="add-btn">
+  <button mat-flat-button color="primary" class="add-btn" (click)="openCreateDialog()">
     <mat-icon>add</mat-icon>
     Nova Matéria
   </button>
 </div>
 
-<mat-card class="table-card animate-fade-in-up">
-  <table mat-table [dataSource]="subjects()" class="data-table">
-    <ng-container matColumnDef="color">
-      <th mat-header-cell *matHeaderCellDef>Cor</th>
-      <td mat-cell *matCellDef="let subject">
-        <div class="color-dot" [style.background-color]="subject.color"></div>
-      </td>
-    </ng-container>
+@if (loading()) {
+  <div class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+} @else {
+  <mat-card class="table-card animate-fade-in-up">
+    @if (subjects().length === 0) {
+      <div class="empty-state">
+        <mat-icon>menu_book</mat-icon>
+        <p>Nenhuma matéria cadastrada ainda.</p>
+        <button mat-stroked-button color="primary" (click)="openCreateDialog()">Criar primeira matéria</button>
+      </div>
+    } @else {
+      <table mat-table [dataSource]="subjects()" class="data-table">
+        <ng-container matColumnDef="color">
+          <th mat-header-cell *matHeaderCellDef>Cor</th>
+          <td mat-cell *matCellDef="let subject">
+            <div class="color-dot" [style.background-color]="subject.color"></div>
+          </td>
+        </ng-container>
 
-    <ng-container matColumnDef="name">
-      <th mat-header-cell *matHeaderCellDef>Nome</th>
-      <td mat-cell *matCellDef="let subject">
-        <span class="cell-primary">{{ subject.name }}</span>
-      </td>
-    </ng-container>
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>Nome</th>
+          <td mat-cell *matCellDef="let subject">
+            <span class="cell-primary">{{ subject.name }}</span>
+          </td>
+        </ng-container>
 
-    <ng-container matColumnDef="icon">
-      <th mat-header-cell *matHeaderCellDef>Ícone</th>
-      <td mat-cell *matCellDef="let subject">
-        <mat-icon>{{ subject.icon }}</mat-icon>
-      </td>
-    </ng-container>
+        <ng-container matColumnDef="icon">
+          <th mat-header-cell *matHeaderCellDef>Ícone</th>
+          <td mat-cell *matCellDef="let subject">
+            <mat-icon>{{ subject.icon }}</mat-icon>
+          </td>
+        </ng-container>
 
-    <ng-container matColumnDef="questions">
-      <th mat-header-cell *matHeaderCellDef>Questões</th>
-      <td mat-cell *matCellDef="let subject">{{ subject.questionCount }}</td>
-    </ng-container>
+        <ng-container matColumnDef="questions">
+          <th mat-header-cell *matHeaderCellDef>Questões</th>
+          <td mat-cell *matCellDef="let subject">{{ subject.questionCount }}</td>
+        </ng-container>
 
-    <ng-container matColumnDef="actions">
-      <th mat-header-cell *matHeaderCellDef>Ações</th>
-      <td mat-cell *matCellDef="let subject">
-        <button mat-icon-button color="primary">
-          <mat-icon>edit</mat-icon>
-        </button>
-        <button mat-icon-button color="warn">
-          <mat-icon>delete</mat-icon>
-        </button>
-      </td>
-    </ng-container>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Ações</th>
+          <td mat-cell *matCellDef="let subject">
+            <button mat-icon-button color="primary" (click)="openEditDialog(subject)">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="confirmDelete(subject)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
 
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-  </table>
-</mat-card>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    }
+  </mat-card>
+}

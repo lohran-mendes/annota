@@ -17,6 +17,12 @@ import { UpdateQuestionDto } from './dto/update-question.dto';
 export class QuestionController {
   constructor(private readonly questionService: QuestionService) {}
 
+  @Get('questions')
+  async findAll() {
+    const questions = await this.questionService.findAll();
+    return { data: questions, total: questions.length };
+  }
+
   @Get('topics/:topicId/questions')
   async findByTopic(@Param('topicId') topicId: string) {
     const questions = await this.questionService.findByTopic(topicId);

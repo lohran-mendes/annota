@@ -17,6 +17,12 @@ import { UpdateTopicDto } from './dto/update-topic.dto';
 export class TopicController {
   constructor(private readonly topicService: TopicService) {}
 
+  @Get('topics')
+  async findAll() {
+    const topics = await this.topicService.findAll();
+    return { data: topics, total: topics.length };
+  }
+
   @Get('subjects/:subjectId/topics')
   async findBySubject(@Param('subjectId') subjectId: string) {
     const topics = await this.topicService.findBySubject(subjectId);
