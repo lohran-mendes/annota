@@ -1,4 +1,4 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -7,6 +7,9 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatDividerModule } from '@angular/material/divider';
 import { FormsModule } from '@angular/forms';
 import { MOCK_QUESTIONS } from '../../../core/mock-data';
+import { QuestionService } from '../../../core/services/question.service';
+import { AnswerService } from '../../../core/services/answer.service';
+import { mergeWithMock } from '../../../core/utils/data-merge';
 import type { Question } from '@annota/shared';
 
 @Component({
@@ -23,13 +26,31 @@ import type { Question } from '@annota/shared';
   templateUrl: './question-solver.html',
   styleUrl: './question-solver.scss',
 })
-export class QuestionSolver {
+export class QuestionSolver implements OnInit {
+  private readonly questionService = inject(QuestionService);
+  private readonly answerService = inject(AnswerService);
+
   questions = signal<Question[]>(MOCK_QUESTIONS);
   currentIndex = signal(0);
   selectedAnswer = signal<number | null>(null);
   answered = signal(false);
+  loading = signal(false);
 
   currentQuestion = computed(() => this.questions()[this.currentIndex()]);
+
+  ngOnInit() {
+    this.loading.set(true);
+    this.questionService.getAll().subscribe({
+      next: (res) => {
+        this.questions.set(mergeWithMock(res.data, MOCK_QUESTIONS));
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('Failed to load questions from API, using mock data:', err);
+        this.loading.set(false);
+      },
+    });
+  }
 
   get isCorrect(): boolean {
     return this.selectedAnswer() === this.currentQuestion().correctAnswerIndex;
@@ -48,6 +69,16 @@ export class QuestionSolver {
   checkAnswer() {
     if (this.selectedAnswer() !== null) {
       this.answered.set(true);
+      this.answerService
+        .submitAnswer({
+          questionId: this.currentQuestion().id,
+          selectedIndex: this.selectedAnswer()!,
+        })
+        .subscribe({
+          error: (err) => {
+            console.error('Failed to submit answer to API:', err);
+          },
+        });
     }
   }
 

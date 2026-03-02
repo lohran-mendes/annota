@@ -1,10 +1,12 @@
-import { Component, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MOCK_MOCK_EXAMS } from '../../../core/mock-data';
+import { MockExamService } from '../../../core/services/mock-exam.service';
+import { mergeWithMock } from '../../../core/utils/data-merge';
 import type { MockExamConfig } from '@annota/shared';
 
 @Component({
@@ -13,10 +15,19 @@ import type { MockExamConfig } from '@annota/shared';
   templateUrl: './mock-exam-setup.html',
   styleUrl: './mock-exam-setup.scss',
 })
-export class MockExamSetup {
-  mockExams = signal<MockExamConfig[]>(MOCK_MOCK_EXAMS);
+export class MockExamSetup implements OnInit {
+  private readonly router = inject(Router);
+  private readonly mockExamService = inject(MockExamService);
 
-  constructor(private router: Router) {}
+  mockExams = signal<MockExamConfig[]>(MOCK_MOCK_EXAMS);
+  loading = signal(false);
+
+  ngOnInit(): void {
+    // TODO: load from API when exam context is available.
+    // MockExamService.getByExam() requires an examId query param, so we
+    // cannot query all mock-exams without a specific exam selected.
+    // For now MOCK_MOCK_EXAMS is the default value set above.
+  }
 
   startExam(exam: MockExamConfig) {
     this.router.navigate(['/mock-exam', exam.id]);
