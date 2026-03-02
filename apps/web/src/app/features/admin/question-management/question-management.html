@@ -20,28 +20,90 @@
     <button mat-stroked-button color="primary" (click)="openCreateDialog()">Criar primeira questão</button>
   </mat-card>
 } @else {
-  <div class="question-list">
-    @for (q of questions(); track q.id; let i = $index) {
-      <mat-card class="question-card stagger-{{ i + 1 }}">
-        <mat-card-content>
-          <div class="question-header">
-            <mat-chip-set>
-              <mat-chip class="subject-chip">{{ q.subjectName }}</mat-chip>
-              <mat-chip class="topic-chip">{{ q.topicName }}</mat-chip>
-            </mat-chip-set>
-            <div class="question-actions">
-              <button mat-icon-button color="primary" (click)="openEditDialog(q)">
-                <mat-icon>edit</mat-icon>
-              </button>
-              <button mat-icon-button color="warn" (click)="confirmDelete(q)">
-                <mat-icon>delete</mat-icon>
-              </button>
+  <mat-accordion class="subject-accordion" multi>
+    @for (group of groupedBySubject(); track group.subject.id) {
+      <mat-expansion-panel
+        [disabled]="group.questionCount === 0"
+        class="subject-panel">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <div class="subject-header-content">
+              <span class="subject-color-dot" [style.background-color]="group.subject.color"></span>
+              <mat-icon class="subject-icon">{{ group.subject.icon }}</mat-icon>
+              <span class="subject-name">{{ group.subject.name }}</span>
             </div>
-          </div>
-          <p class="question-text">{{ q.statement }}</p>
-          <span class="alt-count">{{ q.alternativeCount }} alternativas</span>
-        </mat-card-content>
-      </mat-card>
+          </mat-panel-title>
+          <mat-panel-description>
+            {{ group.questionCount }} {{ group.questionCount === 1 ? 'questão' : 'questões' }}
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+
+        @if (group.questionCount === 0) {
+          <p class="empty-topic-message">Nenhuma questão nesta matéria.</p>
+        } @else {
+          <mat-accordion class="topic-accordion" multi>
+            @for (topicGroup of group.topics; track topicGroup.topic.id) {
+              @if (topicGroup.questions.length > 0) {
+                <mat-expansion-panel class="topic-panel">
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>{{ topicGroup.topic.name }}</mat-panel-title>
+                    <mat-panel-description>
+                      {{ topicGroup.questions.length }} {{ topicGroup.questions.length === 1 ? 'questão' : 'questões' }}
+                    </mat-panel-description>
+                  </mat-expansion-panel-header>
+
+                  <div class="question-list">
+                    @for (q of topicGroup.questions; track q.id) {
+                      <mat-card class="question-card">
+                        <mat-card-content>
+                          <div class="question-header">
+                            <p class="question-text">{{ q.statement }}</p>
+                            <div class="question-actions">
+                              <button mat-icon-button color="primary" (click)="openEditDialog(q)">
+                                <mat-icon>edit</mat-icon>
+                              </button>
+                              <button mat-icon-button color="warn" (click)="confirmDelete(q)">
+                                <mat-icon>delete</mat-icon>
+                              </button>
+                            </div>
+                          </div>
+                          <span class="alt-count">{{ q.alternativeCount }} alternativas</span>
+                        </mat-card-content>
+                      </mat-card>
+                    }
+                  </div>
+                </mat-expansion-panel>
+              }
+            }
+          </mat-accordion>
+        }
+      </mat-expansion-panel>
     }
-  </div>
+  </mat-accordion>
+
+  @if (orphanQuestions().length > 0) {
+    <div class="orphan-section">
+      <h3>Questões sem matéria associada</h3>
+      <div class="question-list">
+        @for (q of orphanQuestions(); track q.id) {
+          <mat-card class="question-card">
+            <mat-card-content>
+              <div class="question-header">
+                <p class="question-text">{{ q.statement }}</p>
+                <div class="question-actions">
+                  <button mat-icon-button color="primary" (click)="openEditDialog(q)">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-icon-button color="warn" (click)="confirmDelete(q)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </div>
+              <span class="alt-count">{{ q.alternativeCount }} alternativas</span>
+            </mat-card-content>
+          </mat-card>
+        }
+      </div>
+    </div>
+  }
 }

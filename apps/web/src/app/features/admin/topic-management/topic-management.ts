@@ -1,11 +1,12 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatTableModule } from '@angular/material/table';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { forkJoin } from 'rxjs';
 import { TopicService } from '../../../core/services/topic.service';
 import { SubjectService } from '../../../core/services/subject.service';
 import { TopicDialog } from '../dialogs/topic-dialog';
@@ -21,9 +22,14 @@ interface TopicRow {
   questionCount: number;
 }
 
+interface SubjectGroup {
+  subject: Subject;
+  topics: TopicRow[];
+}
+
 @Component({
   selector: 'annota-topic-management',
-  imports: [MatCardModule, MatButtonModule, MatIconModule, MatTableModule, MatProgressSpinnerModule],
+  imports: [MatCardModule, MatButtonModule, MatIconModule, MatExpansionModule, MatProgressSpinnerModule],
   templateUrl: './topic-management.html',
   styleUrl: './topic-management.scss',
 })
@@ -36,7 +42,16 @@ export class TopicManagement implements OnInit {
   topics = signal<TopicRow[]>([]);
   subjects = signal<Subject[]>([]);
   loading = signal(false);
-  displayedColumns = ['name', 'subject', 'questions', 'actions'];
+
+  groupedBySubject = computed<SubjectGroup[]>(() => {
+    const subjects = this.subjects();
+    const topics = this.topics();
+
+    return subjects.map((subject) => ({
+      subject,
+      topics: topics.filter((t) => t.subjectId === subject.id),
+    }));
+  });
 
   ngOnInit() {
     this.loadData();
@@ -44,47 +59,40 @@ export class TopicManagement implements OnInit {
 
   loadData() {
     this.loading.set(true);
-    this.subjectService.getAll().subscribe({
-      next: (res) => {
-        this.subjects.set(res.data);
-        this.loadTopics(res.data);
-      },
-      error: () => {
-        this.subjects.set(MOCK_SUBJECTS);
-        this.loadTopicsFallback();
-      },
-    });
-  }
 
-  private loadTopics(subjects: Subject[]) {
-    this.topicService.getAll().subscribe({
-      next: (res) => {
+    forkJoin({
+      subjects: this.subjectService.getAll(),
+      topics: this.topicService.getAll(),
+    }).subscribe({
+      next: ({ subjects, topics }) => {
+        const subjectList = subjects.data.length ? subjects.data : MOCK_SUBJECTS;
+        const topicList = topics.data.length ? topics.data : MOCK_TOPICS;
+        this.subjects.set(subjectList);
         this.topics.set(
-          res.data.map((t) => ({
+          topicList.map((t) => ({
             id: t.id,
             name: t.name,
             subjectId: t.subjectId,
-            subjectName: subjects.find((s) => s.id === t.subjectId)?.name ?? '—',
+            subjectName: subjectList.find((s) => s.id === t.subjectId)?.name ?? '—',
             questionCount: t.questionCount,
           })),
         );
         this.loading.set(false);
       },
-      error: () => this.loadTopicsFallback(),
+      error: () => {
+        this.subjects.set(MOCK_SUBJECTS);
+        this.topics.set(
+          MOCK_TOPICS.map((t) => ({
+            id: t.id,
+            name: t.name,
+            subjectId: t.subjectId,
+            subjectName: MOCK_SUBJECTS.find((s) => s.id === t.subjectId)?.name ?? '—',
+            questionCount: t.questionCount,
+          })),
+        );
+        this.loading.set(false);
+      },
     });
-  }
-
-  private loadTopicsFallback() {
-    this.topics.set(
-      MOCK_TOPICS.map((t) => ({
-        id: t.id,
-        name: t.name,
-        subjectId: t.subjectId,
-        subjectName: MOCK_SUBJECTS.find((s) => s.id === t.subjectId)?.name ?? '—',
-        questionCount: t.questionCount,
-      })),
-    );
-    this.loading.set(false);
   }
 
   openCreateDialog() {
