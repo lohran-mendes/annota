@@ -33,7 +33,10 @@ annota/
       deploy.yml          # GitHub Actions - deploy automatico no GitHub Pages
   apps/
     web/                  # @annota/web - Angular 21 frontend (standalone, signals)
+      .env                # variaveis de ambiente (nao commitado)
+      .env.example        # exemplo de variaveis
       src/
+        env.d.ts          # tipagem das variaveis de ambiente
         app/
           core/           # mock-data, services (skeleton)
           features/       # home, study, progress, mock-exam, admin
@@ -118,6 +121,26 @@ Prova (Exam)
 - SPA routing via `404.html` customizado que redireciona para `index.html`.
 - URL: https://lohran-mendes.github.io/annota/
 - **Backend**: MongoDB Atlas (cluster gratuito). Conexao via MONGODB_URI no `.env`.
+
+## Variaveis de ambiente
+
+### Frontend (Angular) — `@ngx-env/builder`
+- Arquivo `.env` em `apps/web/.env` (nao commitado, ver `.env.example`)
+- Variaveis DEVEM ter prefixo `NG_APP_` (ex: `NG_APP_API_URL`)
+- Acessar via `import.meta.env.NG_APP_*` no codigo
+- **Sempre usar fallback**: `import.meta.env.NG_APP_API_URL ?? 'http://localhost:3000/api'`
+- Tipagem em `apps/web/src/env.d.ts` — adicionar novas variaveis la
+- NUNCA hardcodar URLs de API nos services. Usar `import.meta.env`
+
+### Backend (NestJS) — `@nestjs/config`
+- Arquivo `.env` em `apps/api/.env` (nao commitado, ver `.env.example`)
+- Acessar via `ConfigService.get('VAR_NAME', 'fallback')` ou `process.env.VAR_NAME ?? 'fallback'`
+- **Sempre usar fallback/default values**
+
+### Regra geral
+- Todo valor que muda entre ambientes (URLs, portas, chaves) DEVE vir de variavel de ambiente
+- Sempre fornecer um valor de fallback para desenvolvimento local
+- Nunca commitar `.env` — apenas `.env.example` com valores de exemplo
 
 ## Convencoes de codigo
 

@@ -5,7 +5,7 @@ import type { Exam, ApiListResponse, ApiResponse, CreateExamDto, UpdateExamDto }
 @Injectable({ providedIn: 'root' })
 export class ExamService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:3000/api';
+  private readonly apiUrl = import.meta.env.NG_APP_API_URL ?? 'http://localhost:3000/api';
 
   getAll() {
     return this.http.get<ApiListResponse<Exam>>(`${this.apiUrl}/exams`);

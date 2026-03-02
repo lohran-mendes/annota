@@ -10,7 +10,7 @@
   "scripts": {
     "dev:web": "npm run start -w @annota/web",
     "dev:api": "npm run start:dev -w @annota/api",
-    "dev": "npm run dev:web & npm run dev:api",
+    "dev": "npm run dev:web & npm run dev:api & wait",
     "build:web": "npm run build -w @annota/web",
     "build:ghpages": "npm run build:ghpages -w @annota/web",
     "build:api": "npm run build -w @annota/api",
