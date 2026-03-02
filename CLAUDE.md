@@ -168,6 +168,39 @@ npm run <script> -w @annota/api
 npm run seed -w @annota/api    # Popular MongoDB com dados de exemplo
 ```
 
+## Skills (comandos rapidos)
+
+Use `/skill-name` para executar:
+
+| Skill | Uso | Descricao |
+|-------|-----|-----------|
+| `/api-module` | `/api-module user-auth` | Cria modulo NestJS completo (schema, controller, service, DTOs) |
+| `/angular-feature` | `/angular-feature dashboard` | Cria feature Angular completa (components, routes, service) |
+| `/test` | `/test web`, `/test api`, `/test all` | Roda testes do projeto |
+| `/seed` | `/seed run`, `/seed update` | Gerencia seed do banco de dados |
+| `/dev` | `/dev web`, `/dev api`, `/dev all` | Inicia servidores de desenvolvimento |
+
+## Agents especializados
+
+Agents sao invocados automaticamente pelo Claude quando relevante:
+
+| Agent | Quando usar |
+|-------|-------------|
+| `frontend-dev` | Trabalho com Angular: componentes, services, rotas, UI |
+| `backend-dev` | Trabalho com NestJS: modulos, endpoints, schemas, banco |
+| `code-reviewer` | Revisao de qualidade, seguranca e convencoes |
+
+## Rules (regras contextuais)
+
+Regras carregadas automaticamente conforme os arquivos sendo editados:
+
+| Rule | Ativa quando |
+|------|-------------|
+| `angular.md` | Editando arquivos em `apps/web/` |
+| `nestjs.md` | Editando arquivos em `apps/api/` |
+| `shared-types.md` | Editando arquivos em `libs/shared/` |
+| `testing.md` | Editando arquivos `*.spec.ts` ou `*.test.ts` |
+
 ## Notas para o Claude Code
 
 - Este e um projeto de aprendizado. Priorizar clareza e boas praticas sobre otimizacao prematura.
@@ -176,3 +209,6 @@ npm run seed -w @annota/api    # Popular MongoDB com dados de exemplo
 - Nao adicionar dependencias desnecessarias.
 - Ao criar novos arquivos, seguir a estrutura de pastas definida acima.
 - Usar os padroes mais recentes do Angular (signals, standalone, control flow @if/@for) e NestJS.
+- IMPORTANTE: Ao criar novos modulos backend, usar `/api-module`. Ao criar features frontend, usar `/angular-feature`.
+- IMPORTANTE: Sempre atualizar `libs/shared/src/` ao adicionar novas entidades.
+- Fluxo recomendado para nova feature: tipos compartilhados → backend → frontend → testes → review.
