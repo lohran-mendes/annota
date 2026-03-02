@@ -34,6 +34,7 @@ export interface CreateExamDto {
   description: string;
   year: number;
   institution: string;
+  duration: number;
 }
 
 export interface UpdateExamDto {
@@ -41,6 +42,7 @@ export interface UpdateExamDto {
   description?: string;
   year?: number;
   institution?: string;
+  duration?: number;
 }
 
 // ============================================================
@@ -232,7 +234,7 @@ export interface MockExamQuestionResult {
 //   GET    /api/progress/exams/:examId          → ApiResponse<ExamProgress>
 //
 // Mock Exams:
-//   GET    /api/mock-exams?examId=:examId       → ApiListResponse<MockExamConfig>
+//   GET    /api/mock-exams?examId=:examId       → ApiListResponse<MockExamConfig>  (examId optional)
 //   POST   /api/mock-exams                      → ApiResponse<MockExamSession>
 //   GET    /api/mock-exams/:id                  → ApiResponse<MockExamSession>
 //   POST   /api/mock-exams/:id/submit           → ApiResponse<MockExamResult>

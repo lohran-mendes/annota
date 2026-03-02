@@ -17,4 +17,8 @@ export class CreateExamDto implements ICreateExamDto {
   @IsString()
   @IsNotEmpty()
   institution: string;
+
+  @IsInt()
+  @Min(1)
+  duration: number;
 }

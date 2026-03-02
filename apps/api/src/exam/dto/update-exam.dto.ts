@@ -18,4 +18,9 @@ export class UpdateExamDto implements IUpdateExamDto {
   @IsString()
   @IsOptional()
   institution?: string;
+
+  @IsInt()
+  @Min(1)
+  @IsOptional()
+  duration?: number;
 }

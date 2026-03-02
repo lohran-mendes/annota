@@ -15,8 +15,8 @@ export class MockExamController {
   constructor(private readonly mockExamService: MockExamService) {}
 
   @Get()
-  async findByExam(@Query('examId') examId: string) {
-    const mockExams = await this.mockExamService.findByExam(examId);
+  async findAll(@Query('examId') examId?: string) {
+    const mockExams = await this.mockExamService.findAll(examId);
     return { data: mockExams, total: mockExams.length };
   }
 

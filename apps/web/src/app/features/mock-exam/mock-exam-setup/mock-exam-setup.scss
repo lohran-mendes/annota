@@ -107,6 +107,56 @@
   }
 }
 
+.loading-container {
+  display: flex;
+  justify-content: center;
+  padding: 40px;
+}
+
+.empty-state-card {
+  mat-card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 32px;
+    text-align: center;
+    color: var(--annota-text-light);
+
+    mat-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      opacity: 0.5;
+    }
+  }
+}
+
+.btn-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 100%;
+}
+
+.exam-description {
+  color: var(--annota-text-light);
+  font-size: 0.9rem;
+  margin: 0 0 12px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.status-icon {
+  &.in-progress {
+    color: #ff9800;
+  }
+}
+
 @media (max-width: 599px) {
   .exams-grid {
     grid-template-columns: 1fr;

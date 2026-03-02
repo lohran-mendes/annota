@@ -10,6 +10,7 @@ export const MOCK_EXAMS: Exam[] = [
     institution: 'Centro Paula Souza',
     questionCount: 50,
     subjectCount: 5,
+    duration: 180,
   },
   {
     id: '2',
@@ -20,6 +21,7 @@ export const MOCK_EXAMS: Exam[] = [
     institution: 'INEP/MEC',
     questionCount: 180,
     subjectCount: 4,
+    duration: 330,
   },
   {
     id: '3',
@@ -30,6 +32,7 @@ export const MOCK_EXAMS: Exam[] = [
     institution: 'A Criar',
     questionCount: 0,
     subjectCount: 0,
+    duration: 180,
   },
   {
     id: '4',
@@ -40,6 +43,7 @@ export const MOCK_EXAMS: Exam[] = [
     institution: 'A Criar',
     questionCount: 0,
     subjectCount: 0,
+    duration: 180,
   },
 ];
 

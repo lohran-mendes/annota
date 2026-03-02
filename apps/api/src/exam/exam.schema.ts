@@ -22,6 +22,9 @@ export class Exam {
 
   @Prop({ default: 0 })
   subjectCount: number;
+
+  @Prop({ required: true, default: 180 })
+  duration: number;
 }
 
 export const ExamSchema = SchemaFactory.createForClass(Exam);

@@ -34,6 +34,7 @@ export interface Exam {
   institution: string;
   questionCount: number;
   subjectCount: number;
+  duration: number;
 }
 
 export interface Subject {

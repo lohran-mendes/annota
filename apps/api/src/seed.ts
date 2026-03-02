@@ -10,6 +10,7 @@ const ExamSchema = new mongoose.Schema({
   institution: String,
   questionCount: { type: Number, default: 0 },
   subjectCount: { type: Number, default: 0 },
+  duration: { type: Number, default: 180 },
 });
 
 const SubjectSchema = new mongoose.Schema({
@@ -69,6 +70,7 @@ async function seed() {
     institution: 'Centro Paula Souza',
     questionCount: 8,
     subjectCount: 5,
+    duration: 180,
   });
 
   const exam2 = await Exam.create({
@@ -79,6 +81,7 @@ async function seed() {
     institution: 'INEP/MEC',
     questionCount: 0,
     subjectCount: 0,
+    duration: 330,
   });
 
   console.log(`Exams created: ${exam1.name}, ${exam2.name}`);

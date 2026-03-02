@@ -1,29 +1,71 @@
-import { Component, signal, computed, OnDestroy } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, signal, computed, OnInit, OnDestroy, inject } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
-import { MOCK_QUESTIONS } from '../../../core/mock-data';
-import type { Question } from '@annota/shared';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MockExamService } from '../../../core/services/mock-exam.service';
+import type { MockExamQuestion, MockExamConfig, MockExamAnswer } from '@annota/shared';
 
 @Component({
   selector: 'annota-mock-exam-session',
-  imports: [MatCardModule, MatButtonModule, MatIconModule, MatDividerModule],
+  imports: [
+    MatCardModule, MatButtonModule, MatIconModule,
+    MatDividerModule, MatProgressSpinnerModule, MatSnackBarModule,
+  ],
   templateUrl: './mock-exam-session.html',
   styleUrl: './mock-exam-session.scss',
 })
-export class MockExamSession implements OnDestroy {
-  questions = signal<Question[]>(MOCK_QUESTIONS);
+export class MockExamSession implements OnInit, OnDestroy {
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly mockExamService = inject(MockExamService);
+  private readonly snackBar = inject(MatSnackBar);
+
+  config = signal<MockExamConfig | null>(null);
+  questions = signal<MockExamQuestion[]>([]);
   currentIndex = signal(0);
   answers = signal<Map<number, number>>(new Map());
-  timeRemaining = signal(5400); // 90 min in seconds
-  private timerInterval: ReturnType<typeof setInterval>;
+  timeRemaining = signal(0);
+  loading = signal(true);
+  submitting = signal(false);
+  private timerInterval: ReturnType<typeof setInterval> | null = null;
+  private mockExamId = '';
+  private startTime = 0;
 
   currentQuestion = computed(() => this.questions()[this.currentIndex()]);
   answeredCount = computed(() => this.answers().size);
 
-  constructor(private router: Router) {
+  ngOnInit() {
+    this.mockExamId = this.route.snapshot.paramMap.get('mockExamId') ?? '';
+    this.startTime = Date.now();
+    this.loadSession();
+  }
+
+  ngOnDestroy() {
+    if (this.timerInterval) clearInterval(this.timerInterval);
+  }
+
+  private loadSession() {
+    this.loading.set(true);
+    this.mockExamService.getById(this.mockExamId).subscribe({
+      next: (res) => {
+        this.config.set(res.data.config);
+        this.questions.set(res.data.questions);
+        this.timeRemaining.set(res.data.config.duration * 60);
+        this.loading.set(false);
+        this.startTimer();
+      },
+      error: () => {
+        this.snackBar.open('Erro ao carregar simulado.', 'OK', { duration: 3000 });
+        this.router.navigate(['/mock-exam']);
+      },
+    });
+  }
+
+  private startTimer() {
     this.timerInterval = setInterval(() => {
       this.timeRemaining.update((t) => {
         if (t <= 0) {
@@ -33,10 +75,6 @@ export class MockExamSession implements OnDestroy {
         return t - 1;
       });
     }, 1000);
-  }
-
-  ngOnDestroy() {
-    clearInterval(this.timerInterval);
   }
 
   get formattedTime(): string {
@@ -78,7 +116,37 @@ export class MockExamSession implements OnDestroy {
   }
 
   finishExam() {
-    clearInterval(this.timerInterval);
-    this.router.navigate(['/mock-exam', '1', 'result']);
+    if (this.timerInterval) clearInterval(this.timerInterval);
+    if (this.submitting()) return;
+    this.submitting.set(true);
+
+    const timeSpent = Math.floor((Date.now() - this.startTime) / 1000);
+    const answersMap = this.answers();
+    const questionList = this.questions();
+
+    const answersArray: MockExamAnswer[] = [];
+    answersMap.forEach((selectedIndex, questionIndex) => {
+      const question = questionList[questionIndex];
+      if (question) {
+        answersArray.push({
+          questionId: question.id,
+          selectedIndex,
+        });
+      }
+    });
+
+    this.mockExamService.submit(this.mockExamId, {
+      answers: answersArray,
+      timeSpent,
+    }).subscribe({
+      next: () => {
+        this.submitting.set(false);
+        this.router.navigate(['/mock-exam', this.mockExamId, 'result']);
+      },
+      error: () => {
+        this.submitting.set(false);
+        this.snackBar.open('Erro ao enviar respostas. Tente novamente.', 'OK', { duration: 3000 });
+      },
+    });
   }
 }

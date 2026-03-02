@@ -28,8 +28,9 @@ export class MockExamService {
     private subjectModel: Model<SubjectDocument>,
   ) {}
 
-  async findByExam(examId: string) {
-    return this.mockExamModel.find({ examId }).exec();
+  async findAll(examId?: string) {
+    const filter = examId ? { examId } : {};
+    return this.mockExamModel.find(filter).sort({ createdAt: -1 }).exec();
   }
 
   async create(dto: CreateMockExamDto): Promise<MockExamSession> {

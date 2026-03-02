@@ -39,6 +39,12 @@ export interface ExamDialogData {
         </mat-form-field>
 
         <mat-form-field appearance="outline">
+          <mat-label>Duração (minutos)</mat-label>
+          <input matInput type="number" formControlName="duration" placeholder="180">
+          <mat-hint>Tempo da prova em minutos</mat-hint>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
           <mat-label>Descrição</mat-label>
           <textarea matInput formControlName="description" rows="3"
                     placeholder="Descreva a prova..."></textarea>
@@ -76,6 +82,7 @@ export class ExamDialog {
     name: [this.data.exam?.name ?? '', Validators.required],
     institution: [this.data.exam?.institution ?? '', Validators.required],
     year: [this.data.exam?.year ?? new Date().getFullYear(), [Validators.required, Validators.min(2000)]],
+    duration: [this.data.exam?.duration ?? 180, [Validators.required, Validators.min(1)]],
     description: [this.data.exam?.description ?? '', Validators.required],
   });
 

@@ -4,37 +4,93 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
-import { MOCK_MOCK_EXAMS } from '../../../core/mock-data';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { ExamService } from '../../../core/services/exam.service';
 import { MockExamService } from '../../../core/services/mock-exam.service';
-import { mergeWithMock } from '../../../core/utils/data-merge';
-import type { MockExamConfig } from '@annota/shared';
+import { MOCK_EXAMS, MOCK_MOCK_EXAMS } from '../../../core/mock-data';
+import type { Exam, MockExamConfig } from '@annota/shared';
 
 @Component({
   selector: 'annota-mock-exam-setup',
-  imports: [MatCardModule, MatButtonModule, MatIconModule, MatChipsModule],
+  imports: [
+    MatCardModule, MatButtonModule, MatIconModule,
+    MatChipsModule, MatProgressSpinnerModule, MatSnackBarModule,
+  ],
   templateUrl: './mock-exam-setup.html',
   styleUrl: './mock-exam-setup.scss',
 })
 export class MockExamSetup implements OnInit {
   private readonly router = inject(Router);
+  private readonly examService = inject(ExamService);
   private readonly mockExamService = inject(MockExamService);
+  private readonly snackBar = inject(MatSnackBar);
 
-  mockExams = signal<MockExamConfig[]>(MOCK_MOCK_EXAMS);
-  loading = signal(false);
+  exams = signal<Exam[]>([]);
+  mockExamHistory = signal<MockExamConfig[]>([]);
+  loadingExams = signal(false);
+  loadingHistory = signal(false);
+  startingExam = signal<string | null>(null);
 
   ngOnInit(): void {
-    // TODO: load from API when exam context is available.
-    // MockExamService.getByExam() requires an examId query param, so we
-    // cannot query all mock-exams without a specific exam selected.
-    // For now MOCK_MOCK_EXAMS is the default value set above.
+    this.loadExams();
+    this.loadHistory();
   }
 
-  startExam(exam: MockExamConfig) {
-    this.router.navigate(['/mock-exam', exam.id]);
+  loadExams() {
+    this.loadingExams.set(true);
+    this.examService.getAll().subscribe({
+      next: (res) => {
+        this.exams.set(res.data.filter(e => e.questionCount > 0));
+        this.loadingExams.set(false);
+      },
+      error: () => {
+        this.exams.set(MOCK_EXAMS.filter(e => e.questionCount > 0));
+        this.loadingExams.set(false);
+      },
+    });
   }
 
-  viewResult(exam: MockExamConfig) {
-    this.router.navigate(['/mock-exam', exam.id, 'result']);
+  loadHistory() {
+    this.loadingHistory.set(true);
+    this.mockExamService.getAll().subscribe({
+      next: (res) => {
+        this.mockExamHistory.set(res.data);
+        this.loadingHistory.set(false);
+      },
+      error: () => {
+        this.mockExamHistory.set(MOCK_MOCK_EXAMS);
+        this.loadingHistory.set(false);
+      },
+    });
+  }
+
+  startExam(exam: Exam) {
+    this.startingExam.set(exam.id);
+    const dto = {
+      examId: exam.id,
+      name: `Simulado - ${exam.name}`,
+      questionCount: exam.questionCount,
+      duration: exam.duration,
+    };
+    this.mockExamService.create(dto).subscribe({
+      next: (res) => {
+        this.startingExam.set(null);
+        this.router.navigate(['/mock-exam', res.data.config.id]);
+      },
+      error: () => {
+        this.startingExam.set(null);
+        this.snackBar.open('Erro ao iniciar simulado. Tente novamente.', 'OK', { duration: 3000 });
+      },
+    });
+  }
+
+  continueExam(mockExam: MockExamConfig) {
+    this.router.navigate(['/mock-exam', mockExam.id]);
+  }
+
+  viewResult(mockExam: MockExamConfig) {
+    this.router.navigate(['/mock-exam', mockExam.id, 'result']);
   }
 
   formatDuration(minutes: number): string {

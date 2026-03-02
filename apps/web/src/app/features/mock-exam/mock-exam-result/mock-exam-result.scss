@@ -169,6 +169,15 @@
   border-radius: var(--annota-radius-sm);
 }
 
+.btn-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 100%;
+}
+
 @media (max-width: 599px) {
   .result-hero {
     padding: 24px 16px;
@@ -199,4 +208,14 @@
     width: 100%;
     text-align: center;
   }
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 80px 20px;
+  color: var(--annota-text-light);
 }

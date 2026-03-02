@@ -3,73 +3,161 @@
   <p class="page-subtitle">Teste seus conhecimentos em condições reais de prova</p>
 </div>
 
+<!-- SECTION 1: Available Exams -->
 <section class="section">
   <h2 class="section-title">
     <mat-icon>play_circle</mat-icon>
-    Simulados disponíveis
+    Iniciar Novo Simulado
   </h2>
 
-  <div class="exams-grid">
-    @for (exam of mockExams(); track exam.id; let i = $index) {
-      <mat-card class="exam-card stagger-{{ i + 1 }}" [class.completed]="exam.status === 'completed'">
-        <mat-card-header>
-          @if (exam.status === 'completed') {
-            <mat-icon mat-card-avatar class="status-icon completed">check_circle</mat-icon>
-          } @else {
-            <mat-icon mat-card-avatar class="status-icon available">play_circle_filled</mat-icon>
-          }
-          <mat-card-title>{{ exam.name }}</mat-card-title>
-          <mat-card-subtitle>
-            @if (exam.status === 'completed') {
-              Finalizado em {{ exam.completedAt }}
-            } @else {
-              Pronto para começar
-            }
-          </mat-card-subtitle>
-        </mat-card-header>
+  @if (loadingExams()) {
+    <div class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  } @else if (exams().length === 0) {
+    <mat-card class="empty-state-card">
+      <mat-card-content>
+        <mat-icon>quiz</mat-icon>
+        <p>Nenhuma prova com questões disponíveis. Adicione questões no painel admin.</p>
+      </mat-card-content>
+    </mat-card>
+  } @else {
+    <div class="exams-grid">
+      @for (exam of exams(); track exam.id; let i = $index) {
+        <mat-card class="exam-card stagger-{{ i + 1 }}">
+          <mat-card-header>
+            <mat-icon mat-card-avatar class="status-icon available">school</mat-icon>
+            <mat-card-title>{{ exam.name }}</mat-card-title>
+            <mat-card-subtitle>{{ exam.institution }} - {{ exam.year }}</mat-card-subtitle>
+          </mat-card-header>
 
-        <mat-card-content>
-          <div class="exam-details">
-            <mat-chip-set>
-              <mat-chip>
-                <mat-icon matChipAvatar>help_outline</mat-icon>
-                {{ exam.questionCount }} questões
-              </mat-chip>
-              <mat-chip>
-                <mat-icon matChipAvatar>timer</mat-icon>
-                {{ formatDuration(exam.duration) }}
-              </mat-chip>
-            </mat-chip-set>
+          <mat-card-content>
+            <p class="exam-description">{{ exam.description }}</p>
+            <div class="exam-details">
+              <mat-chip-set>
+                <mat-chip>
+                  <mat-icon matChipAvatar>help_outline</mat-icon>
+                  {{ exam.questionCount }} questões
+                </mat-chip>
+                <mat-chip>
+                  <mat-icon matChipAvatar>timer</mat-icon>
+                  {{ formatDuration(exam.duration) }}
+                </mat-chip>
+                <mat-chip>
+                  <mat-icon matChipAvatar>category</mat-icon>
+                  {{ exam.subjectCount }} matérias
+                </mat-chip>
+              </mat-chip-set>
+            </div>
+          </mat-card-content>
 
-            @if (exam.status === 'completed' && exam.score !== undefined) {
-              <div class="score-display">
-                <span class="score-label">Nota:</span>
-                <span class="score-value" [class.high]="exam.score >= 70" [class.low]="exam.score < 70">
-                  {{ exam.score }}%
+          <mat-card-actions>
+            <button
+              mat-flat-button
+              color="primary"
+              (click)="startExam(exam)"
+              [disabled]="startingExam() !== null"
+            >
+              @if (startingExam() === exam.id) {
+                <span class="btn-content">
+                  <mat-spinner diameter="20"></mat-spinner>
+                  Preparando...
                 </span>
-              </div>
-            }
-          </div>
-        </mat-card-content>
+              } @else {
+                <span class="btn-content">
+                  <mat-icon>play_arrow</mat-icon>
+                  Iniciar Simulado
+                </span>
+              }
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      }
+    </div>
+  }
+</section>
 
-        <mat-card-actions>
-          @if (exam.status === 'completed') {
-            <button mat-stroked-button (click)="viewResult(exam)">
-              <mat-icon>visibility</mat-icon>
-              Ver resultado
-            </button>
-            <button mat-flat-button color="primary" (click)="startExam(exam)">
-              <mat-icon>replay</mat-icon>
-              Refazer
-            </button>
-          } @else {
-            <button mat-flat-button color="primary" (click)="startExam(exam)">
-              <mat-icon>play_arrow</mat-icon>
-              Iniciar simulado
-            </button>
-          }
-        </mat-card-actions>
-      </mat-card>
-    }
-  </div>
+<!-- SECTION 2: Mock Exam History -->
+<section class="section">
+  <h2 class="section-title">
+    <mat-icon>history</mat-icon>
+    Histórico de Simulados
+  </h2>
+
+  @if (loadingHistory()) {
+    <div class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  } @else if (mockExamHistory().length === 0) {
+    <mat-card class="empty-state-card">
+      <mat-card-content>
+        <mat-icon>info_outline</mat-icon>
+        <p>Nenhum simulado realizado ainda. Escolha uma prova acima para começar!</p>
+      </mat-card-content>
+    </mat-card>
+  } @else {
+    <div class="exams-grid">
+      @for (mock of mockExamHistory(); track mock.id; let i = $index) {
+        <mat-card class="exam-card stagger-{{ i + 1 }}" [class.completed]="mock.status === 'completed'">
+          <mat-card-header>
+            @if (mock.status === 'completed') {
+              <mat-icon mat-card-avatar class="status-icon completed">check_circle</mat-icon>
+            } @else {
+              <mat-icon mat-card-avatar class="status-icon in-progress">pending</mat-icon>
+            }
+            <mat-card-title>{{ mock.name }}</mat-card-title>
+            <mat-card-subtitle>
+              @if (mock.status === 'completed') {
+                Finalizado em {{ mock.completedAt }}
+              } @else {
+                Em andamento
+              }
+            </mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content>
+            <div class="exam-details">
+              <mat-chip-set>
+                <mat-chip>
+                  <mat-icon matChipAvatar>help_outline</mat-icon>
+                  {{ mock.questionCount }} questões
+                </mat-chip>
+                <mat-chip>
+                  <mat-icon matChipAvatar>timer</mat-icon>
+                  {{ formatDuration(mock.duration) }}
+                </mat-chip>
+              </mat-chip-set>
+
+              @if (mock.status === 'completed' && mock.score !== undefined) {
+                <div class="score-display">
+                  <span class="score-label">Nota:</span>
+                  <span class="score-value" [class.high]="mock.score >= 70" [class.low]="mock.score < 70">
+                    {{ mock.score }}%
+                  </span>
+                </div>
+              }
+            </div>
+          </mat-card-content>
+
+          <mat-card-actions>
+            @if (mock.status === 'completed') {
+              <button mat-stroked-button (click)="viewResult(mock)">
+                <span class="btn-content">
+                  <mat-icon>visibility</mat-icon>
+                  Ver resultado
+                </span>
+              </button>
+            } @else {
+              <button mat-flat-button color="primary" (click)="continueExam(mock)">
+                <span class="btn-content">
+                  <mat-icon>play_arrow</mat-icon>
+                  Continuar
+                </span>
+              </button>
+            }
+          </mat-card-actions>
+        </mat-card>
+      }
+    </div>
+  }
 </section>

@@ -58,6 +58,15 @@
   border-radius: var(--annota-radius-sm);
 }
 
+.btn-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 100%;
+}
+
 .session-progress {
   height: 6px;
   background: var(--annota-pink-50);
@@ -236,6 +245,16 @@
   .question-grid {
     grid-template-columns: repeat(8, 1fr);
   }
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 80px 20px;
+  color: var(--annota-text-light);
 }
 
 @media (max-width: 599px) {
