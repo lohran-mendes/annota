@@ -5,7 +5,7 @@ import type { Subject, ApiListResponse, ApiResponse, CreateSubjectDto, UpdateSub
 @Injectable({ providedIn: 'root' })
 export class SubjectService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = import.meta.env.NG_APP_API_URL ?? 'http://localhost:3000/api';
+  private readonly apiUrl = import.meta.env?.NG_APP_API_URL ?? 'http://localhost:3000/api';
 
   getAll() {
     return this.http.get<ApiListResponse<Subject>>(`${this.apiUrl}/subjects`);
