@@ -8,6 +8,7 @@ import {
 } from './mock-exam-result.schema';
 import { Question, QuestionDocument } from '../question/question.schema';
 import { Subject, SubjectDocument } from '../subject/subject.schema';
+import { Exam, ExamDocument } from '../exam/exam.schema';
 import { CreateMockExamDto } from './dto/create-mock-exam.dto';
 import { SubmitMockExamDto } from './dto/submit-mock-exam.dto';
 import type {
@@ -26,6 +27,8 @@ export class MockExamService {
     private questionModel: Model<QuestionDocument>,
     @InjectModel(Subject.name)
     private subjectModel: Model<SubjectDocument>,
+    @InjectModel(Exam.name)
+    private examModel: Model<ExamDocument>,
   ) {}
 
   async findAll(examId?: string) {
@@ -34,15 +37,14 @@ export class MockExamService {
   }
 
   async create(dto: CreateMockExamDto): Promise<MockExamSession> {
-    // Buscar subjects do exam para encontrar questoes
-    const subjects = await this.subjectModel
-      .find({ examId: dto.examId })
-      .exec();
-    const subjectIds = subjects.map((s) => s._id);
+    // Buscar questoes vinculadas ao exam
+    const exam = await this.examModel.findById(dto.examId).exec();
+    if (!exam) {
+      throw new NotFoundException(`Exam with id ${dto.examId} not found`);
+    }
 
-    // Buscar todas as questoes do exam
     const allQuestions = await this.questionModel
-      .find({ subjectId: { $in: subjectIds } })
+      .find({ _id: { $in: exam.questionIds } })
       .exec();
 
     // Selecionar questoes aleatorias

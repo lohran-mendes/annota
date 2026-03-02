@@ -12,6 +12,7 @@ import {
 import { ExamService } from './exam.service';
 import { CreateExamDto } from './dto/create-exam.dto';
 import { UpdateExamDto } from './dto/update-exam.dto';
+import { LinkQuestionsDto } from './dto/link-questions.dto';
 
 @Controller('exams')
 export class ExamController {
@@ -48,5 +49,38 @@ export class ExamController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(@Param('id') id: string): Promise<void> {
     await this.examService.remove(id);
+  }
+
+  @Post(':examId/questions/link')
+  async linkQuestions(
+    @Param('examId') examId: string,
+    @Body() dto: LinkQuestionsDto,
+  ) {
+    const exam = await this.examService.linkQuestions(examId, dto.questionIds);
+    return { data: exam };
+  }
+
+  @Post(':examId/questions/unlink')
+  async unlinkQuestions(
+    @Param('examId') examId: string,
+    @Body() dto: LinkQuestionsDto,
+  ) {
+    const exam = await this.examService.unlinkQuestions(
+      examId,
+      dto.questionIds,
+    );
+    return { data: exam };
+  }
+
+  @Get(':examId/questions')
+  async getExamQuestions(@Param('examId') examId: string) {
+    const questions = await this.examService.getExamQuestions(examId);
+    return { data: questions, total: questions.length };
+  }
+
+  @Get(':examId/subjects')
+  async getExamSubjects(@Param('examId') examId: string) {
+    const subjects = await this.examService.getExamSubjects(examId);
+    return { data: subjects, total: subjects.length };
   }
 }

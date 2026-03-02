@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -27,9 +27,11 @@ import type { Question } from '@annota/shared';
   styleUrl: './question-solver.scss',
 })
 export class QuestionSolver implements OnInit {
+  private readonly route = inject(ActivatedRoute);
   private readonly questionService = inject(QuestionService);
   private readonly answerService = inject(AnswerService);
 
+  private examId = '';
   questions = signal<Question[]>(MOCK_QUESTIONS);
   currentIndex = signal(0);
   selectedAnswer = signal<number | null>(null);
@@ -39,6 +41,7 @@ export class QuestionSolver implements OnInit {
   currentQuestion = computed(() => this.questions()[this.currentIndex()]);
 
   ngOnInit() {
+    this.examId = this.route.snapshot.params['examId'] ?? '';
     this.loading.set(true);
     this.questionService.getAll().subscribe({
       next: (res) => {
@@ -73,6 +76,7 @@ export class QuestionSolver implements OnInit {
         .submitAnswer({
           questionId: this.currentQuestion().id,
           selectedIndex: this.selectedAnswer()!,
+          examId: this.examId,
         })
         .subscribe({
           error: (err) => {

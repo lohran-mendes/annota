@@ -22,24 +22,19 @@ export class AnswerService {
     const question = await this.questionService.findOne(dto.questionId);
     const correct = dto.selectedIndex === question.correctAnswerIndex;
 
-    // Buscar examId via subject
-    const subject = await this.subjectService.findOne(
-      question.subjectId.toString(),
-    );
-
     // Verificar se e a primeira vez que o usuario responde esta questao
     const alreadyAnswered = await this.userAnswerModel
       .findOne({ questionId: dto.questionId })
       .exec();
 
-    // Salvar resposta
+    // Salvar resposta com examId vindo do DTO
     const userAnswer = new this.userAnswerModel({
       questionId: dto.questionId,
       selectedIndex: dto.selectedIndex,
       correct,
       subjectId: question.subjectId,
       topicId: question.topicId,
-      examId: (subject as any).examId,
+      examId: dto.examId,
     });
     await userAnswer.save();
 

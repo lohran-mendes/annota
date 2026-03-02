@@ -6,6 +6,7 @@ export type {
   ApiErrorResponse,
   CreateExamDto,
   UpdateExamDto,
+  LinkQuestionsDto,
   CreateSubjectDto,
   UpdateSubjectDto,
   CreateTopicDto,
@@ -32,6 +33,7 @@ export interface Exam {
   description: string;
   year: number;
   institution: string;
+  questionIds: string[];
   questionCount: number;
   subjectCount: number;
   duration: number;
@@ -39,12 +41,26 @@ export interface Exam {
 
 export interface Subject {
   id: string;
-  examId: string;
   name: string;
   icon: string;
   questionCount: number;
   completedCount: number;
   color: string;
+}
+
+export interface ExamSubject {
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+  questionCount: number;
+  topics: ExamTopic[];
+}
+
+export interface ExamTopic {
+  id: string;
+  name: string;
+  questionCount: number;
 }
 
 export interface Topic {

@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
+import mongoose from 'mongoose';
 
 export type ExamDocument = HydratedDocument<Exam>;
 
@@ -16,6 +17,12 @@ export class Exam {
 
   @Prop({ required: true })
   institution: string;
+
+  @Prop({
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Question' }],
+    default: [],
+  })
+  questionIds: mongoose.Types.ObjectId[];
 
   @Prop({ default: 0 })
   questionCount: number;
@@ -34,6 +41,7 @@ ExamSchema.set('toJSON', {
   versionKey: false,
   transform: (_doc: any, ret: any) => {
     ret.id = ret._id.toString();
+    ret.questionIds = ret.questionIds?.map((id: any) => id.toString()) ?? [];
     delete ret._id;
   },
 });

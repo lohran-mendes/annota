@@ -7,11 +7,10 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { SubjectService } from '../../../core/services/subject.service';
-import { ExamService } from '../../../core/services/exam.service';
 import { SubjectDialog } from '../dialogs/subject-dialog';
 import { ConfirmDialog } from '../dialogs/confirm-dialog';
 import { MOCK_SUBJECTS } from '../../../core/mock-data';
-import type { Subject, Exam } from '@annota/shared';
+import type { Subject } from '@annota/shared';
 
 @Component({
   selector: 'annota-subject-management',
@@ -21,12 +20,10 @@ import type { Subject, Exam } from '@annota/shared';
 })
 export class SubjectManagement implements OnInit {
   private readonly subjectService = inject(SubjectService);
-  private readonly examService = inject(ExamService);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
 
   subjects = signal<Subject[]>([]);
-  exams = signal<Exam[]>([]);
   loading = signal(false);
   displayedColumns = ['color', 'name', 'icon', 'questions', 'actions'];
 
@@ -36,10 +33,6 @@ export class SubjectManagement implements OnInit {
 
   loadData() {
     this.loading.set(true);
-    this.examService.getAll().subscribe({
-      next: (res) => this.exams.set(res.data),
-      error: () => {},
-    });
     this.subjectService.getAll().subscribe({
       next: (res) => {
         this.subjects.set(res.data);
@@ -53,7 +46,7 @@ export class SubjectManagement implements OnInit {
   }
 
   openCreateDialog() {
-    const ref = this.dialog.open(SubjectDialog, { data: { exams: this.exams() } });
+    const ref = this.dialog.open(SubjectDialog, { data: {} });
     ref.afterClosed().subscribe((result) => {
       if (result) {
         this.subjectService.create(result).subscribe({
@@ -68,7 +61,7 @@ export class SubjectManagement implements OnInit {
   }
 
   openEditDialog(subject: Subject) {
-    const ref = this.dialog.open(SubjectDialog, { data: { subject, exams: this.exams() } });
+    const ref = this.dialog.open(SubjectDialog, { data: { subject } });
     ref.afterClosed().subscribe((result) => {
       if (result) {
         this.subjectService.update(subject.id, result).subscribe({

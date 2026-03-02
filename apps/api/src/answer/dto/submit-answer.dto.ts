@@ -9,4 +9,8 @@ export class SubmitAnswerDto implements ISubmitAnswerDto {
   @IsInt()
   @Min(0)
   selectedIndex: number;
+
+  @IsString()
+  @IsNotEmpty()
+  examId: string;
 }

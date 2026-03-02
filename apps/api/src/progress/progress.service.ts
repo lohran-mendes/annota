@@ -1,9 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { UserAnswer, UserAnswerDocument } from '../answer/answer.schema';
 import { Subject, SubjectDocument } from '../subject/subject.schema';
 import { Topic, TopicDocument } from '../topic/topic.schema';
+import { Exam, ExamDocument } from '../exam/exam.schema';
+import { Question, QuestionDocument } from '../question/question.schema';
 import type { UserProgress, ExamProgress } from '@annota/shared';
 
 @Injectable()
@@ -15,6 +17,10 @@ export class ProgressService {
     private subjectModel: Model<SubjectDocument>,
     @InjectModel(Topic.name)
     private topicModel: Model<TopicDocument>,
+    @InjectModel(Exam.name)
+    private examModel: Model<ExamDocument>,
+    @InjectModel(Question.name)
+    private questionModel: Model<QuestionDocument>,
   ) {}
 
   async getGlobalProgress(): Promise<UserProgress> {
@@ -70,6 +76,12 @@ export class ProgressService {
   }
 
   async getExamProgress(examId: string): Promise<ExamProgress> {
+    // Buscar exam para validar e obter subjects derivados
+    const exam = await this.examModel.findById(examId).exec();
+    if (!exam) {
+      throw new NotFoundException(`Exam with id ${examId} not found`);
+    }
+
     const filter = { examId };
     const totalAnswered = await this.userAnswerModel
       .countDocuments(filter)
@@ -94,6 +106,18 @@ export class ProgressService {
       }
     }
 
+    // Derivar subjects do exam via questionIds
+    const subjectIds = await this.questionModel
+      .distinct('subjectId', { _id: { $in: exam.questionIds } })
+      .exec();
+
+    const subjects = await this.subjectModel
+      .find({ _id: { $in: subjectIds } })
+      .exec();
+    const subjectMap = new Map(
+      subjects.map((s) => [s._id.toString(), s]),
+    );
+
     // Por materia
     const bySubjectAgg = await this.userAnswerModel.aggregate([
       { $match: { examId: { $eq: examId } } },
@@ -105,11 +129,6 @@ export class ProgressService {
         },
       },
     ]);
-
-    const subjects = await this.subjectModel.find({ examId }).exec();
-    const subjectMap = new Map(
-      subjects.map((s) => [s._id.toString(), s]),
-    );
 
     const bySubject = bySubjectAgg.map((agg) => {
       const subject = subjectMap.get(agg._id.toString());

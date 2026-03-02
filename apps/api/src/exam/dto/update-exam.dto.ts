@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsInt, Min } from 'class-validator';
+import { IsString, IsOptional, IsInt, Min, IsArray } from 'class-validator';
 import type { UpdateExamDto as IUpdateExamDto } from '@annota/shared';
 
 export class UpdateExamDto implements IUpdateExamDto {
@@ -23,4 +23,9 @@ export class UpdateExamDto implements IUpdateExamDto {
   @Min(1)
   @IsOptional()
   duration?: number;
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  questionIds?: string[];
 }

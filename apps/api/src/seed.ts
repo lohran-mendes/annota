@@ -8,13 +8,13 @@ const ExamSchema = new mongoose.Schema({
   description: String,
   year: Number,
   institution: String,
+  questionIds: [{ type: mongoose.Schema.Types.ObjectId }],
   questionCount: { type: Number, default: 0 },
   subjectCount: { type: Number, default: 0 },
   duration: { type: Number, default: 180 },
 });
 
 const SubjectSchema = new mongoose.Schema({
-  examId: mongoose.Schema.Types.ObjectId,
   name: String,
   icon: String,
   questionCount: { type: Number, default: 0 },
@@ -68,8 +68,6 @@ async function seed() {
       'Processo seletivo para ingresso no Ensino Médio das Escolas Técnicas Estaduais de São Paulo. Prova com questões de múltipla escolha abrangendo Matemática, Português, Ciências, História e Geografia.',
     year: 2026,
     institution: 'Centro Paula Souza',
-    questionCount: 8,
-    subjectCount: 5,
     duration: 180,
   });
 
@@ -79,17 +77,14 @@ async function seed() {
       'Exame Nacional do Ensino Médio. Avalia o desempenho dos estudantes ao final da educação básica, servindo como porta de entrada para universidades públicas e programas do governo.',
     year: 2026,
     institution: 'INEP/MEC',
-    questionCount: 0,
-    subjectCount: 0,
     duration: 330,
   });
 
   console.log(`Exams created: ${exam1.name}, ${exam2.name}`);
 
-  // === SUBJECTS (Exam 1) ===
+  // === SUBJECTS (globais) ===
   const subjects = await Subject.insertMany([
     {
-      examId: exam1._id,
       name: 'Matemática',
       icon: 'calculate',
       questionCount: 4,
@@ -97,7 +92,6 @@ async function seed() {
       color: '#E91E63',
     },
     {
-      examId: exam1._id,
       name: 'Português',
       icon: 'menu_book',
       questionCount: 1,
@@ -105,7 +99,6 @@ async function seed() {
       color: '#9C27B0',
     },
     {
-      examId: exam1._id,
       name: 'Ciências',
       icon: 'science',
       questionCount: 1,
@@ -113,7 +106,6 @@ async function seed() {
       color: '#00BCD4',
     },
     {
-      examId: exam1._id,
       name: 'História',
       icon: 'history_edu',
       questionCount: 1,
@@ -121,7 +113,6 @@ async function seed() {
       color: '#FF7043',
     },
     {
-      examId: exam1._id,
       name: 'Geografia',
       icon: 'public',
       questionCount: 1,
@@ -285,6 +276,23 @@ async function seed() {
   ]);
 
   console.log(`Questions created: ${questions.length}`);
+
+  // === VINCULAR QUESTOES AO EXAM ===
+  const allQuestionIds = questions.map((q) => q._id);
+  const distinctSubjectIds = [
+    ...new Set(questions.map((q) => q.subjectId!.toString())),
+  ];
+
+  await Exam.findByIdAndUpdate(exam1._id, {
+    questionIds: allQuestionIds,
+    questionCount: allQuestionIds.length,
+    subjectCount: distinctSubjectIds.length,
+  });
+
+  console.log(
+    `Linked ${allQuestionIds.length} questions to ${exam1.name}`,
+  );
+
   console.log('\nSeed completed successfully!');
 
   await mongoose.disconnect();

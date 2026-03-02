@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
@@ -6,12 +6,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
-import type { Subject, Exam } from '@annota/shared';
-import { ExamService } from '../../../core/services/exam.service';
+import type { Subject } from '@annota/shared';
 
 export interface SubjectDialogData {
   subject?: Subject;
-  exams?: Exam[];
 }
 
 const MATERIAL_ICONS = [
@@ -41,15 +39,6 @@ const COLORS = [
     <h2 mat-dialog-title>{{ data.subject ? 'Editar Matéria' : 'Nova Matéria' }}</h2>
     <mat-dialog-content>
       <form [formGroup]="form" class="dialog-form">
-        <mat-form-field appearance="outline">
-          <mat-label>Prova</mat-label>
-          <mat-select formControlName="examId">
-            @for (exam of exams; track exam.id) {
-              <mat-option [value]="exam.id">{{ exam.name }}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-
         <mat-form-field appearance="outline">
           <mat-label>Nome</mat-label>
           <input matInput formControlName="name" placeholder="Ex: Matemática">
@@ -111,40 +100,23 @@ const COLORS = [
     }
   `],
 })
-export class SubjectDialog implements OnInit {
+export class SubjectDialog {
   readonly dialogRef = inject(MatDialogRef<SubjectDialog>);
   readonly data = inject<SubjectDialogData>(MAT_DIALOG_DATA);
   private readonly fb = inject(FormBuilder);
-  private readonly examService = inject(ExamService);
 
   icons = MATERIAL_ICONS;
   colors = COLORS;
-  exams: Exam[] = [];
 
   form = this.fb.group({
-    examId: [this.data.subject?.examId ?? '', Validators.required],
     name: [this.data.subject?.name ?? '', Validators.required],
     icon: [this.data.subject?.icon ?? 'menu_book', Validators.required],
     color: [this.data.subject?.color ?? '#E91E63', Validators.required],
   });
 
-  ngOnInit() {
-    if (this.data.exams) {
-      this.exams = this.data.exams;
-    } else {
-      this.examService.getAll().subscribe((res) => {
-        this.exams = res.data;
-      });
-    }
-
-    if (this.data.subject) {
-      this.form.get('examId')!.disable();
-    }
-  }
-
   save() {
     if (this.form.valid) {
-      this.dialogRef.close(this.form.getRawValue());
+      this.dialogRef.close(this.form.value);
     }
   }
 }

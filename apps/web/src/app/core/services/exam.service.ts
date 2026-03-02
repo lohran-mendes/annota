@@ -1,6 +1,15 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import type { Exam, ApiListResponse, ApiResponse, CreateExamDto, UpdateExamDto } from '@annota/shared';
+import type {
+  Exam,
+  Question,
+  ExamSubject,
+  ApiListResponse,
+  ApiResponse,
+  CreateExamDto,
+  UpdateExamDto,
+  LinkQuestionsDto,
+} from '@annota/shared';
 
 @Injectable({ providedIn: 'root' })
 export class ExamService {
@@ -25,5 +34,31 @@ export class ExamService {
 
   delete(id: string) {
     return this.http.delete<void>(`${this.apiUrl}/exams/${id}`);
+  }
+
+  linkQuestions(examId: string, dto: LinkQuestionsDto) {
+    return this.http.post<ApiResponse<Exam>>(
+      `${this.apiUrl}/exams/${examId}/questions/link`,
+      dto,
+    );
+  }
+
+  unlinkQuestions(examId: string, dto: LinkQuestionsDto) {
+    return this.http.post<ApiResponse<Exam>>(
+      `${this.apiUrl}/exams/${examId}/questions/unlink`,
+      dto,
+    );
+  }
+
+  getExamQuestions(examId: string) {
+    return this.http.get<ApiListResponse<Question>>(
+      `${this.apiUrl}/exams/${examId}/questions`,
+    );
+  }
+
+  getExamSubjects(examId: string) {
+    return this.http.get<ApiListResponse<ExamSubject>>(
+      `${this.apiUrl}/exams/${examId}/subjects`,
+    );
   }
 }

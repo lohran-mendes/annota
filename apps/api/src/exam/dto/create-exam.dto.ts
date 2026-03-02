@@ -1,4 +1,11 @@
-import { IsString, IsNotEmpty, IsInt, Min } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsInt,
+  Min,
+  IsArray,
+  IsOptional,
+} from 'class-validator';
 import type { CreateExamDto as ICreateExamDto } from '@annota/shared';
 
 export class CreateExamDto implements ICreateExamDto {
@@ -21,4 +28,9 @@ export class CreateExamDto implements ICreateExamDto {
   @IsInt()
   @Min(1)
   duration: number;
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  questionIds?: string[];
 }

@@ -9,6 +9,7 @@ import { MockExamController } from './mock-exam.controller';
 import { MockExamService } from './mock-exam.service';
 import { Question, QuestionSchema } from '../question/question.schema';
 import { Subject, SubjectSchema } from '../subject/subject.schema';
+import { Exam, ExamSchema } from '../exam/exam.schema';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { Subject, SubjectSchema } from '../subject/subject.schema';
       { name: MockExamResult.name, schema: MockExamResultSchema },
       { name: Question.name, schema: QuestionSchema },
       { name: Subject.name, schema: SubjectSchema },
+      { name: Exam.name, schema: ExamSchema },
     ]),
   ],
   controllers: [MockExamController],

@@ -2,20 +2,21 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Question, QuestionDocument } from './question.schema';
+import { Exam, ExamDocument } from '../exam/exam.schema';
 import { CreateQuestionDto } from './dto/create-question.dto';
 import { UpdateQuestionDto } from './dto/update-question.dto';
 import { TopicService } from '../topic/topic.service';
 import { SubjectService } from '../subject/subject.service';
-import { ExamService } from '../exam/exam.service';
 
 @Injectable()
 export class QuestionService {
   constructor(
     @InjectModel(Question.name)
     private questionModel: Model<QuestionDocument>,
+    @InjectModel(Exam.name)
+    private examModel: Model<ExamDocument>,
     private readonly topicService: TopicService,
     private readonly subjectService: SubjectService,
-    private readonly examService: ExamService,
   ) {}
 
   async findAll(): Promise<Question[]> {
@@ -42,15 +43,9 @@ export class QuestionService {
     const question = new this.questionModel(dto);
     const saved = await question.save();
 
-    // Atualizar contadores
+    // Atualizar contadores globais de topic e subject
     await this.topicService.incrementQuestionCount(dto.topicId, 1);
     await this.subjectService.incrementQuestionCount(dto.subjectId, 1);
-
-    const subject = await this.subjectService.findOne(dto.subjectId);
-    await this.examService.incrementQuestionCount(
-      (subject as any).examId,
-      1,
-    );
 
     return saved;
   }
@@ -71,9 +66,14 @@ export class QuestionService {
       throw new NotFoundException(`Question with id ${id} not found`);
     }
 
+    // Buscar exams afetados ANTES de deletar
+    const affectedExams = await this.examModel
+      .find({ questionIds: id })
+      .exec();
+
     await this.questionModel.findByIdAndDelete(id).exec();
 
-    // Decrementar contadores
+    // Decrementar contadores globais
     await this.topicService.incrementQuestionCount(
       question.topicId.toString(),
       -1,
@@ -83,12 +83,29 @@ export class QuestionService {
       -1,
     );
 
-    const subject = await this.subjectService.findOne(
-      question.subjectId.toString(),
-    );
-    await this.examService.incrementQuestionCount(
-      (subject as any).examId,
-      -1,
-    );
+    // Remover dos exams e recomputar contadores
+    if (affectedExams.length) {
+      await this.examModel
+        .updateMany(
+          { questionIds: id },
+          { $pull: { questionIds: id } },
+        )
+        .exec();
+
+      for (const exam of affectedExams) {
+        const updated = await this.examModel.findById(exam._id).exec();
+        if (updated) {
+          const subjectIds = await this.questionModel
+            .distinct('subjectId', { _id: { $in: updated.questionIds } })
+            .exec();
+          await this.examModel
+            .findByIdAndUpdate(exam._id, {
+              questionCount: updated.questionIds.length,
+              subjectCount: subjectIds.length,
+            })
+            .exec();
+        }
+      }
+    }
   }
 }

@@ -8,7 +8,8 @@ export const MOCK_EXAMS: Exam[] = [
       'Processo seletivo para ingresso no Ensino Médio das Escolas Técnicas Estaduais de São Paulo. Prova com questões de múltipla escolha abrangendo Matemática, Português, Ciências, História e Geografia.',
     year: 2026,
     institution: 'Centro Paula Souza',
-    questionCount: 50,
+    questionIds: ['1', '2', '3', '4', '5', '6', '7', '8'],
+    questionCount: 8,
     subjectCount: 5,
     duration: 180,
   },
@@ -19,8 +20,9 @@ export const MOCK_EXAMS: Exam[] = [
       'Exame Nacional do Ensino Médio. Avalia o desempenho dos estudantes ao final da educação básica, servindo como porta de entrada para universidades públicas e programas do governo.',
     year: 2026,
     institution: 'INEP/MEC',
-    questionCount: 180,
-    subjectCount: 4,
+    questionIds: [],
+    questionCount: 0,
+    subjectCount: 0,
     duration: 330,
   },
   {
@@ -30,6 +32,7 @@ export const MOCK_EXAMS: Exam[] = [
       'Ainda sem descrição, é necessário adicionar o novo exame.',
     year: 2026,
     institution: 'A Criar',
+    questionIds: [],
     questionCount: 0,
     subjectCount: 0,
     duration: 180,
@@ -41,6 +44,7 @@ export const MOCK_EXAMS: Exam[] = [
       'Ainda sem descrição, é necessário adicionar o novo exame.',
     year: 2026,
     institution: 'A Criar',
+    questionIds: [],
     questionCount: 0,
     subjectCount: 0,
     duration: 180,
@@ -50,7 +54,6 @@ export const MOCK_EXAMS: Exam[] = [
 export const MOCK_SUBJECTS: Subject[] = [
   {
     id: '1',
-    examId: '1',
     name: 'Matemática',
     icon: 'calculate',
     questionCount: 15,
@@ -59,7 +62,6 @@ export const MOCK_SUBJECTS: Subject[] = [
   },
   {
     id: '2',
-    examId: '1',
     name: 'Português',
     icon: 'menu_book',
     questionCount: 12,
@@ -68,7 +70,6 @@ export const MOCK_SUBJECTS: Subject[] = [
   },
   {
     id: '3',
-    examId: '1',
     name: 'Ciências',
     icon: 'science',
     questionCount: 10,
@@ -77,7 +78,6 @@ export const MOCK_SUBJECTS: Subject[] = [
   },
   {
     id: '4',
-    examId: '1',
     name: 'História',
     icon: 'history_edu',
     questionCount: 8,
@@ -86,7 +86,6 @@ export const MOCK_SUBJECTS: Subject[] = [
   },
   {
     id: '5',
-    examId: '1',
     name: 'Geografia',
     icon: 'public',
     questionCount: 5,

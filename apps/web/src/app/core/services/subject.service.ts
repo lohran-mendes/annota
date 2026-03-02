@@ -11,10 +11,6 @@ export class SubjectService {
     return this.http.get<ApiListResponse<Subject>>(`${this.apiUrl}/subjects`);
   }
 
-  getByExam(examId: string) {
-    return this.http.get<ApiListResponse<Subject>>(`${this.apiUrl}/exams/${examId}/subjects`);
-  }
-
   getById(id: string) {
     return this.http.get<ApiResponse<Subject>>(`${this.apiUrl}/subjects/${id}`);
   }

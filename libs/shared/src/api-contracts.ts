@@ -35,6 +35,7 @@ export interface CreateExamDto {
   year: number;
   institution: string;
   duration: number;
+  questionIds?: string[];
 }
 
 export interface UpdateExamDto {
@@ -43,6 +44,11 @@ export interface UpdateExamDto {
   year?: number;
   institution?: string;
   duration?: number;
+  questionIds?: string[];
+}
+
+export interface LinkQuestionsDto {
+  questionIds: string[];
 }
 
 // ============================================================
@@ -50,7 +56,6 @@ export interface UpdateExamDto {
 // ============================================================
 
 export interface CreateSubjectDto {
-  examId: string;
   name: string;
   icon: string;
   color: string;
@@ -102,6 +107,7 @@ export interface UpdateQuestionDto {
 export interface SubmitAnswerDto {
   questionId: string;
   selectedIndex: number;
+  examId: string;
 }
 
 export interface AnswerResult {
@@ -204,9 +210,13 @@ export interface MockExamQuestionResult {
 //   POST   /api/exams                          → ApiResponse<Exam>
 //   PUT    /api/exams/:id                      → ApiResponse<Exam>
 //   DELETE /api/exams/:id                      → 204
+//   POST   /api/exams/:examId/questions/link   → ApiResponse<Exam>
+//   POST   /api/exams/:examId/questions/unlink → ApiResponse<Exam>
+//   GET    /api/exams/:examId/questions        → ApiListResponse<Question>
+//   GET    /api/exams/:examId/subjects         → ApiListResponse<ExamSubject>
 //
 // Subjects:
-//   GET    /api/exams/:examId/subjects         → ApiListResponse<Subject>
+//   GET    /api/subjects                       → ApiListResponse<Subject>
 //   GET    /api/subjects/:id                   → ApiResponse<Subject>
 //   POST   /api/subjects                       → ApiResponse<Subject>
 //   PUT    /api/subjects/:id                   → ApiResponse<Subject>
