@@ -26,5 +26,8 @@ npm-debug.log*
 # Coverage
 coverage/
 
+# Insomnia
+insomnia-collection.json
+
 # Temp
 tmp/
