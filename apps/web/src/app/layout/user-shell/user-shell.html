@@ -58,6 +58,15 @@
         <mat-icon matListItemIcon>timer</mat-icon>
         <span>Simulados</span>
       </a>
+      <a
+        mat-list-item
+        routerLink="/flashcards"
+        routerLinkActive="active-link"
+        (click)="closeSidenavOnMobile()"
+      >
+        <mat-icon matListItemIcon>style</mat-icon>
+        <span>Cartões</span>
+      </a>
     </mat-nav-list>
 
     <div class="sidenav-footer">

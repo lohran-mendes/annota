@@ -25,6 +25,13 @@ export type {
   MockExamResult,
   MockExamSubjectResult,
   MockExamQuestionResult,
+  CreateDeckDto,
+  UpdateDeckDto,
+  CreateFlashcardDto,
+  UpdateFlashcardDto,
+  ReviewFlashcardDto,
+  ReviewResult,
+  DeckStats,
 } from './api-contracts';
 
 export interface Exam {
@@ -110,4 +117,32 @@ export interface MockExamConfig {
   status: 'available' | 'in_progress' | 'completed';
   score?: number;
   completedAt?: string;
+}
+
+// === Flashcard / Deck ===
+
+export type FlashcardRating = 1 | 2 | 3 | 4;
+
+export interface Deck {
+  id: string;
+  name: string;
+  description: string;
+  cardCount: number;
+  dueCount: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface Flashcard {
+  id: string;
+  deckId: string;
+  front: string;
+  back: string;
+  interval: number;
+  easeFactor: number;
+  repetitions: number;
+  nextReviewDate: string;
+  lastReviewedAt: string | null;
+  createdAt?: string;
+  updatedAt?: string;
 }

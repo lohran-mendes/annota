@@ -1,0 +1,134 @@
+<div class="deck-list-container">
+  <div class="page-header animate-fade-in-up">
+    <div class="header-text">
+      <h1>Cartões</h1>
+      <p class="subtitle">Estude com repetição espaçada no estilo Anki</p>
+    </div>
+    <button mat-flat-button color="primary" (click)="showCreateForm.set(!showCreateForm())">
+      <mat-icon>add</mat-icon>
+      Novo Baralho
+    </button>
+  </div>
+
+  @if (showCreateForm()) {
+    <mat-card class="create-form-card animate-fade-in-up">
+      <mat-card-content>
+        <h3>Criar novo baralho</h3>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Nome do baralho</mat-label>
+          <input
+            matInput
+            [value]="newDeckName()"
+            (input)="newDeckName.set($any($event.target).value)"
+            placeholder="Ex: Matemática - Fórmulas"
+          />
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Descrição (opcional)</mat-label>
+          <textarea
+            matInput
+            [value]="newDeckDescription()"
+            (input)="newDeckDescription.set($any($event.target).value)"
+            rows="2"
+            placeholder="Ex: Fórmulas essenciais para o vestibulinho"
+          ></textarea>
+        </mat-form-field>
+        <div class="form-actions">
+          <button mat-button (click)="showCreateForm.set(false); newDeckName.set(''); newDeckDescription.set('')">
+            Cancelar
+          </button>
+          <button
+            mat-flat-button
+            color="primary"
+            [disabled]="!newDeckName().trim() || creating()"
+            (click)="createDeck()"
+          >
+            @if (creating()) {
+              <span class="btn-content">
+                <mat-spinner diameter="20"></mat-spinner>
+                Criando...
+              </span>
+            } @else {
+              <span class="btn-content">
+                <mat-icon>check</mat-icon>
+                Criar Baralho
+              </span>
+            }
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  @if (loading()) {
+    <div class="loading-container">
+      <mat-spinner diameter="48"></mat-spinner>
+      <p>Carregando baralhos...</p>
+    </div>
+  } @else if (decks().length === 0) {
+    <div class="empty-state animate-fade-in-up">
+      <mat-icon class="empty-icon">style</mat-icon>
+      <h2>Nenhum baralho ainda</h2>
+      <p>Crie seu primeiro baralho de cartões para começar a estudar!</p>
+      <button mat-flat-button color="primary" (click)="showCreateForm.set(true)">
+        <mat-icon>add</mat-icon>
+        Criar Baralho
+      </button>
+    </div>
+  } @else {
+    <div class="deck-grid animate-fade-in-up">
+      @for (deck of decks(); track deck.id) {
+        <mat-card class="deck-card" [class.has-due]="deck.dueCount > 0">
+          <mat-card-header>
+            <mat-icon mat-card-avatar class="deck-icon">style</mat-icon>
+            <mat-card-title>{{ deck.name }}</mat-card-title>
+            <mat-card-subtitle>{{ deck.description || 'Sem descrição' }}</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="deck-stats">
+              <div class="stat">
+                <mat-icon>layers</mat-icon>
+                <span>{{ deck.cardCount }} cartões</span>
+              </div>
+              <div class="stat due" [class.active]="deck.dueCount > 0">
+                <mat-icon>schedule</mat-icon>
+                <span>{{ deck.dueCount }} para revisar</span>
+              </div>
+            </div>
+          </mat-card-content>
+          <mat-card-actions align="end">
+            <button mat-icon-button class="delete-btn" (click)="deleteDeck(deck)" title="Excluir baralho">
+              <mat-icon>delete_outline</mat-icon>
+            </button>
+            <button mat-button (click)="openDeck(deck.id)">
+              <mat-icon>visibility</mat-icon>
+              Ver Cartões
+            </button>
+            <button
+              mat-flat-button
+              color="primary"
+              [disabled]="deck.cardCount === 0"
+              (click)="startReview(deck.id)"
+            >
+              <mat-icon>play_arrow</mat-icon>
+              Estudar
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      }
+    </div>
+  }
+
+  <mat-card class="tip-card animate-fade-in-up">
+    <mat-card-content>
+      <div class="tip-content">
+        <mat-icon>lightbulb</mat-icon>
+        <p>
+          Dica: A repetição espaçada é uma técnica comprovada que mostra os cartões no momento
+          ideal para memorização. Quanto mais vezes você acertar, maior o intervalo até a próxima
+          revisão!
+        </p>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -201,6 +201,56 @@ export interface MockExamQuestionResult {
 }
 
 // ============================================================
+// Deck DTOs
+// ============================================================
+
+export interface CreateDeckDto {
+  name: string;
+  description?: string;
+}
+
+export interface UpdateDeckDto {
+  name?: string;
+  description?: string;
+}
+
+// ============================================================
+// Flashcard DTOs
+// ============================================================
+
+export interface CreateFlashcardDto {
+  deckId: string;
+  front: string;
+  back: string;
+}
+
+export interface UpdateFlashcardDto {
+  front?: string;
+  back?: string;
+}
+
+export interface ReviewFlashcardDto {
+  rating: 1 | 2 | 3 | 4;
+}
+
+export interface ReviewResult {
+  flashcardId: string;
+  nextReviewDate: string;
+  interval: number;
+  easeFactor: number;
+  repetitions: number;
+}
+
+export interface DeckStats {
+  deckId: string;
+  totalCards: number;
+  dueCards: number;
+  newCards: number;
+  learningCards: number;
+  reviewCards: number;
+}
+
+// ============================================================
 // API Endpoints Reference
 // ============================================================
 //
@@ -249,3 +299,20 @@ export interface MockExamQuestionResult {
 //   GET    /api/mock-exams/:id                  → ApiResponse<MockExamSession>
 //   POST   /api/mock-exams/:id/submit           → ApiResponse<MockExamResult>
 //   GET    /api/mock-exams/:id/result           → ApiResponse<MockExamResult>
+//
+// Decks:
+//   GET    /api/decks                             → ApiListResponse<Deck>
+//   GET    /api/decks/:id                         → ApiResponse<Deck>
+//   POST   /api/decks                             → ApiResponse<Deck>
+//   PUT    /api/decks/:id                         → ApiResponse<Deck>
+//   DELETE /api/decks/:id                         → 204
+//   GET    /api/decks/:id/stats                   → ApiResponse<DeckStats>
+//
+// Flashcards:
+//   GET    /api/decks/:deckId/flashcards           → ApiListResponse<Flashcard>
+//   GET    /api/decks/:deckId/flashcards/due       → ApiListResponse<Flashcard>
+//   GET    /api/flashcards/:id                     → ApiResponse<Flashcard>
+//   POST   /api/flashcards                         → ApiResponse<Flashcard>
+//   PUT    /api/flashcards/:id                     → ApiResponse<Flashcard>
+//   DELETE /api/flashcards/:id                     → 204
+//   POST   /api/flashcards/:id/review              → ApiResponse<ReviewResult>

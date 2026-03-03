@@ -8,6 +8,8 @@ import { QuestionModule } from './question/question.module';
 import { AnswerModule } from './answer/answer.module';
 import { ProgressModule } from './progress/progress.module';
 import { MockExamModule } from './mock-exam/mock-exam.module';
+import { DeckModule } from './deck/deck.module';
+import { FlashcardModule } from './flashcard/flashcard.module';
 
 @Module({
   imports: [
@@ -32,6 +34,8 @@ import { MockExamModule } from './mock-exam/mock-exam.module';
     AnswerModule,
     ProgressModule,
     MockExamModule,
+    DeckModule,
+    FlashcardModule,
   ],
 })
 export class AppModule {}

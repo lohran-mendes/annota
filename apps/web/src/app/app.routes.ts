@@ -30,6 +30,13 @@ export const routes: Routes = [
             (m) => m.mockExamRoutes,
           ),
       },
+      {
+        path: 'flashcards',
+        loadChildren: () =>
+          import('./features/flashcards/flashcards.routes').then(
+            (m) => m.flashcardsRoutes,
+          ),
+      },
     ],
   },
   {

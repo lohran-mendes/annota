@@ -1,0 +1,209 @@
+<div class="deck-detail-container">
+  <!-- Header -->
+  <div class="page-header animate-fade-in-up">
+    <div class="header-left">
+      <button mat-icon-button (click)="goBack()" class="back-btn" title="Voltar">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="header-text">
+        <h1>{{ deck()?.name ?? 'Baralho' }}</h1>
+        <p class="subtitle">{{ deck()?.description || 'Sem descrição' }}</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button mat-stroked-button (click)="showAddForm.set(!showAddForm())">
+        <mat-icon>add</mat-icon>
+        Novo Cartão
+      </button>
+      <button
+        mat-flat-button
+        color="primary"
+        [disabled]="cards().length === 0"
+        (click)="startReview()"
+      >
+        <mat-icon>play_arrow</mat-icon>
+        Estudar
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats Row -->
+  <div class="stats-row animate-fade-in-up">
+    <div class="stat-chip">
+      <mat-icon>layers</mat-icon>
+      <span><strong>{{ cards().length }}</strong> cartões</span>
+    </div>
+    <div class="stat-chip" [class.due-active]="dueCount() > 0">
+      <mat-icon>schedule</mat-icon>
+      <span><strong>{{ dueCount() }}</strong> para revisar</span>
+    </div>
+  </div>
+
+  <!-- Add Card Form -->
+  @if (showAddForm()) {
+    <mat-card class="add-form-card animate-fade-in-up">
+      <mat-card-content>
+        <h3>Novo Cartão</h3>
+        <div class="card-form-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>Frente (Pergunta)</mat-label>
+            <textarea
+              matInput
+              [value]="newCardFront()"
+              (input)="newCardFront.set($any($event.target).value)"
+              rows="3"
+              placeholder="Ex: Qual é a fórmula da área do círculo?"
+            ></textarea>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Verso (Resposta)</mat-label>
+            <textarea
+              matInput
+              [value]="newCardBack()"
+              (input)="newCardBack.set($any($event.target).value)"
+              rows="3"
+              placeholder="Ex: A = π × r²"
+            ></textarea>
+          </mat-form-field>
+        </div>
+        <div class="form-actions">
+          <button mat-button (click)="showAddForm.set(false); newCardFront.set(''); newCardBack.set('')">
+            Cancelar
+          </button>
+          <button
+            mat-flat-button
+            color="primary"
+            [disabled]="!newCardFront().trim() || !newCardBack().trim() || addingCard()"
+            (click)="addCard()"
+          >
+            @if (addingCard()) {
+              <span class="btn-content">
+                <mat-spinner diameter="20"></mat-spinner>
+                Adicionando...
+              </span>
+            } @else {
+              <span class="btn-content">
+                <mat-icon>add</mat-icon>
+                Adicionar Cartão
+              </span>
+            }
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  <!-- Cards List -->
+  @if (loading()) {
+    <div class="loading-container">
+      <mat-spinner diameter="48"></mat-spinner>
+      <p>Carregando cartões...</p>
+    </div>
+  } @else if (cards().length === 0) {
+    <div class="empty-state animate-fade-in-up">
+      <mat-icon class="empty-icon">style</mat-icon>
+      <h2>Nenhum cartão neste baralho</h2>
+      <p>Adicione cartões para começar a estudar!</p>
+      <button mat-flat-button color="primary" (click)="showAddForm.set(true)">
+        <mat-icon>add</mat-icon>
+        Adicionar Cartão
+      </button>
+    </div>
+  } @else {
+    <div class="cards-list animate-fade-in-up">
+      <h2 class="section-title">
+        <mat-icon>style</mat-icon>
+        Cartões ({{ cards().length }})
+      </h2>
+      @for (card of cards(); track card.id; let i = $index) {
+        <mat-card class="flashcard-item" [class.is-editing]="isEditing(card.id)" [class.is-expanded]="isExpanded(card.id)">
+          @if (isEditing(card.id)) {
+            <!-- Edit Mode -->
+            <mat-card-content>
+              <h4 class="edit-label">Editando cartão</h4>
+              <div class="card-form-grid">
+                <mat-form-field appearance="outline">
+                  <mat-label>Frente (Pergunta)</mat-label>
+                  <textarea
+                    matInput
+                    [value]="editFront()"
+                    (input)="editFront.set($any($event.target).value)"
+                    rows="3"
+                  ></textarea>
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>Verso (Resposta)</mat-label>
+                  <textarea
+                    matInput
+                    [value]="editBack()"
+                    (input)="editBack.set($any($event.target).value)"
+                    rows="3"
+                  ></textarea>
+                </mat-form-field>
+              </div>
+              <div class="form-actions">
+                <button mat-button (click)="cancelEdit()">Cancelar</button>
+                <button
+                  mat-flat-button
+                  color="primary"
+                  [disabled]="!editFront().trim() || !editBack().trim() || savingEdit()"
+                  (click)="saveEdit()"
+                >
+                  @if (savingEdit()) {
+                    <span class="btn-content">
+                      <mat-spinner diameter="20"></mat-spinner>
+                      Salvando...
+                    </span>
+                  } @else {
+                    <span class="btn-content">
+                      <mat-icon>save</mat-icon>
+                      Salvar
+                    </span>
+                  }
+                </button>
+              </div>
+            </mat-card-content>
+          } @else {
+            <!-- View Mode -->
+            <mat-card-content>
+              <div class="card-header-row" (click)="toggleExpand(card.id)">
+                <div class="card-number">{{ i + 1 }}</div>
+                <div class="card-front-preview">
+                  <span class="card-label">Pergunta</span>
+                  <p class="front-text">{{ card.front }}</p>
+                </div>
+                <mat-icon class="expand-icon">{{ isExpanded(card.id) ? 'expand_less' : 'expand_more' }}</mat-icon>
+              </div>
+              @if (isExpanded(card.id)) {
+                <div class="card-back-section">
+                  <mat-divider></mat-divider>
+                  <span class="card-label answer-label">Resposta</span>
+                  <p class="back-text">{{ card.back }}</p>
+                  <div class="card-meta">
+                    <span class="meta-chip">
+                      <mat-icon>repeat</mat-icon>
+                      {{ card.repetitions }} repetições
+                    </span>
+                    <span class="meta-chip">
+                      <mat-icon>schedule</mat-icon>
+                      Intervalo: {{ card.interval }}d
+                    </span>
+                  </div>
+                </div>
+              }
+            </mat-card-content>
+            <mat-card-actions align="end">
+              <button mat-icon-button class="delete-card-btn" (click)="deleteCard(card)" title="Excluir cartão">
+                <mat-icon>delete_outline</mat-icon>
+              </button>
+              <button mat-button (click)="startEdit(card)">
+                <mat-icon>edit</mat-icon>
+                Editar
+              </button>
+            </mat-card-actions>
+          }
+        </mat-card>
+      }
+    </div>
+  }
+</div>

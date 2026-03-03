@@ -1,0 +1,88 @@
+<div class="review-container">
+  @if (loading()) {
+    <div class="loading-container animate-fade-in">
+      <mat-spinner diameter="48"></mat-spinner>
+      <p>Carregando cartões...</p>
+    </div>
+  } @else if (sessionComplete()) {
+    <div class="session-complete animate-fade-in-up">
+      <mat-icon class="complete-icon">celebration</mat-icon>
+      <h2>Sessão concluída!</h2>
+      <p>Você revisou <strong>{{ reviewedCount() }}</strong> cartões nesta sessão.</p>
+      <button mat-flat-button color="primary" (click)="goBackToDeck()">
+        <mat-icon>arrow_back</mat-icon>
+        Voltar ao baralho
+      </button>
+    </div>
+  } @else if (cards().length === 0) {
+    <div class="empty-state animate-fade-in-up">
+      <mat-icon class="empty-icon">check_circle</mat-icon>
+      <h2>Tudo em dia!</h2>
+      <p>Nenhum cartão para revisar agora. Volte mais tarde ou adicione novos cartões.</p>
+      <button mat-stroked-button (click)="goBackToDeck()">
+        <mat-icon>arrow_back</mat-icon>
+        Voltar ao baralho
+      </button>
+    </div>
+  } @else {
+    <div class="review-header animate-fade-in">
+      <button mat-icon-button (click)="goBackToDeck()" class="close-btn" title="Sair da sessão">
+        <mat-icon>close</mat-icon>
+      </button>
+      <span class="review-counter">{{ currentIndex() + 1 }} / {{ totalCards() }}</span>
+    </div>
+
+    <mat-progress-bar
+      mode="determinate"
+      [value]="progress()"
+      class="review-progress"
+    ></mat-progress-bar>
+
+    <div class="card-container animate-fade-in">
+      <mat-card class="flashcard">
+        <mat-card-content>
+          <div class="card-section card-front">
+            <span class="section-label">Pergunta</span>
+            <p class="card-text">{{ currentCard().front }}</p>
+          </div>
+          @if (showAnswer()) {
+            <mat-divider></mat-divider>
+            <div class="card-section card-back">
+              <span class="section-label answer-label">Resposta</span>
+              <p class="card-text answer-text">{{ currentCard().back }}</p>
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
+
+      @if (!showAnswer()) {
+        <div class="reveal-area">
+          <button mat-flat-button color="primary" class="reveal-btn" (click)="revealAnswer()">
+            <mat-icon>visibility</mat-icon>
+            Mostrar Resposta
+          </button>
+        </div>
+      } @else {
+        <div class="rating-buttons">
+          <button class="rate-btn again" (click)="rate(1)" [disabled]="reviewing()">
+            <mat-icon>replay</mat-icon>
+            <span class="rate-label">De novo</span>
+            <span class="rate-interval">&lt; 1d</span>
+          </button>
+          <button class="rate-btn hard" (click)="rate(2)" [disabled]="reviewing()">
+            <mat-icon>trending_flat</mat-icon>
+            <span class="rate-label">Difícil</span>
+          </button>
+          <button class="rate-btn good" (click)="rate(3)" [disabled]="reviewing()">
+            <mat-icon>thumb_up</mat-icon>
+            <span class="rate-label">Bom</span>
+          </button>
+          <button class="rate-btn easy" (click)="rate(4)" [disabled]="reviewing()">
+            <mat-icon>bolt</mat-icon>
+            <span class="rate-label">Fácil</span>
+          </button>
+        </div>
+      }
+    </div>
+  }
+</div>
