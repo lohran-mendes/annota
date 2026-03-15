@@ -121,27 +121,33 @@
           </mat-card-content>
         </mat-card>
       } @else {
-        <mat-tab-group animationDuration="200ms" dynamicHeight>
+        <mat-accordion multi>
           @for (group of detailsBySubject(); track group.subjectName) {
-            <mat-tab>
-              <ng-template mat-tab-label>
-                <div class="tab-label">
-                  <span class="tab-color-dot" [style.background-color]="group.color"></span>
-                  <span>{{ group.subjectName }}</span>
-                  <span class="tab-count">{{ group.questions.length }}</span>
+            <mat-expansion-panel>
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  <div class="panel-label">
+                    <span class="tab-color-dot" [style.background-color]="group.color"></span>
+                    <span>{{ group.subjectName }}</span>
+                  </div>
+                </mat-panel-title>
+                <mat-panel-description>
+                  <span class="tab-count">{{ group.questions.length }} questões</span>
                   @if (getSubjectErrorCount(group.questions) > 0) {
                     <span class="tab-errors">{{ getSubjectErrorCount(group.questions) }} erros</span>
                   }
-                </div>
-              </ng-template>
+                </mat-panel-description>
+              </mat-expansion-panel-header>
 
               <div class="question-details">
                 @for (detail of group.questions; track detail.questionId; let i = $index) {
-                  <mat-card class="question-card" [class.correct]="detail.correct" [class.incorrect]="!detail.correct">
+                  <mat-card class="question-card" [class.correct]="detail.correct" [class.incorrect]="!detail.correct && detail.selectedIndex >= 0" [class.skipped]="!detail.correct && detail.selectedIndex < 0">
                     <mat-card-header>
-                      <div class="question-badge" [class.correct]="detail.correct" [class.incorrect]="!detail.correct">
+                      <div class="question-badge" [class.correct]="detail.correct" [class.incorrect]="!detail.correct && detail.selectedIndex >= 0" [class.skipped]="!detail.correct && detail.selectedIndex < 0">
                         @if (detail.correct) {
                           <mat-icon>check</mat-icon>
+                        } @else if (detail.selectedIndex < 0) {
+                          <mat-icon>remove</mat-icon>
                         } @else {
                           <mat-icon>close</mat-icon>
                         }
@@ -150,6 +156,8 @@
                         Questão {{ i + 1 }}
                         @if (detail.correct) {
                           <span class="question-status correct">Acerto</span>
+                        } @else if (detail.selectedIndex < 0) {
+                          <span class="question-status skipped">Não respondida</span>
                         } @else {
                           <span class="question-status incorrect">Erro</span>
                         }
@@ -191,9 +199,9 @@
                   </mat-card>
                 }
               </div>
-            </mat-tab>
+            </mat-expansion-panel>
           }
-        </mat-tab-group>
+        </mat-accordion>
       }
     </section>
   }

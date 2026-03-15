@@ -96,10 +96,18 @@
   } @else {
     <div class="exams-grid">
       @for (session of sessionHistory(); track session.id; let i = $index) {
-        <mat-card class="exam-card stagger-{{ i + 1 }}" [class.completed]="session.status === 'completed'">
+        <mat-card class="exam-card stagger-{{ i + 1 }}"
+          [class.score-high]="session.status === 'completed' && session.score !== undefined && session.score >= 75"
+          [class.score-mid]="session.status === 'completed' && session.score !== undefined && session.score >= 60 && session.score < 75"
+          [class.score-low]="session.status === 'completed' && session.score !== undefined && session.score < 60"
+        >
           <mat-card-header>
             @if (session.status === 'completed') {
-              <mat-icon mat-card-avatar class="status-icon completed">check_circle</mat-icon>
+              <mat-icon mat-card-avatar class="status-icon"
+                [class.score-high]="session.score !== undefined && session.score >= 75"
+                [class.score-mid]="session.score !== undefined && session.score >= 60 && session.score < 75"
+                [class.score-low]="session.score === undefined || session.score < 60"
+              >check_circle</mat-icon>
             } @else {
               <mat-icon mat-card-avatar class="status-icon in-progress">pending</mat-icon>
             }
@@ -124,12 +132,22 @@
                   <mat-icon matChipAvatar>timer</mat-icon>
                   {{ formatDuration(session.duration) }}
                 </mat-chip>
+                @if (session.status === 'completed' && session.timeSpent) {
+                  <mat-chip>
+                    <mat-icon matChipAvatar>hourglass_bottom</mat-icon>
+                    {{ formatTimeSpent(session.timeSpent) }}
+                  </mat-chip>
+                }
               </mat-chip-set>
 
               @if (session.status === 'completed' && session.score !== undefined) {
                 <div class="score-display">
                   <span class="score-label">Nota:</span>
-                  <span class="score-value" [class.high]="session.score >= 70" [class.low]="session.score < 70">
+                  <span class="score-value"
+                    [class.high]="session.score >= 75"
+                    [class.mid]="session.score >= 60 && session.score < 75"
+                    [class.low]="session.score < 60"
+                  >
                     {{ session.score }}%
                   </span>
                 </div>

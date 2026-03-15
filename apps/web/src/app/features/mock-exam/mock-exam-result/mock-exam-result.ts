@@ -7,7 +7,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { MatTabsModule } from '@angular/material/tabs';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { MockExamService } from '../../../core/services/mock-exam.service';
 import type { MockExamSubjectResult, MockExamQuestionResult } from '@annota/shared';
 
@@ -16,7 +16,7 @@ import type { MockExamSubjectResult, MockExamQuestionResult } from '@annota/shar
   imports: [
     RouterLink, MatCardModule, MatButtonModule, MatIconModule,
     MatProgressBarModule, MatProgressSpinnerModule,
-    MatDividerModule, MatSlideToggleModule, MatTabsModule,
+    MatDividerModule, MatSlideToggleModule, MatExpansionModule,
   ],
   templateUrl: './mock-exam-result.html',
   styleUrl: './mock-exam-result.scss',

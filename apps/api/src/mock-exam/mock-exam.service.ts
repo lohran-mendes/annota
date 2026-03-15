@@ -262,25 +262,32 @@ export class MockExamService {
       .exec();
     const subjectMap = new Map(subjects.map((s) => [s._id.toString(), s]));
 
-    // Corrigir respostas
+    // Corrigir respostas (incluindo questoes nao respondidas como erradas)
     let correctCount = 0;
-    const details = dto.answers.map((answer) => {
-      const question = questionMap.get(answer.questionId);
+    const answeredMap = new Map(
+      dto.answers.map((a) => [a.questionId, a.selectedIndex]),
+    );
+
+    const details = session.questionIds.map((qId) => {
+      const questionId = qId.toString();
+      const question = questionMap.get(questionId);
+      const selectedIndex = answeredMap.get(questionId) ?? -1;
       const correct =
+        selectedIndex >= 0 &&
         question !== undefined &&
-        answer.selectedIndex === question.correctAnswerIndex;
+        selectedIndex === question.correctAnswerIndex;
       if (correct) correctCount++;
 
       const sid = question?.subjectId?.toString() ?? '';
       const subject = subjectMap.get(sid);
 
       return {
-        questionId: answer.questionId,
+        questionId,
         subjectId: sid,
         subjectName: subject?.name ?? 'Desconhecida',
         statement: question?.statement ?? '',
         alternatives: question?.alternatives ?? [],
-        selectedIndex: answer.selectedIndex,
+        selectedIndex,
         correctAnswerIndex: question?.correctAnswerIndex ?? 0,
         correct,
         explanation: question?.explanation ?? '',
@@ -319,6 +326,7 @@ export class MockExamService {
       .findByIdAndUpdate(sessionId, {
         status: 'completed',
         score,
+        timeSpent: dto.timeSpent,
         completedAt: new Date(),
       })
       .exec();

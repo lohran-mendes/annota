@@ -136,6 +136,7 @@ export interface MockExamSessionConfig {
   duration: number;
   status: 'in_progress' | 'completed';
   score?: number;
+  timeSpent?: number;
   completedAt?: string;
   createdAt?: string;
 }

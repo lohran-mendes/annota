@@ -36,6 +36,9 @@ export class MockExamSession {
   score?: number;
 
   @Prop()
+  timeSpent?: number;
+
+  @Prop()
   completedAt?: Date;
 }
 
