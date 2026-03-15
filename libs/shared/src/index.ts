@@ -18,7 +18,9 @@ export type {
   ExamProgress,
   TopicProgress,
   CreateMockExamDto,
-  MockExamSession,
+  UpdateMockExamDto,
+  StartMockExamSessionDto,
+  MockExamSessionData,
   MockExamQuestion,
   SubmitMockExamDto,
   MockExamAnswer,
@@ -113,15 +115,29 @@ export interface SubjectProgress {
   color: string;
 }
 
-export interface MockExamConfig {
+export interface MockExam {
   id: string;
   examId: string;
   name: string;
+  description: string;
+  questionIds: string[];
   questionCount: number;
   duration: number;
-  status: 'available' | 'in_progress' | 'completed';
+  published: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface MockExamSessionConfig {
+  id: string;
+  mockExamId: string;
+  mockExamName: string;
+  questionCount: number;
+  duration: number;
+  status: 'in_progress' | 'completed';
   score?: number;
   completedAt?: string;
+  createdAt?: string;
 }
 
 // === User ===

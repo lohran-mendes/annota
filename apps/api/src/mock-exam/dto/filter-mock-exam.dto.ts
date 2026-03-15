@@ -1,4 +1,5 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString, IsBoolean } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class FilterMockExamDto {
   @IsOptional()
@@ -6,6 +7,7 @@ export class FilterMockExamDto {
   examId?: string;
 
   @IsOptional()
-  @IsString()
-  status?: string;
+  @Transform(({ value }) => value === 'true' || value === true)
+  @IsBoolean()
+  published?: boolean;
 }

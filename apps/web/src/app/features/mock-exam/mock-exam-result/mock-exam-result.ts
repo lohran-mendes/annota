@@ -32,7 +32,7 @@ export class MockExamResult implements OnInit {
   private mockExamId = '';
 
   ngOnInit() {
-    this.mockExamId = this.route.snapshot.paramMap.get('mockExamId') ?? '';
+    this.mockExamId = this.route.snapshot.paramMap.get('sessionId') ?? '';
     this.loadResult(this.mockExamId);
   }
 
@@ -43,7 +43,7 @@ export class MockExamResult implements OnInit {
 
   private loadResult(id: string) {
     this.loading.set(true);
-    this.mockExamService.getResult(id).subscribe({
+    this.mockExamService.getSessionResult(id).subscribe({
       next: (res) => {
         const result = res.data;
         this.score.set(result.score);

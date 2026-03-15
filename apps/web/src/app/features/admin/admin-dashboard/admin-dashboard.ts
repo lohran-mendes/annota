@@ -8,6 +8,8 @@ import { ExamService } from '../../../core/services/exam.service';
 import { SubjectService } from '../../../core/services/subject.service';
 import { TopicService } from '../../../core/services/topic.service';
 import { QuestionService } from '../../../core/services/question.service';
+import { MockExamService } from '../../../core/services/mock-exam.service';
+
 @Component({
   selector: 'annota-admin-dashboard',
   imports: [RouterLink, MatCardModule, MatButtonModule, MatIconModule],
@@ -19,6 +21,7 @@ export class AdminDashboard implements OnInit {
   private readonly subjectService = inject(SubjectService);
   private readonly topicService = inject(TopicService);
   private readonly questionService = inject(QuestionService);
+  private readonly mockExamService = inject(MockExamService);
 
   loading = signal(true);
   stats = signal([
@@ -26,6 +29,7 @@ export class AdminDashboard implements OnInit {
     { label: 'Matérias', count: 0, icon: 'menu_book', route: '/admin/subjects', color: '#9C27B0' },
     { label: 'Tópicos', count: 0, icon: 'topic', route: '/admin/topics', color: '#00BCD4' },
     { label: 'Questões', count: 0, icon: 'help_outline', route: '/admin/questions', color: '#FF7043' },
+    { label: 'Simulados', count: 0, icon: 'assignment', route: '/admin/mock-exams', color: '#4CAF50' },
   ]);
 
   ngOnInit() {
@@ -34,13 +38,15 @@ export class AdminDashboard implements OnInit {
       subjects: this.subjectService.getAll(),
       topics: this.topicService.getAll(),
       questions: this.questionService.getAll(),
+      mockExams: this.mockExamService.getAll(),
     }).subscribe({
-      next: ({ exams, subjects, topics, questions }) => {
+      next: ({ exams, subjects, topics, questions, mockExams }) => {
         this.stats.set([
           { label: 'Provas', count: exams.total, icon: 'school', route: '/admin/exams', color: '#E91E63' },
           { label: 'Matérias', count: subjects.total, icon: 'menu_book', route: '/admin/subjects', color: '#9C27B0' },
           { label: 'Tópicos', count: topics.total, icon: 'topic', route: '/admin/topics', color: '#00BCD4' },
           { label: 'Questões', count: questions.total, icon: 'help_outline', route: '/admin/questions', color: '#FF7043' },
+          { label: 'Simulados', count: mockExams.total, icon: 'assignment', route: '/admin/mock-exams', color: '#4CAF50' },
         ]);
         this.loading.set(false);
       },

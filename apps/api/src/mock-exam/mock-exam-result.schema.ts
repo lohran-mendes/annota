@@ -55,10 +55,10 @@ const QuestionResultMongoSchema =
 export class MockExamResult {
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'MockExam',
+    ref: 'MockExamSession',
     required: true,
   })
-  mockExamId: mongoose.Types.ObjectId;
+  sessionId: mongoose.Types.ObjectId;
 
   @Prop({ required: true })
   score: number;
@@ -82,13 +82,14 @@ export class MockExamResult {
 export const MockExamResultSchema =
   SchemaFactory.createForClass(MockExamResult);
 
-MockExamResultSchema.index({ mockExamId: 1 });
+MockExamResultSchema.index({ sessionId: 1 });
 
 MockExamResultSchema.set('toJSON', {
   virtuals: true,
   versionKey: false,
   transform: (_doc: any, ret: any) => {
-    ret.mockExamId = ret.mockExamId?.toString();
+    ret.id = ret._id?.toString();
+    ret.sessionId = ret.sessionId?.toString();
     delete ret._id;
   },
 });

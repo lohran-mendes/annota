@@ -1,4 +1,13 @@
-import { IsString, IsNotEmpty, IsInt, Min } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsInt,
+  Min,
+  IsArray,
+  ArrayMinSize,
+  IsOptional,
+  IsBoolean,
+} from 'class-validator';
 import type { CreateMockExamDto as ICreateMockExamDto } from '@annota/shared';
 
 export class CreateMockExamDto implements ICreateMockExamDto {
@@ -10,11 +19,20 @@ export class CreateMockExamDto implements ICreateMockExamDto {
   @IsNotEmpty()
   name: string;
 
-  @IsInt()
-  @Min(1)
-  questionCount: number;
+  @IsOptional()
+  @IsString()
+  description?: string;
 
   @IsInt()
   @Min(1)
   duration: number;
+
+  @IsArray()
+  @ArrayMinSize(1)
+  @IsString({ each: true })
+  questionIds: string[];
+
+  @IsOptional()
+  @IsBoolean()
+  published?: boolean;
 }

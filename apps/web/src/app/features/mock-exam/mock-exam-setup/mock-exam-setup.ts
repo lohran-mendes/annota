@@ -1,4 +1,5 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -6,15 +7,16 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { forkJoin } from 'rxjs';
 import { ExamService } from '../../../core/services/exam.service';
 import { MockExamService } from '../../../core/services/mock-exam.service';
-import type { Exam, MockExamConfig } from '@annota/shared';
+import type { Exam, MockExam, MockExamSessionConfig } from '@annota/shared';
 
 @Component({
   selector: 'annota-mock-exam-setup',
   imports: [
     MatCardModule, MatButtonModule, MatIconModule,
-    MatChipsModule, MatProgressSpinnerModule, MatSnackBarModule,
+    MatChipsModule, MatProgressSpinnerModule, MatSnackBarModule, DatePipe,
   ],
   templateUrl: './mock-exam-setup.html',
   styleUrl: './mock-exam-setup.scss',
@@ -25,35 +27,44 @@ export class MockExamSetup implements OnInit {
   private readonly mockExamService = inject(MockExamService);
   private readonly snackBar = inject(MatSnackBar);
 
-  exams = signal<Exam[]>([]);
-  mockExamHistory = signal<MockExamConfig[]>([]);
-  loadingExams = signal(false);
+  publishedMockExams = signal<MockExam[]>([]);
+  sessionHistory = signal<MockExamSessionConfig[]>([]);
+  private examMap = signal<Map<string, Exam>>(new Map());
+
+  loadingTemplates = signal(false);
   loadingHistory = signal(false);
   startingExam = signal<string | null>(null);
 
+  // Map examId to exam name for display in cards
+  getExamName = computed(() => (examId: string) => this.examMap().get(examId)?.name ?? '');
+
   ngOnInit(): void {
-    this.loadExams();
+    this.loadTemplates();
     this.loadHistory();
   }
 
-  loadExams() {
-    this.loadingExams.set(true);
-    this.examService.getAll().subscribe({
-      next: (res) => {
-        this.exams.set(res.data.filter(e => e.questionCount > 0));
-        this.loadingExams.set(false);
+  loadTemplates() {
+    this.loadingTemplates.set(true);
+    forkJoin({
+      mockExams: this.mockExamService.getAll({ published: 'true' }),
+      exams: this.examService.getAll(),
+    }).subscribe({
+      next: ({ mockExams, exams }) => {
+        this.publishedMockExams.set(mockExams.data);
+        this.examMap.set(new Map(exams.data.map((e) => [e.id, e])));
+        this.loadingTemplates.set(false);
       },
       error: () => {
-        this.loadingExams.set(false);
+        this.loadingTemplates.set(false);
       },
     });
   }
 
   loadHistory() {
     this.loadingHistory.set(true);
-    this.mockExamService.getAll().subscribe({
+    this.mockExamService.getSessions().subscribe({
       next: (res) => {
-        this.mockExamHistory.set(res.data);
+        this.sessionHistory.set(res.data);
         this.loadingHistory.set(false);
       },
       error: () => {
@@ -62,15 +73,9 @@ export class MockExamSetup implements OnInit {
     });
   }
 
-  startExam(exam: Exam) {
-    this.startingExam.set(exam.id);
-    const dto = {
-      examId: exam.id,
-      name: `Simulado - ${exam.name}`,
-      questionCount: exam.questionCount,
-      duration: exam.duration,
-    };
-    this.mockExamService.create(dto).subscribe({
+  startMockExam(mockExam: MockExam) {
+    this.startingExam.set(mockExam.id);
+    this.mockExamService.startSession(mockExam.id).subscribe({
       next: (res) => {
         this.startingExam.set(null);
         this.router.navigate(['/mock-exam', res.data.config.id]);
@@ -82,12 +87,12 @@ export class MockExamSetup implements OnInit {
     });
   }
 
-  continueExam(mockExam: MockExamConfig) {
-    this.router.navigate(['/mock-exam', mockExam.id]);
+  continueSession(session: MockExamSessionConfig) {
+    this.router.navigate(['/mock-exam', session.id]);
   }
 
-  viewResult(mockExam: MockExamConfig) {
-    this.router.navigate(['/mock-exam', mockExam.id, 'result']);
+  viewResult(session: MockExamSessionConfig) {
+    this.router.navigate(['/mock-exam', session.id, 'result']);
   }
 
   formatDuration(minutes: number): string {

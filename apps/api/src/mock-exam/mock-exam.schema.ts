@@ -12,32 +12,22 @@ export class MockExam {
   @Prop({ required: true })
   name: string;
 
-  @Prop({ required: true })
-  questionCount: number;
+  @Prop({ default: '' })
+  description: string;
 
   @Prop({ required: true })
   duration: number;
 
-  @Prop({
-    type: String,
-    enum: ['available', 'in_progress', 'completed'],
-    default: 'available',
-  })
-  status: string;
-
-  @Prop()
-  score?: number;
-
-  @Prop()
-  completedAt?: Date;
-
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Question' }] })
   questionIds: mongoose.Types.ObjectId[];
+
+  @Prop({ default: false })
+  published: boolean;
 }
 
 export const MockExamSchema = SchemaFactory.createForClass(MockExam);
 
-MockExamSchema.index({ examId: 1, status: 1 });
+MockExamSchema.index({ examId: 1, published: 1 });
 
 MockExamSchema.set('toJSON', {
   virtuals: true,
@@ -45,10 +35,12 @@ MockExamSchema.set('toJSON', {
   transform: (_doc: any, ret: any) => {
     ret.id = ret._id.toString();
     ret.examId = ret.examId?.toString();
-    if (ret.completedAt) {
-      ret.completedAt = ret.completedAt.toISOString().split('T')[0];
+    ret.questionCount = Array.isArray(ret.questionIds)
+      ? ret.questionIds.length
+      : 0;
+    if (Array.isArray(ret.questionIds)) {
+      ret.questionIds = ret.questionIds.map((id: any) => id.toString());
     }
     delete ret._id;
-    delete ret.questionIds;
   },
 });

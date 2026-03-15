@@ -3,7 +3,7 @@
 // No NestJS, os DTOs devem ser classes que implementam estas interfaces
 // e adicionam decorators de validacao (class-validator).
 
-import type { Alternative, MockExamConfig, SubjectProgress } from './index';
+import type { Alternative, MockExamSessionConfig, SubjectProgress } from './index';
 
 // ============================================================
 // API Response Wrapper
@@ -142,18 +142,36 @@ export interface TopicProgress {
 }
 
 // ============================================================
-// Mock Exam DTOs
+// Mock Exam DTOs (Admin - template management)
 // ============================================================
 
 export interface CreateMockExamDto {
   examId: string;
   name: string;
-  questionCount: number;
+  description?: string;
   duration: number;
+  questionIds: string[];
+  published?: boolean;
 }
 
-export interface MockExamSession {
-  config: MockExamConfig;
+export interface UpdateMockExamDto {
+  name?: string;
+  description?: string;
+  duration?: number;
+  questionIds?: string[];
+  published?: boolean;
+}
+
+// ============================================================
+// Mock Exam Session DTOs (Student - taking exams)
+// ============================================================
+
+export interface StartMockExamSessionDto {
+  mockExamId: string;
+}
+
+export interface MockExamSessionData {
+  config: MockExamSessionConfig;
   questions: MockExamQuestion[];
 }
 
@@ -176,7 +194,7 @@ export interface MockExamAnswer {
 }
 
 export interface MockExamResult {
-  mockExamId: string;
+  sessionId: string;
   score: number;
   totalQuestions: number;
   correctCount: number;
@@ -342,12 +360,19 @@ export interface AccessLogStreak {
 //   GET    /api/progress                        → ApiResponse<UserProgress>
 //   GET    /api/progress/exams/:examId          → ApiResponse<ExamProgress>
 //
-// Mock Exams:
-//   GET    /api/mock-exams?examId=:examId       → ApiListResponse<MockExamConfig>  (examId optional)
-//   POST   /api/mock-exams                      → ApiResponse<MockExamSession>
-//   GET    /api/mock-exams/:id                  → ApiResponse<MockExamSession>
-//   POST   /api/mock-exams/:id/submit           → ApiResponse<MockExamResult>
-//   GET    /api/mock-exams/:id/result           → ApiResponse<MockExamResult>
+// Mock Exams (Admin):
+//   GET    /api/mock-exams                      → ApiListResponse<MockExam>
+//   POST   /api/mock-exams                      → ApiResponse<MockExam>
+//   GET    /api/mock-exams/:id                  → ApiResponse<MockExam>
+//   PUT    /api/mock-exams/:id                  → ApiResponse<MockExam>
+//   DELETE /api/mock-exams/:id                  → 204
+//
+// Mock Exam Sessions (Student):
+//   GET    /api/mock-exam-sessions              → ApiListResponse<MockExamSessionConfig>
+//   POST   /api/mock-exam-sessions              → ApiResponse<MockExamSessionData>
+//   GET    /api/mock-exam-sessions/:id          → ApiResponse<MockExamSessionData>
+//   POST   /api/mock-exam-sessions/:id/submit   → ApiResponse<MockExamResult>
+//   GET    /api/mock-exam-sessions/:id/result   → ApiResponse<MockExamResult>
 //
 // Decks:
 //   GET    /api/decks                             → ApiListResponse<Deck>

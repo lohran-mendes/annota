@@ -7,7 +7,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MockExamService } from '../../../core/services/mock-exam.service';
-import type { MockExamQuestion, MockExamConfig, MockExamAnswer } from '@annota/shared';
+import type { MockExamQuestion, MockExamSessionConfig, MockExamAnswer } from '@annota/shared';
 
 @Component({
   selector: 'annota-mock-exam-session',
@@ -24,7 +24,7 @@ export class MockExamSession implements OnInit, OnDestroy {
   private readonly mockExamService = inject(MockExamService);
   private readonly snackBar = inject(MatSnackBar);
 
-  config = signal<MockExamConfig | null>(null);
+  config = signal<MockExamSessionConfig | null>(null);
   questions = signal<MockExamQuestion[]>([]);
   currentIndex = signal(0);
   answers = signal<Map<number, number>>(new Map());
@@ -32,14 +32,14 @@ export class MockExamSession implements OnInit, OnDestroy {
   loading = signal(true);
   submitting = signal(false);
   private timerInterval: ReturnType<typeof setInterval> | null = null;
-  private mockExamId = '';
+  private sessionId = '';
   private startTime = 0;
 
   currentQuestion = computed(() => this.questions()[this.currentIndex()]);
   answeredCount = computed(() => this.answers().size);
 
   ngOnInit() {
-    this.mockExamId = this.route.snapshot.paramMap.get('mockExamId') ?? '';
+    this.sessionId = this.route.snapshot.paramMap.get('sessionId') ?? '';
     this.startTime = Date.now();
     this.loadSession();
   }
@@ -50,7 +50,7 @@ export class MockExamSession implements OnInit, OnDestroy {
 
   private loadSession() {
     this.loading.set(true);
-    this.mockExamService.getById(this.mockExamId).subscribe({
+    this.mockExamService.getSession(this.sessionId).subscribe({
       next: (res) => {
         this.config.set(res.data.config);
         this.questions.set(res.data.questions);
@@ -135,13 +135,13 @@ export class MockExamSession implements OnInit, OnDestroy {
       }
     });
 
-    this.mockExamService.submit(this.mockExamId, {
+    this.mockExamService.submitSession(this.sessionId, {
       answers: answersArray,
       timeSpent,
     }).subscribe({
       next: () => {
         this.submitting.set(false);
-        this.router.navigate(['/mock-exam', this.mockExamId, 'result']);
+        this.router.navigate(['/mock-exam', this.sessionId, 'result']);
       },
       error: () => {
         this.submitting.set(false);

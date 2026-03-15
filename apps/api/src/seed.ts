@@ -62,10 +62,45 @@ const FlashcardSeedSchema = new mongoose.Schema({
   lastReviewedAt: { type: Date, default: null },
 }, { timestamps: true });
 
+const MockExamSeedSchema = new mongoose.Schema(
+  {
+    examId: mongoose.Schema.Types.ObjectId,
+    name: String,
+    description: { type: String, default: '' },
+    duration: Number,
+    questionIds: [{ type: mongoose.Schema.Types.ObjectId }],
+    published: { type: Boolean, default: false },
+  },
+  { timestamps: true },
+);
+
+const MockExamSessionSeedSchema = new mongoose.Schema(
+  {
+    mockExamId: mongoose.Schema.Types.ObjectId,
+    mockExamName: String,
+    questionCount: Number,
+    duration: Number,
+    questionIds: [{ type: mongoose.Schema.Types.ObjectId }],
+    status: {
+      type: String,
+      enum: ['in_progress', 'completed'],
+      default: 'in_progress',
+    },
+    score: Number,
+    completedAt: Date,
+  },
+  { timestamps: true },
+);
+
 const Exam = mongoose.model('Exam', ExamSchema);
 const Subject = mongoose.model('Subject', SubjectSchema);
 const Topic = mongoose.model('Topic', TopicSchema);
 const Question = mongoose.model('Question', QuestionSchema);
+const MockExamModel = mongoose.model('MockExam', MockExamSeedSchema);
+const MockExamSessionModel = mongoose.model(
+  'MockExamSession',
+  MockExamSessionSeedSchema,
+);
 const DeckModel = mongoose.model('Deck', DeckSeedSchema);
 const FlashcardModel = mongoose.model('Flashcard', FlashcardSeedSchema);
 
@@ -89,6 +124,8 @@ async function seed() {
   await Subject.deleteMany({});
   await Topic.deleteMany({});
   await Question.deleteMany({});
+  await MockExamModel.deleteMany({});
+  await MockExamSessionModel.deleteMany({});
   console.log('Collections cleared');
 
   // === EXAMS ===
@@ -321,6 +358,35 @@ async function seed() {
 
   console.log(
     `Linked ${allQuestionIds.length} questions to ${exam1.name}`,
+  );
+
+  // === MOCK EXAMS (templates criados pelo admin) ===
+  const matQuestions = questions.filter(
+    (q) => q.subjectId!.toString() === mat._id.toString(),
+  );
+
+  const mockExam1 = await MockExamModel.create({
+    examId: exam1._id,
+    name: 'Simulado Completo — Vestibulinho ETEC 2026',
+    description:
+      'Simulado com todas as questões disponíveis do Vestibulinho ETEC 2026. Replica o formato e a duração da prova real.',
+    duration: 180,
+    questionIds: allQuestionIds,
+    published: true,
+  });
+
+  const mockExam2 = await MockExamModel.create({
+    examId: exam1._id,
+    name: 'Treino Rápido — Matemática',
+    description:
+      'Simulado focado em Matemática com as questões de equações, porcentagem e geometria.',
+    duration: 40,
+    questionIds: matQuestions.map((q) => q._id),
+    published: true,
+  });
+
+  console.log(
+    `Mock exam templates created: ${mockExam1.name}, ${mockExam2.name}`,
   );
 
   // === DECKS & FLASHCARDS ===

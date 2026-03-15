@@ -36,4 +36,11 @@ export const adminRoutes: Routes = [
         (m) => m.QuestionManagement,
       ),
   },
+  {
+    path: 'mock-exams',
+    loadComponent: () =>
+      import('./mock-exam-management/mock-exam-management').then(
+        (m) => m.MockExamManagement,
+      ),
+  },
 ];

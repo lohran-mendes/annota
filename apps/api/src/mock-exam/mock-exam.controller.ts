@@ -2,13 +2,17 @@ import {
   Controller,
   Get,
   Post,
+  Put,
+  Delete,
   Param,
   Body,
   Query,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { MockExamService } from './mock-exam.service';
 import { CreateMockExamDto } from './dto/create-mock-exam.dto';
-import { SubmitMockExamDto } from './dto/submit-mock-exam.dto';
+import { UpdateMockExamDto } from './dto/update-mock-exam.dto';
 import { FilterMockExamDto } from './dto/filter-mock-exam.dto';
 import { ParseObjectIdPipe } from '../common/pipes/parse-object-id.pipe';
 import {
@@ -20,63 +24,82 @@ import {
   ApiBody,
 } from '@nestjs/swagger';
 
-@ApiTags('Mock Exams')
+@ApiTags('Mock Exams (Admin)')
 @Controller('mock-exams')
 export class MockExamController {
   constructor(private readonly mockExamService: MockExamService) {}
 
   @Get()
-  @ApiOperation({ summary: 'List all mock exam sessions' })
-  @ApiQuery({ name: 'examId', required: false, type: String, description: 'Filter by exam ObjectId' })
-  @ApiQuery({ name: 'status', required: false, enum: ['available', 'in_progress', 'completed'], description: 'Filter by status' })
-  @ApiResponse({ status: 200, description: 'List of mock exam sessions' })
+  @ApiOperation({ summary: 'List all mock exam templates' })
+  @ApiQuery({
+    name: 'examId',
+    required: false,
+    type: String,
+    description: 'Filter by exam ObjectId',
+  })
+  @ApiQuery({
+    name: 'published',
+    required: false,
+    type: Boolean,
+    description: 'Filter by published status',
+  })
+  @ApiResponse({ status: 200, description: 'List of mock exam templates' })
   async findAll(@Query() filter: FilterMockExamDto) {
-    const mockExams = await this.mockExamService.findAll(filter.examId, filter.status);
+    const mockExams = await this.mockExamService.findAll(
+      filter.examId,
+      filter.published,
+    );
     return { data: mockExams, total: mockExams.length };
   }
 
   @Post()
-  @ApiOperation({ summary: 'Create a new mock exam session' })
+  @ApiOperation({ summary: 'Create a new mock exam template' })
   @ApiBody({ type: CreateMockExamDto })
-  @ApiResponse({ status: 201, description: 'Mock exam session created successfully' })
+  @ApiResponse({
+    status: 201,
+    description: 'Mock exam template created successfully',
+  })
   @ApiResponse({ status: 400, description: 'Invalid request body' })
+  @ApiResponse({ status: 404, description: 'Exam or question not found' })
   async create(@Body() dto: CreateMockExamDto) {
-    const session = await this.mockExamService.create(dto);
-    return { data: session };
+    const mockExam = await this.mockExamService.create(dto);
+    return { data: mockExam };
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get a mock exam session by ID' })
-  @ApiParam({ name: 'id', description: 'Mock exam session ObjectId' })
-  @ApiResponse({ status: 200, description: 'Mock exam session found' })
-  @ApiResponse({ status: 404, description: 'Mock exam session not found' })
-  async getSession(@Param('id', ParseObjectIdPipe) id: string) {
-    const session = await this.mockExamService.getSession(id);
-    return { data: session };
+  @ApiOperation({ summary: 'Get a mock exam template by ID' })
+  @ApiParam({ name: 'id', description: 'Mock exam ObjectId' })
+  @ApiResponse({ status: 200, description: 'Mock exam template found' })
+  @ApiResponse({ status: 404, description: 'Mock exam template not found' })
+  async findOne(@Param('id', ParseObjectIdPipe) id: string) {
+    const mockExam = await this.mockExamService.findOne(id);
+    return { data: mockExam };
   }
 
-  @Post(':id/submit')
-  @ApiOperation({ summary: 'Submit answers for a mock exam session' })
-  @ApiParam({ name: 'id', description: 'Mock exam session ObjectId' })
-  @ApiBody({ type: SubmitMockExamDto })
-  @ApiResponse({ status: 201, description: 'Mock exam submitted and result generated' })
-  @ApiResponse({ status: 400, description: 'Invalid submission payload' })
-  @ApiResponse({ status: 404, description: 'Mock exam session not found' })
-  async submit(
+  @Put(':id')
+  @ApiOperation({ summary: 'Update a mock exam template' })
+  @ApiParam({ name: 'id', description: 'Mock exam ObjectId' })
+  @ApiBody({ type: UpdateMockExamDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Mock exam template updated successfully',
+  })
+  @ApiResponse({ status: 404, description: 'Mock exam template not found' })
+  async update(
     @Param('id', ParseObjectIdPipe) id: string,
-    @Body() dto: SubmitMockExamDto,
+    @Body() dto: UpdateMockExamDto,
   ) {
-    const result = await this.mockExamService.submit(id, dto);
-    return { data: result };
+    const mockExam = await this.mockExamService.update(id, dto);
+    return { data: mockExam };
   }
 
-  @Get(':id/result')
-  @ApiOperation({ summary: 'Get the result of a completed mock exam' })
-  @ApiParam({ name: 'id', description: 'Mock exam session ObjectId' })
-  @ApiResponse({ status: 200, description: 'Mock exam result retrieved' })
-  @ApiResponse({ status: 404, description: 'Mock exam or result not found' })
-  async getResult(@Param('id', ParseObjectIdPipe) id: string) {
-    const result = await this.mockExamService.getResult(id);
-    return { data: result };
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Delete a mock exam template' })
+  @ApiParam({ name: 'id', description: 'Mock exam ObjectId' })
+  @ApiResponse({ status: 204, description: 'Mock exam template deleted' })
+  @ApiResponse({ status: 404, description: 'Mock exam template not found' })
+  async remove(@Param('id', ParseObjectIdPipe) id: string) {
+    await this.mockExamService.remove(id);
   }
 }
