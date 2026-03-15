@@ -8,7 +8,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ExamService } from '../../../core/services/exam.service';
 import { MockExamService } from '../../../core/services/mock-exam.service';
-import { MOCK_EXAMS, MOCK_MOCK_EXAMS } from '../../../core/mock-data';
 import type { Exam, MockExamConfig } from '@annota/shared';
 
 @Component({
@@ -45,7 +44,6 @@ export class MockExamSetup implements OnInit {
         this.loadingExams.set(false);
       },
       error: () => {
-        this.exams.set(MOCK_EXAMS.filter(e => e.questionCount > 0));
         this.loadingExams.set(false);
       },
     });
@@ -59,7 +57,6 @@ export class MockExamSetup implements OnInit {
         this.loadingHistory.set(false);
       },
       error: () => {
-        this.mockExamHistory.set(MOCK_MOCK_EXAMS);
         this.loadingHistory.set(false);
       },
     });

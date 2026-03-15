@@ -12,7 +12,6 @@ import { SubjectService } from '../../../core/services/subject.service';
 import { TopicService } from '../../../core/services/topic.service';
 import { QuestionDialog } from '../dialogs/question-dialog';
 import { ConfirmDialog } from '../dialogs/confirm-dialog';
-import { MOCK_QUESTIONS, MOCK_TOPICS, MOCK_SUBJECTS } from '../../../core/mock-data';
 import type { Question, Subject, Topic } from '@annota/shared';
 
 interface QuestionRow {
@@ -89,15 +88,12 @@ export class QuestionManagement implements OnInit {
       questions: this.questionService.getAll(),
     }).subscribe({
       next: ({ subjects, topics, questions }) => {
-        this.subjects.set(subjects.data.length ? subjects.data : MOCK_SUBJECTS);
-        this.topics.set(topics.data.length ? topics.data : MOCK_TOPICS);
-        this.mapQuestions(questions.data.length ? questions.data : MOCK_QUESTIONS);
+        this.subjects.set(subjects.data);
+        this.topics.set(topics.data);
+        this.mapQuestions(questions.data);
         this.loading.set(false);
       },
       error: () => {
-        this.subjects.set(MOCK_SUBJECTS);
-        this.topics.set(MOCK_TOPICS);
-        this.mapQuestions(MOCK_QUESTIONS);
         this.loading.set(false);
       },
     });
@@ -106,8 +102,8 @@ export class QuestionManagement implements OnInit {
   private mapQuestions(questions: Question[]) {
     this.questions.set(
       questions.map((q) => {
-        const topic = [...this.topics(), ...MOCK_TOPICS].find((t) => t.id === q.topicId);
-        const subject = [...this.subjects(), ...MOCK_SUBJECTS].find((s) => s.id === q.subjectId);
+        const topic = this.topics().find((t) => t.id === q.topicId);
+        const subject = this.subjects().find((s) => s.id === q.subjectId);
         return {
           id: q.id,
           statement: q.statement.length > 100 ? q.statement.substring(0, 100) + '...' : q.statement,

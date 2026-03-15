@@ -9,7 +9,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { SubjectService } from '../../../core/services/subject.service';
 import { SubjectDialog } from '../dialogs/subject-dialog';
 import { ConfirmDialog } from '../dialogs/confirm-dialog';
-import { MOCK_SUBJECTS } from '../../../core/mock-data';
 import type { Subject } from '@annota/shared';
 
 @Component({
@@ -39,7 +38,6 @@ export class SubjectManagement implements OnInit {
         this.loading.set(false);
       },
       error: () => {
-        this.subjects.set(MOCK_SUBJECTS);
         this.loading.set(false);
       },
     });

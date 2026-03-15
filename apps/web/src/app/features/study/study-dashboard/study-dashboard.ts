@@ -8,8 +8,6 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { forkJoin } from 'rxjs';
 import { SubjectService } from '../../../core/services/subject.service';
 import { TopicService } from '../../../core/services/topic.service';
-import { MOCK_SUBJECTS, MOCK_TOPICS } from '../../../core/mock-data';
-import { mergeWithMock } from '../../../core/utils/data-merge';
 import type { Subject, Topic } from '@annota/shared';
 
 @Component({
@@ -29,8 +27,8 @@ export class StudyDashboard implements OnInit {
   private readonly subjectService = inject(SubjectService);
   private readonly topicService = inject(TopicService);
 
-  subjects = signal<Subject[]>(MOCK_SUBJECTS);
-  topics = signal<Topic[]>(MOCK_TOPICS);
+  subjects = signal<Subject[]>([]);
+  topics = signal<Topic[]>([]);
   loading = signal(false);
 
   ngOnInit() {
@@ -44,8 +42,8 @@ export class StudyDashboard implements OnInit {
       topics: this.topicService.getAll(),
     }).subscribe({
       next: ({ subjects, topics }) => {
-        this.subjects.set(mergeWithMock(subjects.data, MOCK_SUBJECTS));
-        this.topics.set(mergeWithMock(topics.data, MOCK_TOPICS));
+        this.subjects.set(subjects.data);
+        this.topics.set(topics.data);
         this.loading.set(false);
       },
       error: () => {

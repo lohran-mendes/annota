@@ -10,7 +10,6 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { FlashcardService } from '../../../core/services/flashcard.service';
 import { DeckService } from '../../../core/services/deck.service';
-import { MOCK_DECKS, MOCK_FLASHCARDS } from '../../../core/mock-data';
 import type { Deck, Flashcard } from '@annota/shared';
 
 @Component({
@@ -67,8 +66,7 @@ export class DeckDetail implements OnInit {
         this.deck.set(res.data);
       },
       error: () => {
-        const found = MOCK_DECKS.find((d) => d.id === this.deckId) ?? null;
-        this.deck.set(found);
+        this.deck.set(null);
       },
     });
   }
@@ -81,7 +79,6 @@ export class DeckDetail implements OnInit {
         this.loading.set(false);
       },
       error: () => {
-        this.cards.set(MOCK_FLASHCARDS.filter((c) => c.deckId === this.deckId));
         this.loading.set(false);
       },
     });

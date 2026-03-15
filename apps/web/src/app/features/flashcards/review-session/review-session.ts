@@ -7,7 +7,6 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDividerModule } from '@angular/material/divider';
 import { FlashcardService } from '../../../core/services/flashcard.service';
-import { MOCK_FLASHCARDS } from '../../../core/mock-data';
 import type { Flashcard, FlashcardRating, PredictedIntervals } from '@annota/shared';
 
 @Component({
@@ -63,17 +62,9 @@ export class ReviewSession implements OnInit {
         this.loading.set(false);
       },
       error: () => {
-        this.cards.set(this.getMockDueCards());
         this.loading.set(false);
       },
     });
-  }
-
-  private getMockDueCards(): Flashcard[] {
-    const now = new Date();
-    return MOCK_FLASHCARDS.filter(
-      (c) => c.deckId === this.deckId && new Date(c.nextReviewDate) <= now,
-    );
   }
 
   revealAnswer(): void {

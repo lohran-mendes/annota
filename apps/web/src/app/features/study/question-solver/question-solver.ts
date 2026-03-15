@@ -7,7 +7,6 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { FormsModule } from '@angular/forms';
-import { MOCK_QUESTIONS } from '../../../core/mock-data';
 import { QuestionService } from '../../../core/services/question.service';
 import { AnswerService } from '../../../core/services/answer.service';
 import type { Question } from '@annota/shared';
@@ -51,27 +50,20 @@ export class QuestionSolver implements OnInit {
     if (this.topicId) {
       this.questionService.getByTopic(this.topicId).subscribe({
         next: (res) => {
-          const apiQuestions = res.data;
-          if (apiQuestions.length > 0) {
-            this.questions.set(apiQuestions);
-          } else {
-            this.questions.set(MOCK_QUESTIONS.filter((q) => q.topicId === this.topicId));
-          }
+          this.questions.set(res.data);
           this.loading.set(false);
         },
         error: () => {
-          this.questions.set(MOCK_QUESTIONS.filter((q) => q.topicId === this.topicId));
           this.loading.set(false);
         },
       });
     } else {
       this.questionService.getAll().subscribe({
         next: (res) => {
-          this.questions.set(res.data.length > 0 ? res.data : MOCK_QUESTIONS);
+          this.questions.set(res.data);
           this.loading.set(false);
         },
         error: () => {
-          this.questions.set(MOCK_QUESTIONS);
           this.loading.set(false);
         },
       });

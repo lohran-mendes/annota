@@ -9,7 +9,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ExamService } from '../../../core/services/exam.service';
 import { ExamDialog } from '../dialogs/exam-dialog';
 import { ConfirmDialog } from '../dialogs/confirm-dialog';
-import { MOCK_EXAMS } from '../../../core/mock-data';
 import type { Exam } from '@annota/shared';
 
 @Component({
@@ -39,7 +38,6 @@ export class ExamManagement implements OnInit {
         this.loading.set(false);
       },
       error: () => {
-        this.exams.set(MOCK_EXAMS);
         this.loading.set(false);
       },
     });

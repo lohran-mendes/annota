@@ -9,7 +9,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { DeckService } from '../../../core/services/deck.service';
-import { MOCK_DECKS } from '../../../core/mock-data';
 import { ConfirmDialog } from '../../home/confirm-dialog';
 import type { Deck } from '@annota/shared';
 
@@ -50,11 +49,10 @@ export class DeckList implements OnInit {
     this.error.set(false);
     this.deckService.getAll().subscribe({
       next: (res) => {
-        this.decks.set(res.data.length > 0 ? res.data : MOCK_DECKS);
+        this.decks.set(res.data);
         this.loading.set(false);
       },
       error: () => {
-        this.decks.set(MOCK_DECKS);
         this.error.set(true);
         this.loading.set(false);
       },

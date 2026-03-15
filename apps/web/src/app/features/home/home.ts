@@ -8,8 +8,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { ExamService } from '../../core/services/exam.service';
 import { ProgressService } from '../../core/services/progress.service';
 import { AuthService } from '../../core/services/auth.service';
-import { MOCK_EXAMS, MOCK_PROGRESS } from '../../core/mock-data';
-import { mergeWithMock } from '../../core/utils/data-merge';
 import { CreateExamDialog } from './create-exam-dialog';
 import { ConfirmDialog } from './confirm-dialog';
 import type { CreateExamDto, Exam, UserProgress } from '@annota/shared';
@@ -28,9 +26,9 @@ export class Home implements OnInit {
 
   readonly isAdmin = this.authService.isAdmin;
 
-  exams = signal<Exam[]>(MOCK_EXAMS);
+  exams = signal<Exam[]>([]);
   loading = signal(false);
-  progress = signal<UserProgress>(MOCK_PROGRESS);
+  progress = signal<UserProgress>({ totalAnswered: 0, totalCorrect: 0, streak: 0, bySubject: [] });
 
   ngOnInit() {
     this.loadExams();
@@ -41,11 +39,10 @@ export class Home implements OnInit {
     this.loading.set(true);
     this.examService.getAll().subscribe({
       next: (res) => {
-        this.exams.set(mergeWithMock(res.data, MOCK_EXAMS));
+        this.exams.set(res.data);
         this.loading.set(false);
       },
       error: () => {
-        this.exams.set(MOCK_EXAMS);
         this.loading.set(false);
       },
     });
@@ -56,9 +53,7 @@ export class Home implements OnInit {
       next: (res) => {
         this.progress.set(res.data);
       },
-      error: () => {
-        this.progress.set(MOCK_PROGRESS);
-      },
+      error: () => {},
     });
   }
 
@@ -94,20 +89,11 @@ export class Home implements OnInit {
     ref.afterClosed().subscribe((confirmed: boolean) => {
       if (!confirmed) return;
 
-      if (!this.isObjectId(exam.id)) {
-        this.exams.update((list) => list.filter((e) => e.id !== exam.id));
-        return;
-      }
-
       this.examService.delete(exam.id).subscribe({
         next: () => this.loadExams(),
         error: (err) => console.error('Erro ao excluir prova', err),
       });
     });
-  }
-
-  private isObjectId(id: string): boolean {
-    return /^[a-f\d]{24}$/i.test(id);
   }
 
   get accuracyPercent(): number {

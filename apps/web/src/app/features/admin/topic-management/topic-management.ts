@@ -11,7 +11,6 @@ import { TopicService } from '../../../core/services/topic.service';
 import { SubjectService } from '../../../core/services/subject.service';
 import { TopicDialog } from '../dialogs/topic-dialog';
 import { ConfirmDialog } from '../dialogs/confirm-dialog';
-import { MOCK_TOPICS, MOCK_SUBJECTS } from '../../../core/mock-data';
 import type { Topic, Subject } from '@annota/shared';
 
 interface TopicRow {
@@ -65,31 +64,19 @@ export class TopicManagement implements OnInit {
       topics: this.topicService.getAll(),
     }).subscribe({
       next: ({ subjects, topics }) => {
-        const subjectList = subjects.data.length ? subjects.data : MOCK_SUBJECTS;
-        const topicList = topics.data.length ? topics.data : MOCK_TOPICS;
-        this.subjects.set(subjectList);
+        this.subjects.set(subjects.data);
         this.topics.set(
-          topicList.map((t) => ({
+          topics.data.map((t) => ({
             id: t.id,
             name: t.name,
             subjectId: t.subjectId,
-            subjectName: subjectList.find((s) => s.id === t.subjectId)?.name ?? '—',
+            subjectName: subjects.data.find((s) => s.id === t.subjectId)?.name ?? '—',
             questionCount: t.questionCount,
           })),
         );
         this.loading.set(false);
       },
       error: () => {
-        this.subjects.set(MOCK_SUBJECTS);
-        this.topics.set(
-          MOCK_TOPICS.map((t) => ({
-            id: t.id,
-            name: t.name,
-            subjectId: t.subjectId,
-            subjectName: MOCK_SUBJECTS.find((s) => s.id === t.subjectId)?.name ?? '—',
-            questionCount: t.questionCount,
-          })),
-        );
         this.loading.set(false);
       },
     });
