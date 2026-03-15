@@ -32,6 +32,10 @@ export type {
   ReviewFlashcardDto,
   ReviewResult,
   DeckStats,
+  CreateAccessLogDto,
+  AccessLogStreak,
+  LoginDto,
+  AuthResponse,
 } from './api-contracts';
 
 export interface Exam {
@@ -117,6 +121,28 @@ export interface MockExamConfig {
   status: 'available' | 'in_progress' | 'completed';
   score?: number;
   completedAt?: string;
+}
+
+// === User ===
+
+export type UserRole = 'admin' | 'student';
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+// === Access Log ===
+
+export interface AccessLog {
+  id: string;
+  userId?: string;
+  accessDate: string;
+  createdAt?: string;
 }
 
 // === Flashcard / Deck ===

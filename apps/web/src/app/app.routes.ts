@@ -1,10 +1,18 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './core/guards/auth.guard';
+import { adminGuard } from './core/guards/admin.guard';
 
 export const routes: Routes = [
+  {
+    path: 'login',
+    loadComponent: () =>
+      import('./features/login/login').then((m) => m.Login),
+  },
   {
     path: '',
     loadComponent: () =>
       import('./layout/user-shell/user-shell').then((m) => m.UserShell),
+    canActivate: [authGuard],
     children: [
       {
         path: '',
@@ -43,6 +51,7 @@ export const routes: Routes = [
     path: 'admin',
     loadComponent: () =>
       import('./layout/admin-shell/admin-shell').then((m) => m.AdminShell),
+    canActivate: [authGuard, adminGuard],
     loadChildren: () =>
       import('./features/admin/admin.routes').then((m) => m.adminRoutes),
   },

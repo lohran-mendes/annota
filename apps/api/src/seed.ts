@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { config } from 'dotenv';
+import * as bcrypt from 'bcrypt';
 
 config();
 
@@ -67,6 +68,15 @@ const Topic = mongoose.model('Topic', TopicSchema);
 const Question = mongoose.model('Question', QuestionSchema);
 const DeckModel = mongoose.model('Deck', DeckSeedSchema);
 const FlashcardModel = mongoose.model('Flashcard', FlashcardSeedSchema);
+
+const UserSeedSchema = new mongoose.Schema({
+  name: String,
+  email: { type: String, unique: true, lowercase: true, trim: true },
+  password: String,
+  role: { type: String, enum: ['admin', 'student'], default: 'student' },
+}, { timestamps: true });
+
+const UserModel = mongoose.model('User', UserSeedSchema);
 
 async function seed() {
   const uri =
@@ -355,6 +365,30 @@ async function seed() {
   await DeckModel.findByIdAndUpdate(deck3._id, { cardCount: 3 });
 
   console.log(`Flashcards created: ${flashcards.length}`);
+
+  // === USERS ===
+  await UserModel.deleteMany({});
+  console.log('User collection cleared');
+
+  const adminPassword = await bcrypt.hash('admin123', 10);
+  const annaPassword = await bcrypt.hash('anna123', 10);
+
+  const users = await UserModel.insertMany([
+    {
+      name: 'Lohran',
+      email: 'lohran@annota.com',
+      password: adminPassword,
+      role: 'admin',
+    },
+    {
+      name: 'Anna Beatriz',
+      email: 'anna@annota.com',
+      password: annaPassword,
+      role: 'student',
+    },
+  ]);
+
+  console.log(`Users created: ${users.map((u) => u.name).join(', ')}`);
 
   console.log('\nSeed completed successfully!');
 

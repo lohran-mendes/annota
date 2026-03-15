@@ -1,11 +1,12 @@
 import { Component, inject, signal, viewChild } from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatSidenavModule, MatSidenav } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'annota-user-shell',
@@ -24,9 +25,12 @@ import { MatButtonModule } from '@angular/material/button';
 })
 export class UserShell {
   private readonly breakpointObserver = inject(BreakpointObserver);
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
   private readonly sidenavRef = viewChild<MatSidenav>('sidenav');
 
   isMobile = signal(false);
+  isAdmin = this.authService.isAdmin;
 
   constructor() {
     this.breakpointObserver
@@ -45,5 +49,10 @@ export class UserShell {
     if (this.isMobile()) {
       this.sidenavRef()?.close();
     }
+  }
+
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
 }

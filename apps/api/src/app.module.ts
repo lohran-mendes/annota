@@ -10,6 +10,8 @@ import { ProgressModule } from './progress/progress.module';
 import { MockExamModule } from './mock-exam/mock-exam.module';
 import { DeckModule } from './deck/deck.module';
 import { FlashcardModule } from './flashcard/flashcard.module';
+import { AccessLogModule } from './access-log/access-log.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -36,6 +38,8 @@ import { FlashcardModule } from './flashcard/flashcard.module';
     MockExamModule,
     DeckModule,
     FlashcardModule,
+    AccessLogModule,
+    AuthModule,
   ],
 })
 export class AppModule {}

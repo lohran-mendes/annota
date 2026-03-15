@@ -2,8 +2,10 @@
   <button mat-icon-button (click)="sidenav.toggle()" class="menu-btn">
     <mat-icon>menu</mat-icon>
   </button>
-  <img src="annota-icon.svg" alt="Annota" class="toolbar-logo" />
-  <span class="toolbar-title">Annota</span>
+  <a routerLink="/" class="toolbar-brand">
+    <img src="annota-icon.svg" alt="Annota" class="toolbar-logo" />
+    <span class="toolbar-title">Annota</span>
+  </a>
   <span class="spacer"></span>
 </mat-toolbar>
 
@@ -71,14 +73,24 @@
 
     <div class="sidenav-footer">
       <mat-nav-list>
+        @if (isAdmin()) {
+          <a
+            mat-list-item
+            routerLink="/admin"
+            routerLinkActive="active-link"
+            (click)="closeSidenavOnMobile()"
+          >
+            <mat-icon matListItemIcon>settings</mat-icon>
+            <span>Admin</span>
+          </a>
+        }
         <a
           mat-list-item
-          routerLink="/admin"
-          routerLinkActive="active-link"
-          (click)="closeSidenavOnMobile()"
+          class="logout-link"
+          (click)="logout()"
         >
-          <mat-icon matListItemIcon>settings</mat-icon>
-          <span>Admin</span>
+          <mat-icon matListItemIcon>logout</mat-icon>
+          <span>Sair</span>
         </a>
       </mat-nav-list>
     </div>

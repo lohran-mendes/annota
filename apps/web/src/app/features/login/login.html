@@ -1,0 +1,68 @@
+<div class="login-container">
+  <div class="login-card animate-fade-in-up">
+    <div class="login-header">
+      <img src="annota-icon.svg" alt="Annota" class="login-logo" />
+      <h1 class="login-brand">Annota</h1>
+      <p class="login-subtitle">Entre para continuar estudando</p>
+    </div>
+
+    <form (ngSubmit)="submit()" class="login-form">
+      <mat-form-field appearance="outline">
+        <mat-label>Email</mat-label>
+        <input
+          matInput
+          [(ngModel)]="email"
+          name="email"
+          type="email"
+          placeholder="seu@email.com"
+          required
+        />
+        <mat-icon matPrefix>email</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Senha</mat-label>
+        <input
+          matInput
+          [(ngModel)]="password"
+          name="password"
+          [type]="hidePassword() ? 'password' : 'text'"
+          placeholder="Sua senha"
+          required
+          minlength="6"
+        />
+        <mat-icon matPrefix>lock</mat-icon>
+        <button
+          mat-icon-button
+          matSuffix
+          type="button"
+          (click)="hidePassword.update(v => !v)"
+        >
+          <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+      </mat-form-field>
+
+      @if (error()) {
+        <div class="login-error animate-fade-in">
+          <mat-icon>error_outline</mat-icon>
+          <span>{{ error() }}</span>
+        </div>
+      }
+
+      <button
+        mat-flat-button
+        color="primary"
+        type="submit"
+        class="login-submit"
+        [disabled]="loading()"
+      >
+        @if (loading()) {
+          <mat-spinner diameter="20"></mat-spinner>
+        } @else {
+          <mat-icon>login</mat-icon>
+          Entrar
+        }
+      </button>
+    </form>
+  </div>
+</div>

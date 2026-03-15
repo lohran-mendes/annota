@@ -251,6 +251,45 @@ export interface DeckStats {
 }
 
 // ============================================================
+// Auth DTOs
+// ============================================================
+
+export interface RegisterDto {
+  name: string;
+  email: string;
+  password: string;
+}
+
+export interface LoginDto {
+  email: string;
+  password: string;
+}
+
+export interface AuthResponse {
+  accessToken: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    role: 'admin' | 'student';
+  };
+}
+
+// ============================================================
+// Access Log DTOs
+// ============================================================
+
+export interface CreateAccessLogDto {
+  userId?: string;
+}
+
+export interface AccessLogStreak {
+  currentStreak: number;
+  lastAccessDate: string | null;
+  gracePeriodDays: number;
+}
+
+// ============================================================
 // API Endpoints Reference
 // ============================================================
 //
@@ -316,3 +355,13 @@ export interface DeckStats {
 //   PUT    /api/flashcards/:id                     → ApiResponse<Flashcard>
 //   DELETE /api/flashcards/:id                     → 204
 //   POST   /api/flashcards/:id/review              → ApiResponse<ReviewResult>
+//
+// Access Logs:
+//   POST   /api/access-logs                          → ApiResponse<AccessLog>
+//   GET    /api/access-logs/streak                   → ApiResponse<AccessLogStreak>
+//   GET    /api/access-logs                          → ApiListResponse<AccessLog>
+//
+// Auth:
+//   POST   /api/auth/register                        → ApiResponse<AuthResponse>
+//   POST   /api/auth/login                           → ApiResponse<AuthResponse>
+//   GET    /api/auth/me                              → ApiResponse<User>

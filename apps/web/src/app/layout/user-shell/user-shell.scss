@@ -12,6 +12,15 @@
   gap: 8px;
 }
 
+.toolbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
 .toolbar-logo {
   width: 32px;
   height: 32px;
@@ -81,6 +90,23 @@ mat-sidenav-container {
 .sidenav-footer {
   margin-top: auto;
   border-top: 1px solid var(--annota-pink-50);
+}
+
+.logout-link {
+  mat-icon {
+    color: var(--annota-text-light) !important;
+  }
+
+  span {
+    color: var(--annota-text-light) !important;
+  }
+
+  &:hover {
+    mat-icon,
+    span {
+      color: #c62828 !important;
+    }
+  }
 }
 
 mat-nav-list {

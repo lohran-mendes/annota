@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find c:UsersAsusDesktopannotaappsapisrc -type f -name *access-log*)",
+      "Bash(npx tsc:*)"
+    ]
+  }
+}
