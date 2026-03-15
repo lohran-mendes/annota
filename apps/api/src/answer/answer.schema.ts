@@ -21,7 +21,7 @@ export class UserAnswer {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Topic', required: true })
   topicId: mongoose.Types.ObjectId;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Exam', required: true })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Exam' })
   examId: mongoose.Types.ObjectId;
 }
 

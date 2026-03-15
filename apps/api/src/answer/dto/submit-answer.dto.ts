@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsInt, Min } from 'class-validator';
+import { IsString, IsNotEmpty, IsInt, Min, IsOptional, IsMongoId } from 'class-validator';
 import type { SubmitAnswerDto as ISubmitAnswerDto } from '@annota/shared';
 
 export class SubmitAnswerDto implements ISubmitAnswerDto {
@@ -11,6 +11,6 @@ export class SubmitAnswerDto implements ISubmitAnswerDto {
   selectedIndex: number;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   examId: string;
 }

@@ -2,6 +2,31 @@
   display: block;
 }
 
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+
+  mat-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    color: var(--annota-pink-200);
+    margin-bottom: 16px;
+  }
+
+  h3 {
+    margin: 0 0 8px;
+    color: var(--annota-text);
+  }
+
+  p {
+    color: var(--annota-text-light);
+    margin: 0 0 24px;
+    max-width: 400px;
+    margin-inline: auto;
+  }
+}
+
 .solver-header {
   display: flex;
   justify-content: space-between;

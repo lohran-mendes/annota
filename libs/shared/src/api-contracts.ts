@@ -107,7 +107,7 @@ export interface UpdateQuestionDto {
 export interface SubmitAnswerDto {
   questionId: string;
   selectedIndex: number;
-  examId: string;
+  examId?: string;
 }
 
 export interface AnswerResult {

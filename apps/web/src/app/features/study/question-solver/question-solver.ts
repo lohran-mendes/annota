@@ -9,7 +9,6 @@ import { FormsModule } from '@angular/forms';
 import { MOCK_QUESTIONS } from '../../../core/mock-data';
 import { QuestionService } from '../../../core/services/question.service';
 import { AnswerService } from '../../../core/services/answer.service';
-import { mergeWithMock } from '../../../core/utils/data-merge';
 import type { Question } from '@annota/shared';
 
 @Component({
@@ -31,28 +30,49 @@ export class QuestionSolver implements OnInit {
   private readonly questionService = inject(QuestionService);
   private readonly answerService = inject(AnswerService);
 
-  private examId = '';
-  questions = signal<Question[]>(MOCK_QUESTIONS);
+  examId = '';
+  private topicId = '';
+  questions = signal<Question[]>([]);
   currentIndex = signal(0);
   selectedAnswer = signal<number | null>(null);
   answered = signal(false);
-  loading = signal(false);
+  loading = signal(true);
 
   currentQuestion = computed(() => this.questions()[this.currentIndex()]);
 
   ngOnInit() {
     this.examId = this.route.snapshot.params['examId'] ?? '';
+    this.topicId = this.route.snapshot.params['topicId'] ?? '';
     this.loading.set(true);
-    this.questionService.getAll().subscribe({
-      next: (res) => {
-        this.questions.set(mergeWithMock(res.data, MOCK_QUESTIONS));
-        this.loading.set(false);
-      },
-      error: (err) => {
-        console.error('Failed to load questions from API, using mock data:', err);
-        this.loading.set(false);
-      },
-    });
+
+    if (this.topicId) {
+      this.questionService.getByTopic(this.topicId).subscribe({
+        next: (res) => {
+          const apiQuestions = res.data;
+          if (apiQuestions.length > 0) {
+            this.questions.set(apiQuestions);
+          } else {
+            this.questions.set(MOCK_QUESTIONS.filter((q) => q.topicId === this.topicId));
+          }
+          this.loading.set(false);
+        },
+        error: () => {
+          this.questions.set(MOCK_QUESTIONS.filter((q) => q.topicId === this.topicId));
+          this.loading.set(false);
+        },
+      });
+    } else {
+      this.questionService.getAll().subscribe({
+        next: (res) => {
+          this.questions.set(res.data.length > 0 ? res.data : MOCK_QUESTIONS);
+          this.loading.set(false);
+        },
+        error: () => {
+          this.questions.set(MOCK_QUESTIONS);
+          this.loading.set(false);
+        },
+      });
+    }
   }
 
   get isCorrect(): boolean {

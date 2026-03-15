@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { UserAnswer, UserAnswerDocument } from './answer.schema';
 import { SubmitAnswerDto } from './dto/submit-answer.dto';
 import { QuestionService } from '../question/question.service';
@@ -27,15 +27,18 @@ export class AnswerService {
       .findOne({ questionId: dto.questionId })
       .exec();
 
-    // Salvar resposta com examId vindo do DTO
-    const userAnswer = new this.userAnswerModel({
+    // Salvar resposta com examId vindo do DTO (se for ObjectId valido)
+    const answerData: Record<string, any> = {
       questionId: dto.questionId,
       selectedIndex: dto.selectedIndex,
       correct,
       subjectId: question.subjectId,
       topicId: question.topicId,
-      examId: dto.examId,
-    });
+    };
+    if (dto.examId && Types.ObjectId.isValid(dto.examId)) {
+      answerData.examId = dto.examId;
+    }
+    const userAnswer = new this.userAnswerModel(answerData);
     await userAnswer.save();
 
     // Atualizar completedCount se primeira resposta para esta questao

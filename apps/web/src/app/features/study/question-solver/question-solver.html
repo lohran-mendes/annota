@@ -1,5 +1,5 @@
 <div class="solver-header animate-fade-in-up">
-  <a mat-button routerLink="/study/1" class="back-link">
+  <a mat-button [routerLink]="'/study/' + examId" class="back-link">
     <mat-icon>arrow_back</mat-icon>
     Voltar às matérias
   </a>
@@ -8,6 +8,23 @@
     Questão {{ currentIndex() + 1 }} de {{ totalQuestions }}
   </div>
 </div>
+
+@if (loading()) {
+  <div class="empty-state animate-fade-in-up">
+    <mat-icon>hourglass_empty</mat-icon>
+    <p>Carregando questões...</p>
+  </div>
+} @else if (totalQuestions === 0) {
+  <div class="empty-state animate-fade-in-up">
+    <mat-icon>quiz</mat-icon>
+    <h3>Nenhuma questão disponível</h3>
+    <p>Ainda não há questões cadastradas para este tópico. O administrador precisa adicionar questões primeiro.</p>
+    <a mat-flat-button color="primary" [routerLink]="'/study/' + examId">
+      <mat-icon>arrow_back</mat-icon>
+      Voltar às matérias
+    </a>
+  </div>
+} @else {
 
 <div class="question-progress">
   <div
@@ -94,4 +111,6 @@
       <mat-icon>arrow_forward</mat-icon>
     </button>
   </div>
+}
+
 }
