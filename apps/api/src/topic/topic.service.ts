@@ -5,7 +5,7 @@ import { Topic, TopicDocument } from './topic.schema';
 import { CreateTopicDto } from './dto/create-topic.dto';
 import { UpdateTopicDto } from './dto/update-topic.dto';
 import { FilterTopicDto } from './dto/filter-topic.dto';
-import { paginate, PaginatedResult } from '../common/utils/paginate';
+import { paginate, normalizeLeanDocs, PaginatedResult } from '../common/utils/paginate';
 
 @Injectable()
 export class TopicService {
@@ -25,7 +25,8 @@ export class TopicService {
   }
 
   async findBySubject(subjectId: string): Promise<Topic[]> {
-    return this.topicModel.find({ subjectId }).lean().exec();
+    const topics = await this.topicModel.find({ subjectId }).lean().exec();
+    return normalizeLeanDocs<Topic>(topics);
   }
 
   async findOne(id: string): Promise<Topic> {

@@ -9,7 +9,7 @@ import { CreateExamDto } from './dto/create-exam.dto';
 import { UpdateExamDto } from './dto/update-exam.dto';
 import { FilterExamDto } from './dto/filter-exam.dto';
 import type { ExamSubject, ExamTopic } from '@annota/shared';
-import { paginate, PaginatedResult } from '../common/utils/paginate';
+import { paginate, normalizeLeanDoc, normalizeLeanDocs, PaginatedResult } from '../common/utils/paginate';
 
 @Injectable()
 export class ExamService {
@@ -41,7 +41,7 @@ export class ExamService {
     if (!exam) {
       throw new NotFoundException(`Exam with id ${id} not found`);
     }
-    return exam;
+    return normalizeLeanDoc<Exam>(exam);
   }
 
   async create(dto: CreateExamDto): Promise<Exam> {
@@ -120,10 +120,11 @@ export class ExamService {
     if (!exam) {
       throw new NotFoundException(`Exam with id ${examId} not found`);
     }
-    return this.questionModel
+    const questions = await this.questionModel
       .find({ _id: { $in: exam.questionIds } })
       .lean()
       .exec();
+    return normalizeLeanDocs<Question>(questions);
   }
 
   async getExamSubjects(examId: string): Promise<ExamSubject[]> {

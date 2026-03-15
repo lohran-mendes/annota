@@ -11,6 +11,7 @@ import { User, UserDocument } from './user.schema';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import type { AuthResponse } from '@annota/shared';
+import { normalizeLeanDoc } from '../common/utils/paginate';
 
 @Injectable()
 export class AuthService {
@@ -66,7 +67,7 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('Usuário não encontrado');
     }
-    return user as unknown as User;
+    return normalizeLeanDoc<User>(user);
   }
 
   private buildAuthResponse(user: UserDocument): AuthResponse {

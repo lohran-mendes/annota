@@ -8,7 +8,7 @@ import { UpdateQuestionDto } from './dto/update-question.dto';
 import { FilterQuestionDto } from './dto/filter-question.dto';
 import { TopicService } from '../topic/topic.service';
 import { SubjectService } from '../subject/subject.service';
-import { paginate, PaginatedResult } from '../common/utils/paginate';
+import { paginate, normalizeLeanDocs, PaginatedResult } from '../common/utils/paginate';
 
 @Injectable()
 export class QuestionService {
@@ -34,11 +34,13 @@ export class QuestionService {
   }
 
   async findByTopic(topicId: string): Promise<Question[]> {
-    return this.questionModel.find({ topicId }).lean().exec();
+    const questions = await this.questionModel.find({ topicId }).lean().exec();
+    return normalizeLeanDocs<Question>(questions);
   }
 
   async findBySubject(subjectId: string): Promise<Question[]> {
-    return this.questionModel.find({ subjectId }).lean().exec();
+    const questions = await this.questionModel.find({ subjectId }).lean().exec();
+    return normalizeLeanDocs<Question>(questions);
   }
 
   async findOne(id: string): Promise<Question> {

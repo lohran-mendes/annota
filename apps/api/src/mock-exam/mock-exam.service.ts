@@ -15,6 +15,7 @@ import type {
   MockExamSession,
   MockExamResult as IMockExamResult,
 } from '@annota/shared';
+import { normalizeLeanDocs } from '../common/utils/paginate';
 
 @Injectable()
 export class MockExamService {
@@ -35,7 +36,8 @@ export class MockExamService {
     const filter: Record<string, unknown> = {};
     if (examId) filter.examId = examId;
     if (status) filter.status = status;
-    return this.mockExamModel.find(filter).sort({ createdAt: -1 }).lean().exec();
+    const docs = await this.mockExamModel.find(filter).sort({ createdAt: -1 }).lean().exec();
+    return normalizeLeanDocs(docs);
   }
 
   async create(dto: CreateMockExamDto): Promise<MockExamSession> {

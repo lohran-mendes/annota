@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { AccessLog, AccessLogDocument } from './access-log.schema';
 import { CreateAccessLogDto } from './dto/create-access-log.dto';
+import { normalizeLeanDoc, normalizeLeanDocs } from '../common/utils/paginate';
 
 @Injectable()
 export class AccessLogService {
@@ -22,7 +23,7 @@ export class AccessLogService {
       .exec();
 
     if (existing) {
-      return existing as unknown as AccessLog;
+      return normalizeLeanDoc<AccessLog>(existing);
     }
 
     const log = new this.accessLogModel({
@@ -86,11 +87,12 @@ export class AccessLogService {
 
   async findAll(userId?: string): Promise<AccessLog[]> {
     const filter: any = { userId: userId ?? null };
-    return this.accessLogModel
+    const docs = await this.accessLogModel
       .find(filter)
       .sort({ accessDate: -1 })
       .lean()
-      .exec() as unknown as AccessLog[];
+      .exec();
+    return normalizeLeanDocs<AccessLog>(docs);
   }
 
   private getTodayString(): string {
