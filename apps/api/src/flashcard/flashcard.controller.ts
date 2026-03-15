@@ -59,4 +59,11 @@ export class FlashcardController {
     const result = await this.flashcardService.review(id, dto.rating);
     return { data: result };
   }
+
+  @Get('flashcards/:id/predict')
+  async predict(@Param('id') id: string) {
+    const card = await this.flashcardService.findOne(id);
+    const intervals = this.flashcardService.predictIntervals(card);
+    return { data: intervals };
+  }
 }

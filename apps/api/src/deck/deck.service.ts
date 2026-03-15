@@ -19,7 +19,6 @@ export class DeckService {
     const decks = await this.deckModel
       .find()
       .sort({ createdAt: -1 })
-      .lean()
       .exec();
 
     const now = new Date();
@@ -32,7 +31,8 @@ export class DeckService {
             nextReviewDate: { $lte: now },
           })
           .exec();
-        return { ...deck, dueCount };
+        const json = deck.toJSON();
+        return { ...json, dueCount };
       }),
     );
 
@@ -40,7 +40,7 @@ export class DeckService {
   }
 
   async findOne(id: string): Promise<Deck> {
-    const deck = await this.deckModel.findById(id).lean().exec();
+    const deck = await this.deckModel.findById(id).exec();
     if (!deck) {
       throw new NotFoundException(`Deck with id ${id} not found`);
     }
@@ -50,7 +50,8 @@ export class DeckService {
       .countDocuments({ deckId: id, nextReviewDate: { $lte: now } })
       .exec();
 
-    return { ...deck, dueCount } as unknown as Deck;
+    const json = deck.toJSON();
+    return { ...json, dueCount } as unknown as Deck;
   }
 
   async create(dto: CreateDeckDto): Promise<Deck> {
@@ -64,12 +65,11 @@ export class DeckService {
   async update(id: string, dto: UpdateDeckDto): Promise<Deck> {
     const deck = await this.deckModel
       .findByIdAndUpdate(id, dto, { new: true })
-      .lean()
       .exec();
     if (!deck) {
       throw new NotFoundException(`Deck with id ${id} not found`);
     }
-    return deck as unknown as Deck;
+    return deck;
   }
 
   async remove(id: string): Promise<void> {

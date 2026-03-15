@@ -77,8 +77,7 @@ export class DeckDetail implements OnInit {
     this.loading.set(true);
     this.flashcardService.getByDeck(this.deckId).subscribe({
       next: (res) => {
-        const fallback = MOCK_FLASHCARDS.filter((c) => c.deckId === this.deckId);
-        this.cards.set(res.data.length > 0 ? res.data : fallback);
+        this.cards.set(res.data);
         this.loading.set(false);
       },
       error: () => {

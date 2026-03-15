@@ -5,7 +5,7 @@ import { Flashcard, FlashcardDocument } from './flashcard.schema';
 import { Deck, DeckDocument } from '../deck/deck.schema';
 import { CreateFlashcardDto } from './dto/create-flashcard.dto';
 import { UpdateFlashcardDto } from './dto/update-flashcard.dto';
-import type { ReviewResult } from '@annota/shared';
+import type { ReviewResult, PredictedIntervals } from '@annota/shared';
 
 @Injectable()
 export class FlashcardService {
@@ -15,6 +15,43 @@ export class FlashcardService {
     @InjectModel(Deck.name)
     private deckModel: Model<DeckDocument>,
   ) {}
+
+  /**
+   * Calcula os intervalos previstos para cada rating sem alterar o cartão.
+   * Usado pelo frontend para exibir "1d", "6d", etc. nos botões.
+   */
+  predictIntervals(card: {
+    interval: number;
+    easeFactor: number;
+    repetitions: number;
+  }): PredictedIntervals {
+    const { interval, easeFactor, repetitions } = card;
+
+    const calcInterval = (rating: 1 | 2 | 3 | 4): number => {
+      switch (rating) {
+        case 1: // Again — revisão imediata na sessão, depois 10 minutos
+          return 0;
+        case 2: // Hard
+          if (repetitions === 0) return 1;
+          return Math.max(1, Math.round(interval * 1.2));
+        case 3: // Good
+          if (repetitions === 0) return 1;
+          if (repetitions === 1) return 6;
+          return Math.round(interval * easeFactor);
+        case 4: // Easy
+          if (repetitions === 0) return 4;
+          if (repetitions === 1) return Math.round(6 * 1.3);
+          return Math.round(interval * easeFactor * 1.3);
+      }
+    };
+
+    return {
+      again: calcInterval(1),
+      hard: calcInterval(2),
+      good: calcInterval(3),
+      easy: calcInterval(4),
+    };
+  }
 
   async findByDeck(deckId: string): Promise<Flashcard[]> {
     const deck = await this.deckModel.findById(deckId).lean().exec();
@@ -100,26 +137,30 @@ export class FlashcardService {
     let { interval, easeFactor, repetitions } = card;
 
     switch (rating) {
-      case 1: // Again
+      case 1: // Again — reseta progresso, cartão volta para revisão imediata
         repetitions = 0;
-        interval = 1;
+        interval = 0;
         easeFactor = Math.max(1.3, easeFactor - 0.2);
         break;
-      case 2: // Hard
-        interval = Math.max(1, Math.round(interval * 1.2));
+      case 2: // Hard — progride devagar, penaliza ease
+        if (repetitions === 0) {
+          interval = 1;
+        } else {
+          interval = Math.max(1, Math.round(interval * 1.2));
+        }
         easeFactor = Math.max(1.3, easeFactor - 0.15);
+        repetitions++;
         break;
-      case 3: // Good
+      case 3: // Good — progressão padrão SM-2
         if (repetitions === 0) interval = 1;
         else if (repetitions === 1) interval = 6;
         else interval = Math.round(interval * easeFactor);
         repetitions++;
         break;
-      case 4: // Easy
-        if (repetitions === 0) interval = 1;
-        else if (repetitions === 1) interval = 6;
-        else interval = Math.round(interval * easeFactor);
-        interval = Math.round(interval * 1.3);
+      case 4: // Easy — intervalo maior, bonifica ease
+        if (repetitions === 0) interval = 4;
+        else if (repetitions === 1) interval = Math.round(6 * 1.3);
+        else interval = Math.round(interval * easeFactor * 1.3);
         easeFactor += 0.15;
         repetitions++;
         break;
@@ -138,6 +179,9 @@ export class FlashcardService {
         lastReviewedAt: now,
       })
       .exec();
+
+    const deckId = card.deckId.toString();
+    await this.recomputeDeckCardCount(deckId);
 
     return {
       flashcardId: id,

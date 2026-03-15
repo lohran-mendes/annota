@@ -31,6 +31,7 @@ export type {
   UpdateFlashcardDto,
   ReviewFlashcardDto,
   ReviewResult,
+  PredictedIntervals,
   DeckStats,
   CreateAccessLogDto,
   AccessLogStreak,

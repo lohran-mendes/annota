@@ -67,19 +67,22 @@
           <button class="rate-btn again" (click)="rate(1)" [disabled]="reviewing()">
             <mat-icon>replay</mat-icon>
             <span class="rate-label">De novo</span>
-            <span class="rate-interval">&lt; 1d</span>
+            <span class="rate-interval">{{ formatInterval(predictedIntervals().again) }}</span>
           </button>
           <button class="rate-btn hard" (click)="rate(2)" [disabled]="reviewing()">
             <mat-icon>trending_flat</mat-icon>
             <span class="rate-label">Difícil</span>
+            <span class="rate-interval">{{ formatInterval(predictedIntervals().hard) }}</span>
           </button>
           <button class="rate-btn good" (click)="rate(3)" [disabled]="reviewing()">
             <mat-icon>thumb_up</mat-icon>
             <span class="rate-label">Bom</span>
+            <span class="rate-interval">{{ formatInterval(predictedIntervals().good) }}</span>
           </button>
           <button class="rate-btn easy" (click)="rate(4)" [disabled]="reviewing()">
             <mat-icon>bolt</mat-icon>
             <span class="rate-label">Fácil</span>
+            <span class="rate-interval">{{ formatInterval(predictedIntervals().easy) }}</span>
           </button>
         </div>
       }

@@ -59,8 +59,10 @@
         @if (loading()) {
           <mat-spinner diameter="20"></mat-spinner>
         } @else {
-          <mat-icon>login</mat-icon>
-          Entrar
+          <ng-container>
+            <mat-icon>login</mat-icon>
+            Entrar
+          </ng-container>
         }
       </button>
     </form>

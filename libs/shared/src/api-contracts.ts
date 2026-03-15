@@ -241,6 +241,13 @@ export interface ReviewResult {
   repetitions: number;
 }
 
+export interface PredictedIntervals {
+  again: number;
+  hard: number;
+  good: number;
+  easy: number;
+}
+
 export interface DeckStats {
   deckId: string;
   totalCards: number;
