@@ -6,6 +6,7 @@ import {
   Delete,
   Param,
   Body,
+  Query,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
@@ -14,15 +15,19 @@ import { CreateExamDto } from './dto/create-exam.dto';
 import { UpdateExamDto } from './dto/update-exam.dto';
 import { LinkQuestionsDto } from './dto/link-questions.dto';
 import { ParseObjectIdPipe } from '../common/pipes/parse-object-id.pipe';
+import { PaginationDto } from '../common/dto/pagination.dto';
+import { FilterExamDto } from './dto/filter-exam.dto';
 
 @Controller('exams')
 export class ExamController {
   constructor(private readonly examService: ExamService) {}
 
   @Get()
-  async findAll() {
-    const exams = await this.examService.findAll();
-    return { data: exams, total: exams.length };
+  async findAll(
+    @Query() pagination: PaginationDto,
+    @Query() filter: FilterExamDto,
+  ) {
+    return this.examService.findAll(pagination.page, pagination.limit, filter);
   }
 
   @Get(':id')

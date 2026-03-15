@@ -4,6 +4,8 @@ import { Model } from 'mongoose';
 import { Subject, SubjectDocument } from './subject.schema';
 import { CreateSubjectDto } from './dto/create-subject.dto';
 import { UpdateSubjectDto } from './dto/update-subject.dto';
+import { FilterSubjectDto } from './dto/filter-subject.dto';
+import { paginate, PaginatedResult } from '../common/utils/paginate';
 
 @Injectable()
 export class SubjectService {
@@ -11,8 +13,14 @@ export class SubjectService {
     @InjectModel(Subject.name) private subjectModel: Model<SubjectDocument>,
   ) {}
 
-  async findAll(): Promise<Subject[]> {
-    return this.subjectModel.find().exec();
+  async findAll(
+    page = 1,
+    limit = 20,
+    filter?: FilterSubjectDto,
+  ): Promise<PaginatedResult<Subject>> {
+    const query: Record<string, unknown> = {};
+    if (filter?.search) query.name = new RegExp(filter.search, 'i');
+    return paginate(this.subjectModel, query, page, limit);
   }
 
   async findOne(id: string): Promise<Subject> {

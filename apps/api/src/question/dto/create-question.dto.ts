@@ -9,6 +9,7 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import type { CreateQuestionDto as ICreateQuestionDto } from '@annota/shared';
+import { IsValidAnswerIndex } from '../../common/validators/valid-answer-index.validator';
 
 export class AlternativeDto {
   @IsString()
@@ -41,6 +42,7 @@ export class CreateQuestionDto implements ICreateQuestionDto {
 
   @IsInt()
   @Min(0)
+  @IsValidAnswerIndex()
   correctAnswerIndex: number;
 
   @IsString()

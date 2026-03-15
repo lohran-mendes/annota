@@ -37,6 +37,8 @@ export class MockExam {
 
 export const MockExamSchema = SchemaFactory.createForClass(MockExam);
 
+MockExamSchema.index({ examId: 1, status: 1 });
+
 MockExamSchema.set('toJSON', {
   virtuals: true,
   versionKey: false,

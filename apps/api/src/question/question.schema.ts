@@ -38,6 +38,9 @@ export class Question {
 
 export const QuestionSchema = SchemaFactory.createForClass(Question);
 
+QuestionSchema.index({ topicId: 1 });
+QuestionSchema.index({ subjectId: 1 });
+
 QuestionSchema.set('toJSON', {
   virtuals: true,
   versionKey: false,

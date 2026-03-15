@@ -1,5 +1,6 @@
 import {
   IsArray,
+  ArrayMinSize,
   IsInt,
   IsString,
   IsNotEmpty,
@@ -21,6 +22,7 @@ class MockExamAnswerDto {
 
 export class SubmitMockExamDto implements ISubmitMockExamDto {
   @IsArray()
+  @ArrayMinSize(1)
   @ValidateNested({ each: true })
   @Type(() => MockExamAnswerDto)
   answers: MockExamAnswerDto[];

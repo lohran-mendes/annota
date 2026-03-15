@@ -27,6 +27,10 @@ export class UserAnswer {
 
 export const UserAnswerSchema = SchemaFactory.createForClass(UserAnswer);
 
+UserAnswerSchema.index({ questionId: 1, createdAt: -1 });
+UserAnswerSchema.index({ examId: 1, subjectId: 1 });
+UserAnswerSchema.index({ subjectId: 1, topicId: 1 });
+
 UserAnswerSchema.set('toJSON', {
   virtuals: true,
   versionKey: false,

@@ -14,6 +14,8 @@ export class AccessLog {
 
 export const AccessLogSchema = SchemaFactory.createForClass(AccessLog);
 
+AccessLogSchema.index({ userId: 1, accessDate: -1 });
+
 AccessLogSchema.set('toJSON', {
   virtuals: true,
   versionKey: false,

@@ -9,6 +9,7 @@ import {
 import { MockExamService } from './mock-exam.service';
 import { CreateMockExamDto } from './dto/create-mock-exam.dto';
 import { SubmitMockExamDto } from './dto/submit-mock-exam.dto';
+import { FilterMockExamDto } from './dto/filter-mock-exam.dto';
 import { ParseObjectIdPipe } from '../common/pipes/parse-object-id.pipe';
 
 @Controller('mock-exams')
@@ -16,8 +17,8 @@ export class MockExamController {
   constructor(private readonly mockExamService: MockExamService) {}
 
   @Get()
-  async findAll(@Query('examId') examId?: string) {
-    const mockExams = await this.mockExamService.findAll(examId);
+  async findAll(@Query() filter: FilterMockExamDto) {
+    const mockExams = await this.mockExamService.findAll(filter.examId, filter.status);
     return { data: mockExams, total: mockExams.length };
   }
 

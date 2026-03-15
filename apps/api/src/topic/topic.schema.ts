@@ -21,6 +21,8 @@ export class Topic {
 
 export const TopicSchema = SchemaFactory.createForClass(Topic);
 
+TopicSchema.index({ subjectId: 1 });
+
 TopicSchema.set('toJSON', {
   virtuals: true,
   versionKey: false,

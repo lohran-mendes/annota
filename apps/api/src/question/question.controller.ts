@@ -6,12 +6,15 @@ import {
   Delete,
   Param,
   Body,
+  Query,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
 import { QuestionService } from './question.service';
 import { CreateQuestionDto } from './dto/create-question.dto';
 import { UpdateQuestionDto } from './dto/update-question.dto';
+import { FilterQuestionDto } from './dto/filter-question.dto';
+import { PaginationDto } from '../common/dto/pagination.dto';
 import { ParseObjectIdPipe } from '../common/pipes/parse-object-id.pipe';
 
 @Controller()
@@ -19,9 +22,8 @@ export class QuestionController {
   constructor(private readonly questionService: QuestionService) {}
 
   @Get('questions')
-  async findAll() {
-    const questions = await this.questionService.findAll();
-    return { data: questions, total: questions.length };
+  async findAll(@Query() pagination: PaginationDto, @Query() filter: FilterQuestionDto) {
+    return this.questionService.findAll(pagination.page, pagination.limit, filter);
   }
 
   @Get('topics/:topicId/questions')

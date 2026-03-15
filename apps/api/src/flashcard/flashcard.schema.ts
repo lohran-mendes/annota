@@ -33,6 +33,8 @@ export class Flashcard {
 
 export const FlashcardSchema = SchemaFactory.createForClass(Flashcard);
 
+FlashcardSchema.index({ deckId: 1, nextReviewDate: 1 });
+
 FlashcardSchema.set('toJSON', {
   virtuals: true,
   versionKey: false,

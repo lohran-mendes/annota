@@ -6,6 +6,7 @@ import {
   Delete,
   Param,
   Body,
+  Query,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
@@ -13,15 +14,19 @@ import { TopicService } from './topic.service';
 import { CreateTopicDto } from './dto/create-topic.dto';
 import { UpdateTopicDto } from './dto/update-topic.dto';
 import { ParseObjectIdPipe } from '../common/pipes/parse-object-id.pipe';
+import { PaginationDto } from '../common/dto/pagination.dto';
+import { FilterTopicDto } from './dto/filter-topic.dto';
 
 @Controller()
 export class TopicController {
   constructor(private readonly topicService: TopicService) {}
 
   @Get('topics')
-  async findAll() {
-    const topics = await this.topicService.findAll();
-    return { data: topics, total: topics.length };
+  async findAll(
+    @Query() pagination: PaginationDto,
+    @Query() filter: FilterTopicDto,
+  ) {
+    return this.topicService.findAll(pagination.page, pagination.limit, filter);
   }
 
   @Get('subjects/:subjectId/topics')

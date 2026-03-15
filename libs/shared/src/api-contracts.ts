@@ -17,6 +17,9 @@ export interface ApiResponse<T> {
 export interface ApiListResponse<T> {
   data: T[];
   total: number;
+  page?: number;
+  limit?: number;
+  totalPages?: number;
 }
 
 export interface ApiErrorResponse {

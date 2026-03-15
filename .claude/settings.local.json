@@ -4,7 +4,9 @@
       "Bash(find c:UsersAsusDesktopannotaappsapisrc -type f -name *access-log*)",
       "Bash(npx tsc:*)",
       "Bash(npm run:*)",
-      "Bash(find /c/Users/Asus/Desktop/annota/apps/web/src/app/features/admin -type f -name *.ts)"
+      "Bash(find /c/Users/Asus/Desktop/annota/apps/web/src/app/features/admin -type f -name *.ts)",
+      "Bash(node -e \"const m = require\\(''mongoose''\\); console.log\\(typeof m.FilterQuery\\); console.log\\(Object.keys\\(m\\).filter\\(k => k.toLowerCase\\(\\).includes\\(''filter''\\)\\)\\)\")",
+      "Bash(node -e \"const m = require\\(''mongoose''\\); console.log\\(typeof m.RootFilterQuery\\)\")"
     ]
   }
 }

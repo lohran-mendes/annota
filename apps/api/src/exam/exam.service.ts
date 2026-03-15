@@ -7,7 +7,9 @@ import { Subject, SubjectDocument } from '../subject/subject.schema';
 import { Topic, TopicDocument } from '../topic/topic.schema';
 import { CreateExamDto } from './dto/create-exam.dto';
 import { UpdateExamDto } from './dto/update-exam.dto';
+import { FilterExamDto } from './dto/filter-exam.dto';
 import type { ExamSubject, ExamTopic } from '@annota/shared';
+import { paginate, PaginatedResult } from '../common/utils/paginate';
 
 @Injectable()
 export class ExamService {
@@ -18,12 +20,24 @@ export class ExamService {
     @InjectModel(Topic.name) private topicModel: Model<TopicDocument>,
   ) {}
 
-  async findAll(): Promise<Exam[]> {
-    return this.examModel.find().exec();
+  async findAll(
+    page = 1,
+    limit = 20,
+    filter?: FilterExamDto,
+  ): Promise<PaginatedResult<Exam>> {
+    const query: Record<string, unknown> = {};
+    if (filter?.search) {
+      const regex = new RegExp(filter.search, 'i');
+      query.$or = [{ name: regex }, { institution: regex }];
+    }
+    if (filter?.year) query.year = filter.year;
+    if (filter?.institution)
+      query.institution = new RegExp(filter.institution, 'i');
+    return paginate(this.examModel, query, page, limit);
   }
 
   async findOne(id: string): Promise<Exam> {
-    const exam = await this.examModel.findById(id).exec();
+    const exam = await this.examModel.findById(id).lean().exec();
     if (!exam) {
       throw new NotFoundException(`Exam with id ${id} not found`);
     }
@@ -108,6 +122,7 @@ export class ExamService {
     }
     return this.questionModel
       .find({ _id: { $in: exam.questionIds } })
+      .lean()
       .exec();
   }
 
@@ -123,6 +138,7 @@ export class ExamService {
 
     const questions = await this.questionModel
       .find({ _id: { $in: exam.questionIds } })
+      .lean()
       .exec();
 
     // Agrupar questoes por subjectId
@@ -139,6 +155,7 @@ export class ExamService {
     const subjectIds = [...subjectQuestionsMap.keys()];
     const subjects = await this.subjectModel
       .find({ _id: { $in: subjectIds } })
+      .lean()
       .exec();
     const subjectMap = new Map(
       subjects.map((s) => [s._id.toString(), s]),
@@ -147,6 +164,7 @@ export class ExamService {
     const topicIds = [...new Set(questions.map((q) => q.topicId.toString()))];
     const topics = await this.topicModel
       .find({ _id: { $in: topicIds } })
+      .lean()
       .exec();
     const topicMap = new Map(topics.map((t) => [t._id.toString(), t]));
 

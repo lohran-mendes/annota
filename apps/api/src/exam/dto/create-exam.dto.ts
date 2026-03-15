@@ -3,6 +3,7 @@ import {
   IsNotEmpty,
   IsInt,
   Min,
+  Max,
   IsArray,
   IsOptional,
 } from 'class-validator';
@@ -19,6 +20,7 @@ export class CreateExamDto implements ICreateExamDto {
 
   @IsInt()
   @Min(2000)
+  @Max(2100)
   year: number;
 
   @IsString()

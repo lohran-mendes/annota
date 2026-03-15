@@ -5,8 +5,10 @@ import { Question, QuestionDocument } from './question.schema';
 import { Exam, ExamDocument } from '../exam/exam.schema';
 import { CreateQuestionDto } from './dto/create-question.dto';
 import { UpdateQuestionDto } from './dto/update-question.dto';
+import { FilterQuestionDto } from './dto/filter-question.dto';
 import { TopicService } from '../topic/topic.service';
 import { SubjectService } from '../subject/subject.service';
+import { paginate, PaginatedResult } from '../common/utils/paginate';
 
 @Injectable()
 export class QuestionService {
@@ -19,16 +21,24 @@ export class QuestionService {
     private readonly subjectService: SubjectService,
   ) {}
 
-  async findAll(): Promise<Question[]> {
-    return this.questionModel.find().exec();
+  async findAll(
+    page = 1,
+    limit = 20,
+    filter?: FilterQuestionDto,
+  ): Promise<PaginatedResult<Question>> {
+    const query: Record<string, unknown> = {};
+    if (filter?.search) query.statement = new RegExp(filter.search, 'i');
+    if (filter?.subjectId) query.subjectId = filter.subjectId;
+    if (filter?.topicId) query.topicId = filter.topicId;
+    return paginate(this.questionModel, query, page, limit);
   }
 
   async findByTopic(topicId: string): Promise<Question[]> {
-    return this.questionModel.find({ topicId }).exec();
+    return this.questionModel.find({ topicId }).lean().exec();
   }
 
   async findBySubject(subjectId: string): Promise<Question[]> {
-    return this.questionModel.find({ subjectId }).exec();
+    return this.questionModel.find({ subjectId }).lean().exec();
   }
 
   async findOne(id: string): Promise<Question> {
