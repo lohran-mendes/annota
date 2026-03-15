@@ -12,6 +12,7 @@ import {
 import { DeckService } from './deck.service';
 import { CreateDeckDto } from './dto/create-deck.dto';
 import { UpdateDeckDto } from './dto/update-deck.dto';
+import { ParseObjectIdPipe } from '../common/pipes/parse-object-id.pipe';
 
 @Controller('decks')
 export class DeckController {
@@ -24,7 +25,7 @@ export class DeckController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
+  async findOne(@Param('id', ParseObjectIdPipe) id: string) {
     const deck = await this.deckService.findOne(id);
     return { data: deck };
   }
@@ -36,19 +37,19 @@ export class DeckController {
   }
 
   @Put(':id')
-  async update(@Param('id') id: string, @Body() dto: UpdateDeckDto) {
+  async update(@Param('id', ParseObjectIdPipe) id: string, @Body() dto: UpdateDeckDto) {
     const deck = await this.deckService.update(id, dto);
     return { data: deck };
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async remove(@Param('id') id: string): Promise<void> {
+  async remove(@Param('id', ParseObjectIdPipe) id: string): Promise<void> {
     await this.deckService.remove(id);
   }
 
   @Get(':id/stats')
-  async getStats(@Param('id') id: string) {
+  async getStats(@Param('id', ParseObjectIdPipe) id: string) {
     const stats = await this.deckService.getStats(id);
     return { data: stats };
   }

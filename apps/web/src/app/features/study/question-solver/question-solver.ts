@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { FormsModule } from '@angular/forms';
 import { MOCK_QUESTIONS } from '../../../core/mock-data';
 import { QuestionService } from '../../../core/services/question.service';
@@ -20,6 +21,7 @@ import type { Question } from '@annota/shared';
     MatIconModule,
     MatRadioModule,
     MatDividerModule,
+    MatSnackBarModule,
     FormsModule,
   ],
   templateUrl: './question-solver.html',
@@ -29,6 +31,7 @@ export class QuestionSolver implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly questionService = inject(QuestionService);
   private readonly answerService = inject(AnswerService);
+  private readonly snackBar = inject(MatSnackBar);
 
   examId = '';
   private topicId = '';
@@ -96,11 +99,11 @@ export class QuestionSolver implements OnInit {
         .submitAnswer({
           questionId: this.currentQuestion().id,
           selectedIndex: this.selectedAnswer()!,
-          examId: this.examId,
+          examId: this.examId || undefined,
         })
         .subscribe({
-          error: (err) => {
-            console.error('Failed to submit answer to API:', err);
+          error: () => {
+            this.snackBar.open('Erro ao registrar resposta. Tente novamente.', 'OK', { duration: 4000 });
           },
         });
     }

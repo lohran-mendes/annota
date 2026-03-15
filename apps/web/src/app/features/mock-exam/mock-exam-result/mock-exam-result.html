@@ -3,6 +3,24 @@
     <mat-spinner diameter="48"></mat-spinner>
     <p>Carregando resultado...</p>
   </div>
+} @else if (error()) {
+  <mat-card class="empty-state-card">
+    <mat-card-content>
+      <mat-icon class="empty-icon error-icon">cloud_off</mat-icon>
+      <h2>Erro ao carregar resultado</h2>
+      <p>Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.</p>
+      <div class="error-actions">
+        <button mat-flat-button color="primary" (click)="reload()">
+          <mat-icon>refresh</mat-icon>
+          Tentar novamente
+        </button>
+        <a mat-stroked-button routerLink="/mock-exam">
+          <mat-icon>arrow_back</mat-icon>
+          Voltar aos simulados
+        </a>
+      </div>
+    </mat-card-content>
+  </mat-card>
 } @else {
   <div class="result-hero animate-fade-in-up" [class.pass]="score() >= 60" [class.fail]="score() < 60">
     <mat-icon class="result-hero-icon">

@@ -12,6 +12,7 @@ import {
 import { SubjectService } from './subject.service';
 import { CreateSubjectDto } from './dto/create-subject.dto';
 import { UpdateSubjectDto } from './dto/update-subject.dto';
+import { ParseObjectIdPipe } from '../common/pipes/parse-object-id.pipe';
 
 @Controller('subjects')
 export class SubjectController {
@@ -24,7 +25,7 @@ export class SubjectController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
+  async findOne(@Param('id', ParseObjectIdPipe) id: string) {
     const subject = await this.subjectService.findOne(id);
     return { data: subject };
   }
@@ -37,7 +38,7 @@ export class SubjectController {
 
   @Put(':id')
   async update(
-    @Param('id') id: string,
+    @Param('id', ParseObjectIdPipe) id: string,
     @Body() dto: UpdateSubjectDto,
   ) {
     const subject = await this.subjectService.update(id, dto);
@@ -46,7 +47,7 @@ export class SubjectController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async remove(@Param('id') id: string): Promise<void> {
+  async remove(@Param('id', ParseObjectIdPipe) id: string): Promise<void> {
     await this.subjectService.remove(id);
   }
 }

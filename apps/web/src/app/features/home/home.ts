@@ -93,11 +93,21 @@ export class Home implements OnInit {
 
     ref.afterClosed().subscribe((confirmed: boolean) => {
       if (!confirmed) return;
+
+      if (!this.isObjectId(exam.id)) {
+        this.exams.update((list) => list.filter((e) => e.id !== exam.id));
+        return;
+      }
+
       this.examService.delete(exam.id).subscribe({
         next: () => this.loadExams(),
         error: (err) => console.error('Erro ao excluir prova', err),
       });
     });
+  }
+
+  private isObjectId(id: string): boolean {
+    return /^[a-f\d]{24}$/i.test(id);
   }
 
   get accuracyPercent(): number {

@@ -27,10 +27,18 @@ export class MockExamResult implements OnInit {
   timeSpent = signal('');
   subjectResults = signal<MockExamSubjectResult[]>([]);
   loading = signal(true);
+  error = signal(false);
+
+  private mockExamId = '';
 
   ngOnInit() {
-    const mockExamId = this.route.snapshot.paramMap.get('mockExamId') ?? '';
-    this.loadResult(mockExamId);
+    this.mockExamId = this.route.snapshot.paramMap.get('mockExamId') ?? '';
+    this.loadResult(this.mockExamId);
+  }
+
+  reload(): void {
+    this.error.set(false);
+    this.loadResult(this.mockExamId);
   }
 
   private loadResult(id: string) {
@@ -46,6 +54,7 @@ export class MockExamResult implements OnInit {
         this.loading.set(false);
       },
       error: () => {
+        this.error.set(true);
         this.loading.set(false);
       },
     });

@@ -12,6 +12,7 @@ import {
 import { QuestionService } from './question.service';
 import { CreateQuestionDto } from './dto/create-question.dto';
 import { UpdateQuestionDto } from './dto/update-question.dto';
+import { ParseObjectIdPipe } from '../common/pipes/parse-object-id.pipe';
 
 @Controller()
 export class QuestionController {
@@ -24,13 +25,13 @@ export class QuestionController {
   }
 
   @Get('topics/:topicId/questions')
-  async findByTopic(@Param('topicId') topicId: string) {
+  async findByTopic(@Param('topicId', ParseObjectIdPipe) topicId: string) {
     const questions = await this.questionService.findByTopic(topicId);
     return { data: questions, total: questions.length };
   }
 
   @Get('questions/:id')
-  async findOne(@Param('id') id: string) {
+  async findOne(@Param('id', ParseObjectIdPipe) id: string) {
     const question = await this.questionService.findOne(id);
     return { data: question };
   }
@@ -43,7 +44,7 @@ export class QuestionController {
 
   @Put('questions/:id')
   async update(
-    @Param('id') id: string,
+    @Param('id', ParseObjectIdPipe) id: string,
     @Body() dto: UpdateQuestionDto,
   ) {
     const question = await this.questionService.update(id, dto);
@@ -52,7 +53,7 @@ export class QuestionController {
 
   @Delete('questions/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async remove(@Param('id') id: string): Promise<void> {
+  async remove(@Param('id', ParseObjectIdPipe) id: string): Promise<void> {
     await this.questionService.remove(id);
   }
 }

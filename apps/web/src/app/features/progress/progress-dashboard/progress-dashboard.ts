@@ -1,5 +1,6 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -17,6 +18,7 @@ const EMPTY_PROGRESS: UserProgress = {
   selector: 'annota-progress-dashboard',
   imports: [
     MatCardModule,
+    MatButtonModule,
     MatIconModule,
     MatProgressBarModule,
     MatProgressSpinnerModule,
@@ -58,7 +60,17 @@ export class ProgressDashboard implements OnInit {
 
   hasData = computed(() => this.progress().totalAnswered > 0);
 
+  reload(): void {
+    this.error.set(false);
+    this.loadProgress();
+  }
+
   ngOnInit(): void {
+    this.loadProgress();
+  }
+
+  private loadProgress(): void {
+    this.loading.set(true);
     this.progressService.getGlobalProgress().subscribe({
       next: (res) => {
         this.progress.set(res.data);

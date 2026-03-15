@@ -9,6 +9,7 @@ import {
 import { MockExamService } from './mock-exam.service';
 import { CreateMockExamDto } from './dto/create-mock-exam.dto';
 import { SubmitMockExamDto } from './dto/submit-mock-exam.dto';
+import { ParseObjectIdPipe } from '../common/pipes/parse-object-id.pipe';
 
 @Controller('mock-exams')
 export class MockExamController {
@@ -27,14 +28,14 @@ export class MockExamController {
   }
 
   @Get(':id')
-  async getSession(@Param('id') id: string) {
+  async getSession(@Param('id', ParseObjectIdPipe) id: string) {
     const session = await this.mockExamService.getSession(id);
     return { data: session };
   }
 
   @Post(':id/submit')
   async submit(
-    @Param('id') id: string,
+    @Param('id', ParseObjectIdPipe) id: string,
     @Body() dto: SubmitMockExamDto,
   ) {
     const result = await this.mockExamService.submit(id, dto);
@@ -42,7 +43,7 @@ export class MockExamController {
   }
 
   @Get(':id/result')
-  async getResult(@Param('id') id: string) {
+  async getResult(@Param('id', ParseObjectIdPipe) id: string) {
     const result = await this.mockExamService.getResult(id);
     return { data: result };
   }

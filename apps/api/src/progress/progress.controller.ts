@@ -1,5 +1,6 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { ProgressService } from './progress.service';
+import { ParseObjectIdPipe } from '../common/pipes/parse-object-id.pipe';
 
 @Controller('progress')
 export class ProgressController {
@@ -12,7 +13,7 @@ export class ProgressController {
   }
 
   @Get('exams/:examId')
-  async getExamProgress(@Param('examId') examId: string) {
+  async getExamProgress(@Param('examId', ParseObjectIdPipe) examId: string) {
     const progress = await this.progressService.getExamProgress(examId);
     return { data: progress };
   }
