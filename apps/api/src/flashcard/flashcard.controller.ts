@@ -14,7 +14,9 @@ import { CreateFlashcardDto } from './dto/create-flashcard.dto';
 import { UpdateFlashcardDto } from './dto/update-flashcard.dto';
 import { ReviewFlashcardDto } from './dto/review-flashcard.dto';
 import { ParseObjectIdPipe } from '../common/pipes/parse-object-id.pipe';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Flashcards')
 @Controller()
 export class FlashcardController {
   constructor(private readonly flashcardService: FlashcardService) {}

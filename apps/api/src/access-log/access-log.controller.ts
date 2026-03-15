@@ -1,7 +1,10 @@
 import { Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { AccessLogService } from './access-log.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiTags('Access Logs')
+@ApiBearerAuth()
 @Controller('access-logs')
 @UseGuards(JwtAuthGuard)
 export class AccessLogController {

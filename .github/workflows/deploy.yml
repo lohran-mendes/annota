@@ -30,6 +30,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Run API tests
+        run: npm run test:api -- --passWithNoTests
+
       - name: Build Angular app
         run: npm run build:ghpages
 

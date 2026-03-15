@@ -16,7 +16,9 @@ import { UpdateSubjectDto } from './dto/update-subject.dto';
 import { ParseObjectIdPipe } from '../common/pipes/parse-object-id.pipe';
 import { PaginationDto } from '../common/dto/pagination.dto';
 import { FilterSubjectDto } from './dto/filter-subject.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Subjects')
 @Controller('subjects')
 export class SubjectController {
   constructor(private readonly subjectService: SubjectService) {}

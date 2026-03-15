@@ -17,7 +17,9 @@ import { LinkQuestionsDto } from './dto/link-questions.dto';
 import { ParseObjectIdPipe } from '../common/pipes/parse-object-id.pipe';
 import { PaginationDto } from '../common/dto/pagination.dto';
 import { FilterExamDto } from './dto/filter-exam.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Exams')
 @Controller('exams')
 export class ExamController {
   constructor(private readonly examService: ExamService) {}

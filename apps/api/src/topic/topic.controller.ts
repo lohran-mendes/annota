@@ -16,7 +16,9 @@ import { UpdateTopicDto } from './dto/update-topic.dto';
 import { ParseObjectIdPipe } from '../common/pipes/parse-object-id.pipe';
 import { PaginationDto } from '../common/dto/pagination.dto';
 import { FilterTopicDto } from './dto/filter-topic.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Topics')
 @Controller()
 export class TopicController {
   constructor(private readonly topicService: TopicService) {}

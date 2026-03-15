@@ -11,7 +11,9 @@ import { CreateMockExamDto } from './dto/create-mock-exam.dto';
 import { SubmitMockExamDto } from './dto/submit-mock-exam.dto';
 import { FilterMockExamDto } from './dto/filter-mock-exam.dto';
 import { ParseObjectIdPipe } from '../common/pipes/parse-object-id.pipe';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Mock Exams')
 @Controller('mock-exams')
 export class MockExamController {
   constructor(private readonly mockExamService: MockExamService) {}

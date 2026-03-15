@@ -13,7 +13,9 @@ import { DeckService } from './deck.service';
 import { CreateDeckDto } from './dto/create-deck.dto';
 import { UpdateDeckDto } from './dto/update-deck.dto';
 import { ParseObjectIdPipe } from '../common/pipes/parse-object-id.pipe';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Decks')
 @Controller('decks')
 export class DeckController {
   constructor(private readonly deckService: DeckService) {}

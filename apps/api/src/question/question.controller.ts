@@ -16,7 +16,9 @@ import { UpdateQuestionDto } from './dto/update-question.dto';
 import { FilterQuestionDto } from './dto/filter-question.dto';
 import { PaginationDto } from '../common/dto/pagination.dto';
 import { ParseObjectIdPipe } from '../common/pipes/parse-object-id.pipe';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Questions')
 @Controller()
 export class QuestionController {
   constructor(private readonly questionService: QuestionService) {}

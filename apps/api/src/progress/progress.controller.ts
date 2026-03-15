@@ -1,7 +1,9 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { ProgressService } from './progress.service';
 import { ParseObjectIdPipe } from '../common/pipes/parse-object-id.pipe';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Progress')
 @Controller('progress')
 export class ProgressController {
   constructor(private readonly progressService: ProgressService) {}
