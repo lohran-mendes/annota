@@ -121,6 +121,21 @@
   }
 }
 
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+
+  .section-title {
+    margin-bottom: 0;
+  }
+}
+
+.add-exam-btn {
+  flex-shrink: 0;
+}
+
 .exam-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -137,8 +152,24 @@
     transform: translateY(-4px);
   }
 
+  mat-card-header {
+    position: relative;
+  }
+
   mat-card-actions {
     padding: 8px 16px 16px;
+  }
+}
+
+.delete-exam-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  color: var(--annota-text-light);
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: var(--mat-sys-error, #b00020);
   }
 }
 
@@ -230,6 +261,11 @@
 
   .stat-item {
     padding: 10px 14px;
+  }
+
+  .section-header {
+    flex-wrap: wrap;
+    gap: 8px;
   }
 
   .exam-grid {

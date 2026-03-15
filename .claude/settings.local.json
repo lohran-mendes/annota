@@ -3,7 +3,8 @@
     "allow": [
       "Bash(find c:UsersAsusDesktopannotaappsapisrc -type f -name *access-log*)",
       "Bash(npx tsc:*)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(find /c/Users/Asus/Desktop/annota/apps/web/src/app/features/admin -type f -name *.ts)"
     ]
   }
 }

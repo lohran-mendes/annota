@@ -53,10 +53,18 @@
 </section>
 
 <section class="section">
-  <h2 class="section-title">
-    <mat-icon>school</mat-icon>
-    Escolha uma prova para estudar
-  </h2>
+  <div class="section-header">
+    <h2 class="section-title">
+      <mat-icon>school</mat-icon>
+      Escolha uma prova para estudar
+    </h2>
+    @if (isAdmin()) {
+      <button mat-flat-button color="primary" class="add-exam-btn" (click)="openCreateDialog()">
+        <mat-icon>add</mat-icon>
+        Nova prova
+      </button>
+    }
+  </div>
 
   <div class="exam-grid">
     @for (exam of exams(); track exam.id; let i = $index) {
@@ -65,6 +73,16 @@
           <mat-icon mat-card-avatar class="exam-icon">description</mat-icon>
           <mat-card-title>{{ exam.name }}</mat-card-title>
           <mat-card-subtitle>{{ exam.institution }} - {{ exam.year }}</mat-card-subtitle>
+          @if (isAdmin()) {
+            <button
+              mat-icon-button
+              class="delete-exam-btn"
+              aria-label="Excluir prova"
+              (click)="deleteExam(exam, $event)"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          }
         </mat-card-header>
         <mat-card-content>
           <p class="exam-description">{{ exam.description }}</p>
