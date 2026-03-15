@@ -224,6 +224,29 @@ export interface MockExamQuestionResult {
 }
 
 // ============================================================
+// Mock Exam Session Admin types
+// ============================================================
+
+export interface MockExamSessionAdmin {
+  id: string;
+  mockExamId: string;
+  mockExamName: string;
+  status: 'in_progress' | 'completed';
+  score?: number;
+  timeSpent?: number;
+  completedAt?: string;
+  createdAt?: string;
+}
+
+export interface MockExamSessionStats {
+  total: number;
+  completed: number;
+  inProgress: number;
+  averageScore: number;
+  averageTimeSpent: number;
+}
+
+// ============================================================
 // Deck DTOs
 // ============================================================
 
@@ -375,6 +398,11 @@ export interface AccessLogStreak {
 //   GET    /api/mock-exam-sessions/:id          → ApiResponse<MockExamSessionData>
 //   POST   /api/mock-exam-sessions/:id/submit   → ApiResponse<MockExamResult>
 //   GET    /api/mock-exam-sessions/:id/result   → ApiResponse<MockExamResult>
+//
+// Mock Exam Sessions (Admin):
+//   GET    /api/mock-exam-sessions/admin/all    → ApiListResponse<MockExamSessionAdmin>
+//   GET    /api/mock-exam-sessions/admin/stats  → ApiResponse<MockExamSessionStats>
+//   DELETE /api/mock-exam-sessions/admin/:id    → 204
 //
 // Decks:
 //   GET    /api/decks                             → ApiListResponse<Deck>

@@ -3,6 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import type {
   MockExam,
   MockExamSessionConfig,
+  MockExamSessionAdmin,
+  MockExamSessionStats,
   ApiListResponse,
   ApiResponse,
   CreateMockExamDto,
@@ -61,5 +63,19 @@ export class MockExamService {
 
   getSessionResult(sessionId: string) {
     return this.http.get<ApiResponse<MockExamResult>>(`${this.apiUrl}/mock-exam-sessions/${sessionId}/result`);
+  }
+
+  // Admin session methods — history management
+
+  getAllSessions(params?: { mockExamId?: string; status?: string }) {
+    return this.http.get<ApiListResponse<MockExamSessionAdmin>>(`${this.apiUrl}/mock-exam-sessions/admin/all`, { params });
+  }
+
+  getSessionStats() {
+    return this.http.get<ApiResponse<MockExamSessionStats>>(`${this.apiUrl}/mock-exam-sessions/admin/stats`);
+  }
+
+  deleteSession(sessionId: string) {
+    return this.http.delete<void>(`${this.apiUrl}/mock-exam-sessions/admin/${sessionId}`);
   }
 }

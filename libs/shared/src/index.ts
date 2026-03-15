@@ -27,6 +27,8 @@ export type {
   MockExamResult,
   MockExamSubjectResult,
   MockExamQuestionResult,
+  MockExamSessionAdmin,
+  MockExamSessionStats,
   CreateDeckDto,
   UpdateDeckDto,
   CreateFlashcardDto,

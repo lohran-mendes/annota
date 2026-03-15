@@ -71,6 +71,15 @@
         <mat-icon matListItemIcon>help_outline</mat-icon>
         <span>Questões</span>
       </a>
+      <a
+        mat-list-item
+        routerLink="/admin/mock-exams"
+        routerLinkActive="active-link"
+        (click)="closeSidenavOnMobile()"
+      >
+        <mat-icon matListItemIcon>assignment</mat-icon>
+        <span>Simulados</span>
+      </a>
     </mat-nav-list>
   </mat-sidenav>
 

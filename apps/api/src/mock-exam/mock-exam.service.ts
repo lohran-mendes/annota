@@ -26,6 +26,8 @@ import type {
   MockExamSessionData,
   MockExamResult as IMockExamResult,
   MockExamSessionConfig,
+  MockExamSessionAdmin,
+  MockExamSessionStats,
 } from '@annota/shared';
 import { normalizeLeanDoc, normalizeLeanDocs } from '../common/utils/paginate';
 
@@ -351,6 +353,89 @@ export class MockExamService {
       timeSpent: dto.timeSpent,
       bySubject,
       details,
+    };
+  }
+
+  // ----------------------------------------------------------------
+  // Admin session management
+  // ----------------------------------------------------------------
+
+  async listAllSessions(
+    mockExamId?: string,
+    status?: 'in_progress' | 'completed',
+  ): Promise<MockExamSessionAdmin[]> {
+    const filter: Record<string, unknown> = {};
+    if (mockExamId) filter.mockExamId = mockExamId;
+    if (status) filter.status = status;
+
+    const docs = await this.sessionModel
+      .find(filter)
+      .sort({ createdAt: -1 })
+      .lean()
+      .exec();
+
+    return docs.map((doc) => ({
+      id: (doc._id as any).toString(),
+      mockExamId: doc.mockExamId?.toString() ?? '',
+      mockExamName: doc.mockExamName,
+      status: doc.status,
+      score: doc.score,
+      timeSpent: doc.timeSpent,
+      completedAt: doc.completedAt
+        ? (doc.completedAt as any).toISOString()
+        : undefined,
+      createdAt: (doc as any).createdAt
+        ? (doc as any).createdAt.toISOString()
+        : undefined,
+    }));
+  }
+
+  async deleteSession(sessionId: string): Promise<void> {
+    const session = await this.sessionModel
+      .findByIdAndDelete(sessionId)
+      .exec();
+    if (!session) {
+      throw new NotFoundException(
+        `MockExamSession with id ${sessionId} not found`,
+      );
+    }
+    // Remove associated result (if any — ignore if none exists)
+    await this.resultModel.deleteOne({ sessionId }).exec();
+  }
+
+  async getSessionStats(): Promise<MockExamSessionStats> {
+    const [totalResult, completedResult, scoreResult, timeResult] =
+      await Promise.all([
+        this.sessionModel.countDocuments().exec(),
+        this.sessionModel.countDocuments({ status: 'completed' }).exec(),
+        this.sessionModel
+          .aggregate<{ avg: number }>([
+            { $match: { status: 'completed', score: { $exists: true } } },
+            { $group: { _id: null, avg: { $avg: '$score' } } },
+          ])
+          .exec(),
+        this.sessionModel
+          .aggregate<{ avg: number }>([
+            {
+              $match: {
+                status: 'completed',
+                timeSpent: { $exists: true },
+              },
+            },
+            { $group: { _id: null, avg: { $avg: '$timeSpent' } } },
+          ])
+          .exec(),
+      ]);
+
+    const total = totalResult;
+    const completed = completedResult;
+
+    return {
+      total,
+      completed,
+      inProgress: total - completed,
+      averageScore: scoreResult[0]?.avg ?? 0,
+      averageTimeSpent: timeResult[0]?.avg ?? 0,
     };
   }
 

@@ -2,13 +2,17 @@ import {
   Controller,
   Get,
   Post,
+  Delete,
   Param,
   Body,
   Query,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { MockExamService } from './mock-exam.service';
 import { StartSessionDto } from './dto/start-session.dto';
 import { SubmitMockExamDto } from './dto/submit-mock-exam.dto';
+import { FilterSessionDto } from './dto/filter-session.dto';
 import { ParseObjectIdPipe } from '../common/pipes/parse-object-id.pipe';
 import {
   ApiTags,
@@ -51,6 +55,55 @@ export class MockExamSessionController {
     const sessionData = await this.mockExamService.startSession(dto);
     return { data: sessionData };
   }
+
+  // ----------------------------------------------------------------
+  // Admin endpoints
+  // ----------------------------------------------------------------
+
+  @Get('admin/all')
+  @ApiOperation({ summary: '[Admin] List all sessions with optional filters' })
+  @ApiQuery({
+    name: 'mockExamId',
+    required: false,
+    type: String,
+    description: 'Filter by mock exam ObjectId',
+  })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    enum: ['in_progress', 'completed'],
+    description: 'Filter by session status',
+  })
+  @ApiResponse({ status: 200, description: 'List of all sessions' })
+  async listAllSessions(@Query() filter: FilterSessionDto) {
+    const sessions = await this.mockExamService.listAllSessions(
+      filter.mockExamId,
+      filter.status,
+    );
+    return { data: sessions, total: sessions.length };
+  }
+
+  @Get('admin/stats')
+  @ApiOperation({ summary: '[Admin] Get aggregate stats across all sessions' })
+  @ApiResponse({ status: 200, description: 'Session aggregate statistics' })
+  async getSessionStats() {
+    const stats = await this.mockExamService.getSessionStats();
+    return { data: stats };
+  }
+
+  @Delete('admin/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: '[Admin] Delete a session and its associated result' })
+  @ApiParam({ name: 'id', description: 'Mock exam session ObjectId' })
+  @ApiResponse({ status: 204, description: 'Session deleted' })
+  @ApiResponse({ status: 404, description: 'Session not found' })
+  async deleteSession(@Param('id', ParseObjectIdPipe) id: string) {
+    await this.mockExamService.deleteSession(id);
+  }
+
+  // ----------------------------------------------------------------
+  // Student endpoints
+  // ----------------------------------------------------------------
 
   @Get(':id')
   @ApiOperation({ summary: 'Get an active mock exam session by ID' })

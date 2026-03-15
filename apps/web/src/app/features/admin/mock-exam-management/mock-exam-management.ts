@@ -8,11 +8,17 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { FormsModule } from '@angular/forms';
+import { DatePipe } from '@angular/common';
 import { MockExamService } from '../../../core/services/mock-exam.service';
 import { ExamService } from '../../../core/services/exam.service';
 import { MockExamDialog } from '../dialogs/mock-exam-dialog';
 import { ConfirmDialog } from '../dialogs/confirm-dialog';
-import type { Exam, MockExam } from '@annota/shared';
+import type { Exam, MockExam, MockExamSessionAdmin, MockExamSessionStats } from '@annota/shared';
 import { forkJoin } from 'rxjs';
 
 @Component({
@@ -20,7 +26,8 @@ import { forkJoin } from 'rxjs';
   imports: [
     MatCardModule, MatButtonModule, MatIconModule,
     MatTableModule, MatSlideToggleModule, MatProgressSpinnerModule,
-    MatTooltipModule,
+    MatTooltipModule, MatTabsModule, MatChipsModule, MatSelectModule,
+    MatFormFieldModule, FormsModule, DatePipe,
   ],
   templateUrl: './mock-exam-management.html',
   styleUrl: './mock-exam-management.scss',
@@ -32,12 +39,21 @@ export class MockExamManagement implements OnInit {
   private readonly snackBar = inject(MatSnackBar);
 
   mockExams = signal<MockExam[]>([]);
+  sessions = signal<MockExamSessionAdmin[]>([]);
+  stats = signal<MockExamSessionStats | null>(null);
   private examMap = signal<Map<string, Exam>>(new Map());
   loading = signal(false);
+  loadingSessions = signal(false);
   displayedColumns = ['name', 'exam', 'questions', 'duration', 'published', 'actions'];
+  sessionColumns = ['mockExamName', 'status', 'score', 'timeSpent', 'completedAt', 'actions'];
+
+  // Session filters
+  filterMockExamId = signal('');
+  filterStatus = signal('');
 
   ngOnInit() {
     this.loadData();
+    this.loadSessions();
   }
 
   loadData() {
@@ -57,6 +73,27 @@ export class MockExamManagement implements OnInit {
     });
   }
 
+  loadSessions() {
+    this.loadingSessions.set(true);
+    const params: Record<string, string> = {};
+    if (this.filterMockExamId()) params['mockExamId'] = this.filterMockExamId();
+    if (this.filterStatus()) params['status'] = this.filterStatus();
+
+    forkJoin({
+      sessions: this.mockExamService.getAllSessions(params),
+      stats: this.mockExamService.getSessionStats(),
+    }).subscribe({
+      next: ({ sessions, stats }) => {
+        this.sessions.set(sessions.data);
+        this.stats.set(stats.data);
+        this.loadingSessions.set(false);
+      },
+      error: () => {
+        this.loadingSessions.set(false);
+      },
+    });
+  }
+
   getExamName(examId: string): string {
     return this.examMap().get(examId)?.name ?? '—';
   }
@@ -65,6 +102,25 @@ export class MockExamManagement implements OnInit {
     const h = Math.floor(minutes / 60);
     const m = minutes % 60;
     return h > 0 ? `${h}h${m > 0 ? ` ${m}min` : ''}` : `${m}min`;
+  }
+
+  formatTimeSpent(seconds?: number): string {
+    if (!seconds) return '—';
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    if (h > 0) return `${h}h ${m}min`;
+    if (m > 0) return `${m}min ${s}s`;
+    return `${s}s`;
+  }
+
+  formatScore(score?: number): string {
+    if (score == null) return '—';
+    return `${Math.round(score)}%`;
+  }
+
+  onFilterChange() {
+    this.loadSessions();
   }
 
   openCreateDialog() {
@@ -134,6 +190,26 @@ export class MockExamManagement implements OnInit {
             this.loadData();
           },
           error: () => this.snackBar.open('Erro ao excluir simulado.', 'OK', { duration: 3000 }),
+        });
+      }
+    });
+  }
+
+  confirmDeleteSession(session: MockExamSessionAdmin) {
+    const ref = this.dialog.open(ConfirmDialog, {
+      data: {
+        title: 'Excluir Sessão',
+        message: `Deseja excluir esta sessão de "${session.mockExamName}"? O resultado será perdido.`,
+      },
+    });
+    ref.afterClosed().subscribe((confirmed) => {
+      if (confirmed) {
+        this.mockExamService.deleteSession(session.id).subscribe({
+          next: () => {
+            this.snackBar.open('Sessão excluída!', 'OK', { duration: 3000 });
+            this.loadSessions();
+          },
+          error: () => this.snackBar.open('Erro ao excluir sessão.', 'OK', { duration: 3000 }),
         });
       }
     });

@@ -1,7 +1,7 @@
 <div class="page-header animate-fade-in-up">
   <div>
     <h1>Gerenciar Simulados</h1>
-    <p class="page-subtitle">Crie e publique simulados para os alunos</p>
+    <p class="page-subtitle">Crie, publique e acompanhe o histórico de simulados</p>
   </div>
   <button mat-flat-button color="primary" class="add-btn" (click)="openCreateDialog()">
     <mat-icon>add</mat-icon>
@@ -9,71 +9,229 @@
   </button>
 </div>
 
-@if (loading()) {
-  <div class="loading-container">
-    <mat-spinner diameter="40"></mat-spinner>
-  </div>
-} @else {
-  <mat-card class="table-card animate-fade-in-up">
-    @if (mockExams().length === 0) {
-      <div class="empty-state">
-        <mat-icon>assignment</mat-icon>
-        <p>Nenhum simulado cadastrado ainda.</p>
-        <button mat-stroked-button color="primary" (click)="openCreateDialog()">Criar primeiro simulado</button>
+<mat-tab-group class="animate-fade-in-up" animationDuration="200ms">
+  <!-- Tab: Simulados (Templates) -->
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <mat-icon class="tab-icon">assignment</mat-icon>
+      Simulados
+    </ng-template>
+
+    @if (loading()) {
+      <div class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
       </div>
     } @else {
-      <table mat-table [dataSource]="mockExams()" class="data-table">
-        <ng-container matColumnDef="name">
-          <th mat-header-cell *matHeaderCellDef>Nome</th>
-          <td mat-cell *matCellDef="let mockExam">
-            <span class="cell-primary">{{ mockExam.name }}</span>
-            @if (mockExam.description) {
-              <span class="cell-secondary">{{ mockExam.description }}</span>
-            }
-          </td>
-        </ng-container>
+      <mat-card class="table-card">
+        @if (mockExams().length === 0) {
+          <div class="empty-state">
+            <mat-icon>assignment</mat-icon>
+            <p>Nenhum simulado cadastrado ainda.</p>
+            <button mat-stroked-button color="primary" (click)="openCreateDialog()">Criar primeiro simulado</button>
+          </div>
+        } @else {
+          <table mat-table [dataSource]="mockExams()" class="data-table">
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef>Nome</th>
+              <td mat-cell *matCellDef="let mockExam">
+                <span class="cell-primary">{{ mockExam.name }}</span>
+                @if (mockExam.description) {
+                  <span class="cell-secondary">{{ mockExam.description }}</span>
+                }
+              </td>
+            </ng-container>
 
-        <ng-container matColumnDef="exam">
-          <th mat-header-cell *matHeaderCellDef>Prova</th>
-          <td mat-cell *matCellDef="let mockExam">{{ getExamName(mockExam.examId) }}</td>
-        </ng-container>
+            <ng-container matColumnDef="exam">
+              <th mat-header-cell *matHeaderCellDef>Prova</th>
+              <td mat-cell *matCellDef="let mockExam">{{ getExamName(mockExam.examId) }}</td>
+            </ng-container>
 
-        <ng-container matColumnDef="questions">
-          <th mat-header-cell *matHeaderCellDef>Questões</th>
-          <td mat-cell *matCellDef="let mockExam">{{ mockExam.questionCount }}</td>
-        </ng-container>
+            <ng-container matColumnDef="questions">
+              <th mat-header-cell *matHeaderCellDef>Questões</th>
+              <td mat-cell *matCellDef="let mockExam">{{ mockExam.questionCount }}</td>
+            </ng-container>
 
-        <ng-container matColumnDef="duration">
-          <th mat-header-cell *matHeaderCellDef>Duração</th>
-          <td mat-cell *matCellDef="let mockExam">{{ formatDuration(mockExam.duration) }}</td>
-        </ng-container>
+            <ng-container matColumnDef="duration">
+              <th mat-header-cell *matHeaderCellDef>Duração</th>
+              <td mat-cell *matCellDef="let mockExam">{{ formatDuration(mockExam.duration) }}</td>
+            </ng-container>
 
-        <ng-container matColumnDef="published">
-          <th mat-header-cell *matHeaderCellDef>Publicado</th>
-          <td mat-cell *matCellDef="let mockExam">
-            <mat-slide-toggle
-              [checked]="mockExam.published"
-              (change)="togglePublished(mockExam)"
-              [matTooltip]="mockExam.published ? 'Despublicar' : 'Publicar'"
-            ></mat-slide-toggle>
-          </td>
-        </ng-container>
+            <ng-container matColumnDef="published">
+              <th mat-header-cell *matHeaderCellDef>Publicado</th>
+              <td mat-cell *matCellDef="let mockExam">
+                <mat-slide-toggle
+                  [checked]="mockExam.published"
+                  (change)="togglePublished(mockExam)"
+                  [matTooltip]="mockExam.published ? 'Despublicar' : 'Publicar'"
+                ></mat-slide-toggle>
+              </td>
+            </ng-container>
 
-        <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef>Ações</th>
-          <td mat-cell *matCellDef="let mockExam">
-            <button mat-icon-button color="primary" (click)="openEditDialog(mockExam)" matTooltip="Editar">
-              <mat-icon>edit</mat-icon>
-            </button>
-            <button mat-icon-button color="warn" (click)="confirmDelete(mockExam)" matTooltip="Excluir">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </td>
-        </ng-container>
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Ações</th>
+              <td mat-cell *matCellDef="let mockExam">
+                <button mat-icon-button color="primary" (click)="openEditDialog(mockExam)" matTooltip="Editar">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" (click)="confirmDelete(mockExam)" matTooltip="Excluir">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-      </table>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+        }
+      </mat-card>
     }
-  </mat-card>
-}
+  </mat-tab>
+
+  <!-- Tab: Histórico (Sessions) -->
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <mat-icon class="tab-icon">history</mat-icon>
+      Histórico
+    </ng-template>
+
+    <!-- Stats cards -->
+    @if (stats(); as s) {
+      <div class="stats-row">
+        <mat-card class="stat-card">
+          <mat-icon class="stat-icon total">quiz</mat-icon>
+          <div class="stat-info">
+            <span class="stat-value">{{ s.total }}</span>
+            <span class="stat-label">Total de sessões</span>
+          </div>
+        </mat-card>
+        <mat-card class="stat-card">
+          <mat-icon class="stat-icon completed">check_circle</mat-icon>
+          <div class="stat-info">
+            <span class="stat-value">{{ s.completed }}</span>
+            <span class="stat-label">Concluídas</span>
+          </div>
+        </mat-card>
+        <mat-card class="stat-card">
+          <mat-icon class="stat-icon in-progress">hourglass_top</mat-icon>
+          <div class="stat-info">
+            <span class="stat-value">{{ s.inProgress }}</span>
+            <span class="stat-label">Em andamento</span>
+          </div>
+        </mat-card>
+        <mat-card class="stat-card">
+          <mat-icon class="stat-icon score">trending_up</mat-icon>
+          <div class="stat-info">
+            <span class="stat-value">{{ formatScore(s.averageScore) }}</span>
+            <span class="stat-label">Média de acerto</span>
+          </div>
+        </mat-card>
+        <mat-card class="stat-card">
+          <mat-icon class="stat-icon time">timer</mat-icon>
+          <div class="stat-info">
+            <span class="stat-value">{{ formatTimeSpent(s.averageTimeSpent) }}</span>
+            <span class="stat-label">Tempo médio</span>
+          </div>
+        </mat-card>
+      </div>
+    }
+
+    <!-- Filters -->
+    <div class="filters-row">
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Simulado</mat-label>
+        <mat-select [value]="filterMockExamId()" (selectionChange)="filterMockExamId.set($event.value); onFilterChange()">
+          <mat-option value="">Todos</mat-option>
+          @for (me of mockExams(); track me.id) {
+            <mat-option [value]="me.id">{{ me.name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Status</mat-label>
+        <mat-select [value]="filterStatus()" (selectionChange)="filterStatus.set($event.value); onFilterChange()">
+          <mat-option value="">Todos</mat-option>
+          <mat-option value="completed">Concluído</mat-option>
+          <mat-option value="in_progress">Em andamento</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    @if (loadingSessions()) {
+      <div class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+    } @else {
+      <mat-card class="table-card">
+        @if (sessions().length === 0) {
+          <div class="empty-state">
+            <mat-icon>history</mat-icon>
+            <p>Nenhuma sessão encontrada.</p>
+          </div>
+        } @else {
+          <table mat-table [dataSource]="sessions()" class="data-table">
+            <ng-container matColumnDef="mockExamName">
+              <th mat-header-cell *matHeaderCellDef>Simulado</th>
+              <td mat-cell *matCellDef="let session">
+                <span class="cell-primary">{{ session.mockExamName }}</span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef>Status</th>
+              <td mat-cell *matCellDef="let session">
+                <span class="status-chip" [class]="session.status">
+                  @if (session.status === 'completed') {
+                    <mat-icon class="status-icon">check_circle</mat-icon>
+                    Concluído
+                  } @else {
+                    <mat-icon class="status-icon">hourglass_top</mat-icon>
+                    Em andamento
+                  }
+                </span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="score">
+              <th mat-header-cell *matHeaderCellDef>Nota</th>
+              <td mat-cell *matCellDef="let session">
+                <span class="cell-primary" [class.score-high]="session.score >= 70" [class.score-low]="session.score != null && session.score < 50">
+                  {{ formatScore(session.score) }}
+                </span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="timeSpent">
+              <th mat-header-cell *matHeaderCellDef>Tempo</th>
+              <td mat-cell *matCellDef="let session">{{ formatTimeSpent(session.timeSpent) }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="completedAt">
+              <th mat-header-cell *matHeaderCellDef>Data</th>
+              <td mat-cell *matCellDef="let session">
+                @if (session.completedAt) {
+                  {{ session.completedAt | date:'dd/MM/yyyy HH:mm' }}
+                } @else if (session.createdAt) {
+                  {{ session.createdAt | date:'dd/MM/yyyy HH:mm' }}
+                } @else {
+                  —
+                }
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Ações</th>
+              <td mat-cell *matCellDef="let session">
+                <button mat-icon-button color="warn" (click)="confirmDeleteSession(session)" matTooltip="Excluir sessão">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="sessionColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: sessionColumns;"></tr>
+          </table>
+        }
+      </mat-card>
+    }
+  </mat-tab>
+</mat-tab-group>
