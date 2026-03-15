@@ -97,6 +97,107 @@
     </div>
   </section>
 
+  @if (questionDetails().length > 0) {
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">
+          <mat-icon>quiz</mat-icon>
+          Revisão das questões
+        </h2>
+        <mat-slide-toggle
+          [checked]="showOnlyErrors()"
+          (change)="toggleShowOnlyErrors()"
+          color="warn"
+        >
+          Mostrar apenas erros
+        </mat-slide-toggle>
+      </div>
+
+      @if (detailsBySubject().length === 0) {
+        <mat-card class="empty-filter">
+          <mat-card-content>
+            <mat-icon>celebration</mat-icon>
+            <p>Nenhum erro encontrado! Parabéns!</p>
+          </mat-card-content>
+        </mat-card>
+      } @else {
+        <mat-tab-group animationDuration="200ms" dynamicHeight>
+          @for (group of detailsBySubject(); track group.subjectName) {
+            <mat-tab>
+              <ng-template mat-tab-label>
+                <div class="tab-label">
+                  <span class="tab-color-dot" [style.background-color]="group.color"></span>
+                  <span>{{ group.subjectName }}</span>
+                  <span class="tab-count">{{ group.questions.length }}</span>
+                  @if (getSubjectErrorCount(group.questions) > 0) {
+                    <span class="tab-errors">{{ getSubjectErrorCount(group.questions) }} erros</span>
+                  }
+                </div>
+              </ng-template>
+
+              <div class="question-details">
+                @for (detail of group.questions; track detail.questionId; let i = $index) {
+                  <mat-card class="question-card" [class.correct]="detail.correct" [class.incorrect]="!detail.correct">
+                    <mat-card-header>
+                      <div class="question-badge" [class.correct]="detail.correct" [class.incorrect]="!detail.correct">
+                        @if (detail.correct) {
+                          <mat-icon>check</mat-icon>
+                        } @else {
+                          <mat-icon>close</mat-icon>
+                        }
+                      </div>
+                      <mat-card-title class="question-number">
+                        Questão {{ i + 1 }}
+                        @if (detail.correct) {
+                          <span class="question-status correct">Acerto</span>
+                        } @else {
+                          <span class="question-status incorrect">Erro</span>
+                        }
+                      </mat-card-title>
+                    </mat-card-header>
+
+                    <mat-card-content>
+                      <p class="question-statement">{{ detail.statement }}</p>
+
+                      <div class="alternatives-list">
+                        @for (alt of detail.alternatives; track $index) {
+                          <div
+                            class="alternative-item"
+                            [class.selected]="$index === detail.selectedIndex"
+                            [class.correct-answer]="$index === detail.correctAnswerIndex"
+                            [class.wrong-answer]="$index === detail.selectedIndex && !detail.correct"
+                          >
+                            <span class="alt-label">{{ alt.label }}</span>
+                            <span class="alt-text">{{ alt.text }}</span>
+                            @if ($index === detail.correctAnswerIndex) {
+                              <mat-icon class="alt-icon correct">check_circle</mat-icon>
+                            } @else if ($index === detail.selectedIndex && !detail.correct) {
+                              <mat-icon class="alt-icon wrong">cancel</mat-icon>
+                            }
+                          </div>
+                        }
+                      </div>
+
+                      <mat-divider></mat-divider>
+
+                      <div class="explanation">
+                        <div class="explanation-header">
+                          <mat-icon>lightbulb</mat-icon>
+                          <strong>Explicação</strong>
+                        </div>
+                        <p>{{ detail.explanation }}</p>
+                      </div>
+                    </mat-card-content>
+                  </mat-card>
+                }
+              </div>
+            </mat-tab>
+          }
+        </mat-tab-group>
+      }
+    </section>
+  }
+
   <div class="action-area animate-fade-in">
     <a mat-stroked-button routerLink="/mock-exam" class="action-btn">
       <span class="btn-content">

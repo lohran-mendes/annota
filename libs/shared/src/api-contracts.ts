@@ -213,6 +213,8 @@ export interface MockExamSubjectResult {
 
 export interface MockExamQuestionResult {
   questionId: string;
+  subjectId: string;
+  subjectName: string;
   statement: string;
   alternatives: Alternative[];
   selectedIndex: number;

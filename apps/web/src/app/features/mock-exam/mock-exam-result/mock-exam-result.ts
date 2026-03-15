@@ -1,18 +1,22 @@
-import { Component, signal, inject, OnInit } from '@angular/core';
+import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatTabsModule } from '@angular/material/tabs';
 import { MockExamService } from '../../../core/services/mock-exam.service';
-import type { MockExamSubjectResult } from '@annota/shared';
+import type { MockExamSubjectResult, MockExamQuestionResult } from '@annota/shared';
 
 @Component({
   selector: 'annota-mock-exam-result',
   imports: [
     RouterLink, MatCardModule, MatButtonModule, MatIconModule,
     MatProgressBarModule, MatProgressSpinnerModule,
+    MatDividerModule, MatSlideToggleModule, MatTabsModule,
   ],
   templateUrl: './mock-exam-result.html',
   styleUrl: './mock-exam-result.scss',
@@ -26,6 +30,8 @@ export class MockExamResult implements OnInit {
   correctAnswers = signal(0);
   timeSpent = signal('');
   subjectResults = signal<MockExamSubjectResult[]>([]);
+  questionDetails = signal<MockExamQuestionResult[]>([]);
+  showOnlyErrors = signal(false);
   loading = signal(true);
   error = signal(false);
 
@@ -51,6 +57,7 @@ export class MockExamResult implements OnInit {
         this.correctAnswers.set(result.correctCount);
         this.timeSpent.set(this.formatTimeSpent(result.timeSpent));
         this.subjectResults.set(result.bySubject);
+        this.questionDetails.set(result.details ?? []);
         this.loading.set(false);
       },
       error: () => {
@@ -69,7 +76,37 @@ export class MockExamResult implements OnInit {
     return `${m}min`;
   }
 
+  detailsBySubject = computed(() => {
+    const details = this.questionDetails();
+    const onlyErrors = this.showOnlyErrors();
+    const grouped = new Map<string, { subjectName: string; color: string; questions: MockExamQuestionResult[] }>();
+
+    for (const detail of details) {
+      if (onlyErrors && detail.correct) continue;
+      const key = detail.subjectId;
+      if (!grouped.has(key)) {
+        const sub = this.subjectResults().find((s) => s.subjectId === key);
+        grouped.set(key, {
+          subjectName: detail.subjectName,
+          color: sub?.color ?? '#999',
+          questions: [],
+        });
+      }
+      grouped.get(key)!.questions.push(detail);
+    }
+
+    return Array.from(grouped.values());
+  });
+
   getPercent(correct: number, total: number): number {
     return total > 0 ? Math.round((correct / total) * 100) : 0;
+  }
+
+  toggleShowOnlyErrors(): void {
+    this.showOnlyErrors.update((v) => !v);
+  }
+
+  getSubjectErrorCount(questions: MockExamQuestionResult[]): number {
+    return questions.filter((q) => !q.correct).length;
   }
 }

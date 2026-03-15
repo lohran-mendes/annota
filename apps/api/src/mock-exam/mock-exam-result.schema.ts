@@ -28,6 +28,12 @@ class QuestionResultSchema {
   questionId: string;
 
   @Prop({ required: true })
+  subjectId: string;
+
+  @Prop({ required: true })
+  subjectName: string;
+
+  @Prop({ required: true })
   statement: string;
 
   @Prop({ type: [Object], required: true })

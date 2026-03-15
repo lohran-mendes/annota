@@ -271,8 +271,13 @@ export class MockExamService {
         answer.selectedIndex === question.correctAnswerIndex;
       if (correct) correctCount++;
 
+      const sid = question?.subjectId?.toString() ?? '';
+      const subject = subjectMap.get(sid);
+
       return {
         questionId: answer.questionId,
+        subjectId: sid,
+        subjectName: subject?.name ?? 'Desconhecida',
         statement: question?.statement ?? '',
         alternatives: question?.alternatives ?? [],
         selectedIndex: answer.selectedIndex,
