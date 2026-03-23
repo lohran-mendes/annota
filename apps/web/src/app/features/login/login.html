@@ -57,12 +57,14 @@
         [disabled]="loading()"
       >
         @if (loading()) {
-          <mat-spinner diameter="20"></mat-spinner>
+            <span class="login-submit-content login-submit-content-loading">
+              <mat-spinner diameter="20"></mat-spinner>
+            </span>
         } @else {
-          <ng-container>
+            <span class="login-submit-content">
             <mat-icon>login</mat-icon>
             Entrar
-          </ng-container>
+            </span>
         }
       </button>
     </form>
