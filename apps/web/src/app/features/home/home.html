@@ -1,17 +1,13 @@
 <div class="welcome-section animate-fade-in-up">
   <div class="welcome-top">
     <div class="welcome-intro">
-      <img src="anna-com-livros.png" alt="Anna Beatriz segurando livros" class="anna-avatar" />
+      <img [src]="userAvatar()" [alt]="userName() + ' segurando livros'" class="anna-avatar" />
       <div class="welcome-content">
-        <h1 class="welcome-title">Oi, Anna!</h1>
-        <p class="welcome-subtitle">
-          Acredito no seu potencial. Você é inteligente, dedicada e capaz de conquistar tudo o que
-          quiser. Este app foi feito especialmente pra te ajudar a brilhar nos seus próximos
-          desafios!
-        </p>
+        <h1 class="welcome-title">Oi, {{ userFirstName() }}!</h1>
+        <p class="welcome-subtitle">{{ welcomeSubtitle() }}</p>
         <p class="welcome-signature">
           <mat-icon>favorite</mat-icon>
-          Com todo o amor, do seu irmão
+          {{ welcomeSignature() }}
         </p>
       </div>
     </div>

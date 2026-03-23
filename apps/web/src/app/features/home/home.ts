@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -25,6 +25,26 @@ export class Home implements OnInit {
   private readonly dialog = inject(MatDialog);
 
   readonly isAdmin = this.authService.isAdmin;
+  readonly userName = computed(() => this.authService.user()?.name ?? 'Estudante');
+  readonly userFirstName = computed(() => this.userName().split(' ')[0]);
+  readonly userAvatar = computed(() => {
+    const name = this.userName().toLowerCase();
+    if (name.includes('maria')) return 'maria-com-livros.png';
+    if (name.includes('anna')) return 'anna-com-livros.png';
+    return 'anna-com-livros.png';
+  });
+  readonly welcomeSubtitle = computed(() => {
+    const name = this.userName().toLowerCase();
+    if (name.includes('maria')) {
+      return 'Você é uma pessoa incrível e muito capaz! Tenho certeza que com dedicação e esforço, você pode alcançar tudo o que deseja. Estarei com você em cada passo!';
+    }
+    return 'Acredito no seu potencial. Você é inteligente, dedicada e capaz de conquistar tudo o que quiser. Este app foi feito especialmente pra te ajudar a brilhar nos seus próximos desafios!';
+  });
+  readonly welcomeSignature = computed(() => {
+    const name = this.userName().toLowerCase();
+    if (name.includes('maria')) return 'Com amor, do seu Nego';
+    return 'Com todo o amor, do seu irmão';
+  });
 
   exams = signal<Exam[]>([]);
   loading = signal(false);

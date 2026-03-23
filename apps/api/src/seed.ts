@@ -438,6 +438,7 @@ async function seed() {
 
   const adminPassword = await bcrypt.hash('admin123', 10);
   const annaPassword = await bcrypt.hash('anna123', 10);
+  const mariaPassword = await bcrypt.hash('maria123', 10);
 
   const users = await UserModel.insertMany([
     {
@@ -452,6 +453,12 @@ async function seed() {
       password: annaPassword,
       role: 'student',
     },
+    {
+      name: 'Maria Eduarda',
+      email: 'maria@annota.com',
+      password: mariaPassword,
+      role: 'student',
+    }
   ]);
 
   console.log(`Users created: ${users.map((u) => u.name).join(', ')}`);
