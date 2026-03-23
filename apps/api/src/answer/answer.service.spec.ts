@@ -40,6 +40,7 @@ const buildUserAnswerModel = () => {
 };
 
 describe('AnswerService', () => {
+  const userId = 'user-id-1';
   let service: AnswerService;
   let MockUserAnswerModel: any;
   let mockSave: jest.Mock;
@@ -112,7 +113,7 @@ describe('AnswerService', () => {
         exec: jest.fn().mockResolvedValue([]),
       });
 
-      const result = await service.submitAnswer({ ...dto, selectedIndex: 2 });
+      const result = await service.submitAnswer(userId, { ...dto, selectedIndex: 2 });
 
       expect(result.correct).toBe(true);
       expect(result.correctAnswerIndex).toBe(2);
@@ -130,7 +131,7 @@ describe('AnswerService', () => {
         exec: jest.fn().mockResolvedValue([]),
       });
 
-      const result = await service.submitAnswer({ ...dto, selectedIndex: 0 });
+      const result = await service.submitAnswer(userId, { ...dto, selectedIndex: 0 });
 
       expect(result.correct).toBe(false);
     });
@@ -149,7 +150,7 @@ describe('AnswerService', () => {
       topicService.incrementCompletedCount.mockResolvedValue(undefined);
       subjectService.incrementCompletedCount.mockResolvedValue(undefined);
 
-      await service.submitAnswer(dto);
+      await service.submitAnswer(userId, dto);
 
       expect(topicService.incrementCompletedCount).toHaveBeenCalledTimes(1);
       expect(topicService.incrementCompletedCount).toHaveBeenCalledWith('topic-id-1', 1);
@@ -171,7 +172,7 @@ describe('AnswerService', () => {
         exec: jest.fn().mockResolvedValue([]),
       });
 
-      await service.submitAnswer(dto);
+      await service.submitAnswer(userId, dto);
 
       expect(topicService.incrementCompletedCount).not.toHaveBeenCalled();
       expect(subjectService.incrementCompletedCount).not.toHaveBeenCalled();
@@ -182,7 +183,7 @@ describe('AnswerService', () => {
         new NotFoundException('Question with id question-id-1 not found'),
       );
 
-      await expect(service.submitAnswer(dto)).rejects.toThrow(NotFoundException);
+      await expect(service.submitAnswer(userId, dto)).rejects.toThrow(NotFoundException);
     });
 
     it('deve incluir o streak calculado no resultado', async () => {
@@ -201,7 +202,7 @@ describe('AnswerService', () => {
         ]),
       });
 
-      const result = await service.submitAnswer({ ...dto, selectedIndex: 2 });
+      const result = await service.submitAnswer(userId, { ...dto, selectedIndex: 2 });
 
       expect(result.streak).toBe(3);
     });
@@ -219,7 +220,7 @@ describe('AnswerService', () => {
         exec: jest.fn().mockResolvedValue([]),
       });
 
-      const streak = await service.getStreak();
+      const streak = await service.getStreak(userId);
 
       expect(streak).toBe(0);
     });
@@ -235,7 +236,7 @@ describe('AnswerService', () => {
         ]),
       });
 
-      const streak = await service.getStreak();
+      const streak = await service.getStreak(userId);
 
       expect(streak).toBe(3);
     });
@@ -253,7 +254,7 @@ describe('AnswerService', () => {
         ]),
       });
 
-      const streak = await service.getStreak();
+      const streak = await service.getStreak(userId);
 
       expect(streak).toBe(2);
     });
@@ -268,7 +269,7 @@ describe('AnswerService', () => {
         ]),
       });
 
-      const streak = await service.getStreak();
+      const streak = await service.getStreak(userId);
 
       expect(streak).toBe(0);
     });

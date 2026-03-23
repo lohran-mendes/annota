@@ -45,6 +45,7 @@ const QuestionSchema = new mongoose.Schema({
 });
 
 const DeckSeedSchema = new mongoose.Schema({
+  userId: mongoose.Schema.Types.ObjectId,
   name: String,
   description: String,
   cardCount: { type: Number, default: 0 },
@@ -76,6 +77,7 @@ const MockExamSeedSchema = new mongoose.Schema(
 
 const MockExamSessionSeedSchema = new mongoose.Schema(
   {
+    userId: mongoose.Schema.Types.ObjectId,
     mockExamId: mongoose.Schema.Types.ObjectId,
     mockExamName: String,
     questionCount: Number,
@@ -389,49 +391,6 @@ async function seed() {
     `Mock exam templates created: ${mockExam1.name}, ${mockExam2.name}`,
   );
 
-  // === DECKS & FLASHCARDS ===
-  await DeckModel.deleteMany({});
-  await FlashcardModel.deleteMany({});
-  console.log('Deck and Flashcard collections cleared');
-
-  const deck1 = await DeckModel.create({
-    name: 'Matemática - Fórmulas',
-    description: 'Fórmulas essenciais de matemática para o vestibulinho',
-  });
-
-  const deck2 = await DeckModel.create({
-    name: 'Português - Figuras de Linguagem',
-    description: 'Principais figuras de linguagem com exemplos',
-  });
-
-  const deck3 = await DeckModel.create({
-    name: 'Ciências - Corpo Humano',
-    description: 'Sistemas do corpo humano e suas funções',
-  });
-
-  console.log(`Decks created: ${deck1.name}, ${deck2.name}, ${deck3.name}`);
-
-  const flashcards = await FlashcardModel.insertMany([
-    { deckId: deck1._id, front: 'Qual é a fórmula da área do círculo?', back: 'A = π × r² (pi vezes o raio ao quadrado)' },
-    { deckId: deck1._id, front: 'Qual é a fórmula de Bhaskara?', back: 'x = (-b ± √(b² - 4ac)) / 2a' },
-    { deckId: deck1._id, front: 'Qual é o Teorema de Pitágoras?', back: 'a² = b² + c² (hipotenusa ao quadrado é igual à soma dos catetos ao quadrado)' },
-    { deckId: deck1._id, front: 'Como calcular porcentagem de um valor?', back: 'Valor × (porcentagem / 100). Ex: 15% de 80 = 80 × 0,15 = 12' },
-    { deckId: deck1._id, front: 'Qual é a fórmula do volume do cilindro?', back: 'V = π × r² × h (área da base vezes a altura)' },
-    { deckId: deck2._id, front: 'O que é Metáfora?', back: 'Comparação implícita entre dois elementos sem usar "como" ou "tal qual". Ex: "Ele é um touro" (ele é forte como um touro).' },
-    { deckId: deck2._id, front: 'O que é Hipérbole?', back: 'Exagero intencional para dar ênfase. Ex: "Já te disse um milhão de vezes."' },
-    { deckId: deck2._id, front: 'O que é Ironia?', back: 'Dizer o contrário do que se pensa, geralmente com tom de humor ou crítica. Ex: "Que lindo, tirou zero na prova!"' },
-    { deckId: deck2._id, front: 'O que é Personificação (Prosopopeia)?', back: 'Atribuir características humanas a seres inanimados ou irracionais. Ex: "O sol sorriu para nós naquela manhã."' },
-    { deckId: deck3._id, front: 'Qual é a função do sistema circulatório?', back: 'Transportar sangue, nutrientes e oxigênio para todas as células do corpo, e recolher resíduos como gás carbônico.' },
-    { deckId: deck3._id, front: 'Onde ocorrem as trocas gasosas no pulmão?', back: 'Nos alvéolos pulmonares. O oxigênio passa para o sangue e o gás carbônico é liberado para ser expirado (hematose).' },
-    { deckId: deck3._id, front: 'Qual é a função do sistema nervoso?', back: 'Coordenar e controlar as atividades do corpo, receber e processar informações, e enviar respostas através de impulsos nervosos.' },
-  ]);
-
-  await DeckModel.findByIdAndUpdate(deck1._id, { cardCount: 5 });
-  await DeckModel.findByIdAndUpdate(deck2._id, { cardCount: 4 });
-  await DeckModel.findByIdAndUpdate(deck3._id, { cardCount: 3 });
-
-  console.log(`Flashcards created: ${flashcards.length}`);
-
   // === USERS ===
   await UserModel.deleteMany({});
   console.log('User collection cleared');
@@ -461,7 +420,78 @@ async function seed() {
     }
   ]);
 
+  const [lohran, anna, maria] = users;
   console.log(`Users created: ${users.map((u) => u.name).join(', ')}`);
+
+  // === DECKS & FLASHCARDS (per user) ===
+  await DeckModel.deleteMany({});
+  await FlashcardModel.deleteMany({});
+  console.log('Deck and Flashcard collections cleared');
+
+  // Decks para Anna
+  const deck1 = await DeckModel.create({
+    userId: anna._id,
+    name: 'Matemática - Fórmulas',
+    description: 'Fórmulas essenciais de matemática para o vestibulinho',
+  });
+
+  const deck2 = await DeckModel.create({
+    userId: anna._id,
+    name: 'Português - Figuras de Linguagem',
+    description: 'Principais figuras de linguagem com exemplos',
+  });
+
+  const deck3 = await DeckModel.create({
+    userId: anna._id,
+    name: 'Ciências - Corpo Humano',
+    description: 'Sistemas do corpo humano e suas funções',
+  });
+
+  // Decks para Maria
+  const deck4 = await DeckModel.create({
+    userId: maria._id,
+    name: 'Matemática - Fórmulas',
+    description: 'Fórmulas essenciais de matemática para o vestibulinho',
+  });
+
+  const deck5 = await DeckModel.create({
+    userId: maria._id,
+    name: 'História - Datas Importantes',
+    description: 'Principais datas e eventos da história do Brasil',
+  });
+
+  console.log(`Decks created: Anna(${deck1.name}, ${deck2.name}, ${deck3.name}), Maria(${deck4.name}, ${deck5.name})`);
+
+  const flashcards = await FlashcardModel.insertMany([
+    // Flashcards Anna
+    { deckId: deck1._id, front: 'Qual é a fórmula da área do círculo?', back: 'A = π × r² (pi vezes o raio ao quadrado)' },
+    { deckId: deck1._id, front: 'Qual é a fórmula de Bhaskara?', back: 'x = (-b ± √(b² - 4ac)) / 2a' },
+    { deckId: deck1._id, front: 'Qual é o Teorema de Pitágoras?', back: 'a² = b² + c² (hipotenusa ao quadrado é igual à soma dos catetos ao quadrado)' },
+    { deckId: deck1._id, front: 'Como calcular porcentagem de um valor?', back: 'Valor × (porcentagem / 100). Ex: 15% de 80 = 80 × 0,15 = 12' },
+    { deckId: deck1._id, front: 'Qual é a fórmula do volume do cilindro?', back: 'V = π × r² × h (área da base vezes a altura)' },
+    { deckId: deck2._id, front: 'O que é Metáfora?', back: 'Comparação implícita entre dois elementos sem usar "como" ou "tal qual". Ex: "Ele é um touro" (ele é forte como um touro).' },
+    { deckId: deck2._id, front: 'O que é Hipérbole?', back: 'Exagero intencional para dar ênfase. Ex: "Já te disse um milhão de vezes."' },
+    { deckId: deck2._id, front: 'O que é Ironia?', back: 'Dizer o contrário do que se pensa, geralmente com tom de humor ou crítica. Ex: "Que lindo, tirou zero na prova!"' },
+    { deckId: deck2._id, front: 'O que é Personificação (Prosopopeia)?', back: 'Atribuir características humanas a seres inanimados ou irracionais. Ex: "O sol sorriu para nós naquela manhã."' },
+    { deckId: deck3._id, front: 'Qual é a função do sistema circulatório?', back: 'Transportar sangue, nutrientes e oxigênio para todas as células do corpo, e recolher resíduos como gás carbônico.' },
+    { deckId: deck3._id, front: 'Onde ocorrem as trocas gasosas no pulmão?', back: 'Nos alvéolos pulmonares. O oxigênio passa para o sangue e o gás carbônico é liberado para ser expirado (hematose).' },
+    { deckId: deck3._id, front: 'Qual é a função do sistema nervoso?', back: 'Coordenar e controlar as atividades do corpo, receber e processar informações, e enviar respostas através de impulsos nervosos.' },
+    // Flashcards Maria
+    { deckId: deck4._id, front: 'Qual é a fórmula da área do triângulo?', back: 'A = (b × h) / 2 (base vezes altura dividido por 2)' },
+    { deckId: deck4._id, front: 'Qual é a fórmula da área do círculo?', back: 'A = π × r² (pi vezes o raio ao quadrado)' },
+    { deckId: deck4._id, front: 'Como calcular a média aritmética?', back: 'Soma de todos os valores dividida pela quantidade de valores. Ex: (7+8+9)/3 = 8' },
+    { deckId: deck5._id, front: 'Quando o Brasil foi descoberto?', back: '22 de abril de 1500, por Pedro Álvares Cabral.' },
+    { deckId: deck5._id, front: 'Quando foi proclamada a República?', back: '15 de novembro de 1889, por Marechal Deodoro da Fonseca.' },
+    { deckId: deck5._id, front: 'Quando foi abolida a escravidão no Brasil?', back: '13 de maio de 1888, com a Lei Áurea assinada pela Princesa Isabel.' },
+  ]);
+
+  await DeckModel.findByIdAndUpdate(deck1._id, { cardCount: 5 });
+  await DeckModel.findByIdAndUpdate(deck2._id, { cardCount: 4 });
+  await DeckModel.findByIdAndUpdate(deck3._id, { cardCount: 3 });
+  await DeckModel.findByIdAndUpdate(deck4._id, { cardCount: 3 });
+  await DeckModel.findByIdAndUpdate(deck5._id, { cardCount: 3 });
+
+  console.log(`Flashcards created: ${flashcards.length}`);
 
   console.log('\nSeed completed successfully!');
 

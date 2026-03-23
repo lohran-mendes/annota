@@ -59,6 +59,9 @@ const QuestionResultMongoSchema =
 
 @Schema({ timestamps: true })
 export class MockExamResult {
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true })
+  userId: mongoose.Types.ObjectId;
+
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'MockExamSession',
@@ -95,6 +98,7 @@ MockExamResultSchema.set('toJSON', {
   versionKey: false,
   transform: (_doc: any, ret: any) => {
     ret.id = ret._id?.toString();
+    ret.userId = ret.userId?.toString();
     ret.sessionId = ret.sessionId?.toString();
     delete ret._id;
   },

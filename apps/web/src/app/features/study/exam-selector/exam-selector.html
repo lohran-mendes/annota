@@ -1,0 +1,53 @@
+<div class="page-header animate-fade-in-up">
+  <h1 class="page-title">Escolha uma prova</h1>
+  <p class="page-subtitle">Selecione a prova para a qual deseja estudar</p>
+</div>
+
+@if (loading()) {
+  <div class="loading-state">
+    <mat-spinner diameter="48" />
+  </div>
+} @else if (exams().length === 0) {
+  <div class="empty-state animate-fade-in-up">
+    <mat-icon class="empty-icon">school</mat-icon>
+    <p class="empty-title">Nenhuma prova disponível</p>
+    <p class="empty-subtitle">Ainda não há provas cadastradas. Volte em breve!</p>
+  </div>
+} @else {
+  <div class="exam-grid">
+    @for (exam of exams(); track exam.id; let i = $index) {
+      <mat-card class="exam-card stagger-{{ i + 1 }} animate-fade-in-up">
+        <mat-card-header>
+          <mat-icon mat-card-avatar class="exam-icon">description</mat-icon>
+          <mat-card-title>{{ exam.name }}</mat-card-title>
+          <mat-card-subtitle>{{ exam.institution }} · {{ exam.year }}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p class="exam-description">{{ exam.description }}</p>
+          <div class="exam-chips">
+            <mat-chip-set>
+              <mat-chip>
+                <mat-icon matChipAvatar>help_outline</mat-icon>
+                {{ exam.questionCount }} questões
+              </mat-chip>
+              <mat-chip>
+                <mat-icon matChipAvatar>category</mat-icon>
+                {{ exam.subjectCount }} matérias
+              </mat-chip>
+              <mat-chip>
+                <mat-icon matChipAvatar>timer</mat-icon>
+                {{ exam.duration }} minutos
+              </mat-chip>
+            </mat-chip-set>
+          </div>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-flat-button color="primary" [routerLink]="['/study', exam.id]">
+            <mat-icon>play_arrow</mat-icon>
+            Estudar
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    }
+  </div>
+}

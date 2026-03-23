@@ -1,10 +1,13 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Req } from '@nestjs/common';
 import { AnswerService } from './answer.service';
 import { SubmitAnswerDto } from './dto/submit-answer.dto';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
 
 @ApiTags('Answers')
+@ApiBearerAuth()
 @Controller('answers')
+@UseGuards(JwtAuthGuard)
 export class AnswerController {
   constructor(private readonly answerService: AnswerService) {}
 
@@ -14,8 +17,8 @@ export class AnswerController {
   @ApiResponse({ status: 201, description: 'Answer submitted successfully' })
   @ApiResponse({ status: 400, description: 'Invalid request body' })
   @ApiResponse({ status: 404, description: 'Question not found' })
-  async submitAnswer(@Body() dto: SubmitAnswerDto) {
-    const result = await this.answerService.submitAnswer(dto);
+  async submitAnswer(@Req() req: any, @Body() dto: SubmitAnswerDto) {
+    const result = await this.answerService.submitAnswer(req.user.sub, dto);
     return { data: result };
   }
 }

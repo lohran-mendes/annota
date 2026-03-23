@@ -18,17 +18,18 @@ export class AnswerService {
     private readonly subjectService: SubjectService,
   ) {}
 
-  async submitAnswer(dto: SubmitAnswerDto): Promise<AnswerResult> {
+  async submitAnswer(userId: string, dto: SubmitAnswerDto): Promise<AnswerResult> {
     const question = await this.questionService.findOne(dto.questionId);
     const correct = dto.selectedIndex === question.correctAnswerIndex;
 
     // Verificar se e a primeira vez que o usuario responde esta questao
     const alreadyAnswered = await this.userAnswerModel
-      .findOne({ questionId: dto.questionId })
+      .findOne({ userId, questionId: dto.questionId })
       .exec();
 
-    // Salvar resposta com examId vindo do DTO (se for ObjectId valido)
+    // Salvar resposta com userId e examId
     const answerData: Record<string, any> = {
+      userId,
       questionId: dto.questionId,
       selectedIndex: dto.selectedIndex,
       correct,
@@ -53,7 +54,7 @@ export class AnswerService {
       );
     }
 
-    const streak = await this.getStreak();
+    const streak = await this.getStreak(userId);
 
     return {
       correct,
@@ -63,9 +64,9 @@ export class AnswerService {
     };
   }
 
-  async getStreak(): Promise<number> {
+  async getStreak(userId: string): Promise<number> {
     const recentAnswers = await this.userAnswerModel
-      .find()
+      .find({ userId })
       .sort({ createdAt: -1 })
       .limit(100)
       .exec();

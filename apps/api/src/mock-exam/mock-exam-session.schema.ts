@@ -6,6 +6,9 @@ export type MockExamSessionDocument = HydratedDocument<MockExamSession>;
 
 @Schema({ timestamps: true })
 export class MockExamSession {
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true })
+  userId: mongoose.Types.ObjectId;
+
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'MockExam',
@@ -45,13 +48,14 @@ export class MockExamSession {
 export const MockExamSessionSchema =
   SchemaFactory.createForClass(MockExamSession);
 
-MockExamSessionSchema.index({ mockExamId: 1, status: 1 });
+MockExamSessionSchema.index({ userId: 1, mockExamId: 1, status: 1 });
 
 MockExamSessionSchema.set('toJSON', {
   virtuals: true,
   versionKey: false,
   transform: (_doc: any, ret: any) => {
     ret.id = ret._id.toString();
+    ret.userId = ret.userId?.toString();
     ret.mockExamId = ret.mockExamId?.toString();
     if (ret.completedAt) {
       ret.completedAt = ret.completedAt.toISOString();

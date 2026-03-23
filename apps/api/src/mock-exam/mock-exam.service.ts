@@ -29,7 +29,7 @@ import type {
   MockExamSessionAdmin,
   MockExamSessionStats,
 } from '@annota/shared';
-import { normalizeLeanDoc, normalizeLeanDocs } from '../common/utils/paginate';
+import { normalizeLeanDoc } from '../common/utils/paginate';
 
 @Injectable()
 export class MockExamService {
@@ -138,10 +138,10 @@ export class MockExamService {
   }
 
   // ----------------------------------------------------------------
-  // Student sessions — MockExamSession
+  // Student sessions — MockExamSession (filtered by userId)
   // ----------------------------------------------------------------
 
-  async startSession(dto: StartSessionDto): Promise<MockExamSessionData> {
+  async startSession(userId: string, dto: StartSessionDto): Promise<MockExamSessionData> {
     const mockExam = await this.mockExamModel
       .findById(dto.mockExamId)
       .exec();
@@ -156,8 +156,9 @@ export class MockExamService {
       );
     }
 
-    // Criar session copiando os questionIds do template
+    // Criar session com userId
     const session = new this.sessionModel({
+      userId,
       mockExamId: mockExam._id,
       mockExamName: mockExam.name,
       questionCount: mockExam.questionIds.length,
@@ -187,8 +188,8 @@ export class MockExamService {
     };
   }
 
-  async getSession(sessionId: string): Promise<MockExamSessionData> {
-    const session = await this.sessionModel.findById(sessionId).exec();
+  async getSession(userId: string, sessionId: string): Promise<MockExamSessionData> {
+    const session = await this.sessionModel.findOne({ _id: sessionId, userId }).exec();
     if (!session) {
       throw new NotFoundException(
         `MockExamSession with id ${sessionId} not found`,
@@ -215,8 +216,8 @@ export class MockExamService {
     };
   }
 
-  async listSessions(mockExamId?: string): Promise<MockExamSessionConfig[]> {
-    const filter: Record<string, unknown> = {};
+  async listSessions(userId: string, mockExamId?: string): Promise<MockExamSessionConfig[]> {
+    const filter: Record<string, unknown> = { userId };
     if (mockExamId) filter.mockExamId = mockExamId;
     const docs = await this.sessionModel
       .find(filter)
@@ -231,10 +232,11 @@ export class MockExamService {
   }
 
   async submitSession(
+    userId: string,
     sessionId: string,
     dto: SubmitMockExamDto,
   ): Promise<IMockExamResult> {
-    const session = await this.sessionModel.findById(sessionId).exec();
+    const session = await this.sessionModel.findOne({ _id: sessionId, userId }).exec();
     if (!session) {
       throw new NotFoundException(
         `MockExamSession with id ${sessionId} not found`,
@@ -333,8 +335,9 @@ export class MockExamService {
       })
       .exec();
 
-    // Salvar resultado detalhado
+    // Salvar resultado detalhado com userId
     const result = new this.resultModel({
+      userId,
       sessionId,
       score,
       totalQuestions: session.questionCount,
@@ -439,9 +442,9 @@ export class MockExamService {
     };
   }
 
-  async getSessionResult(sessionId: string): Promise<IMockExamResult> {
+  async getSessionResult(userId: string, sessionId: string): Promise<IMockExamResult> {
     const result = await this.resultModel
-      .findOne({ sessionId })
+      .findOne({ sessionId, userId })
       .exec();
     if (!result) {
       throw new NotFoundException(

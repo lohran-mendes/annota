@@ -6,6 +6,9 @@ export type UserAnswerDocument = HydratedDocument<UserAnswer>;
 
 @Schema({ timestamps: true })
 export class UserAnswer {
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true })
+  userId: mongoose.Types.ObjectId;
+
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Question', required: true })
   questionId: mongoose.Types.ObjectId;
 
@@ -27,9 +30,9 @@ export class UserAnswer {
 
 export const UserAnswerSchema = SchemaFactory.createForClass(UserAnswer);
 
-UserAnswerSchema.index({ questionId: 1, createdAt: -1 });
-UserAnswerSchema.index({ examId: 1, subjectId: 1 });
-UserAnswerSchema.index({ subjectId: 1, topicId: 1 });
+UserAnswerSchema.index({ userId: 1, questionId: 1, createdAt: -1 });
+UserAnswerSchema.index({ userId: 1, examId: 1, subjectId: 1 });
+UserAnswerSchema.index({ userId: 1, subjectId: 1, topicId: 1 });
 
 UserAnswerSchema.set('toJSON', {
   virtuals: true,
@@ -39,6 +42,7 @@ UserAnswerSchema.set('toJSON', {
     ret.questionId = ret.questionId?.toString();
     ret.subjectId = ret.subjectId?.toString();
     ret.topicId = ret.topicId?.toString();
+    ret.userId = ret.userId?.toString();
     ret.examId = ret.examId?.toString();
     delete ret._id;
   },

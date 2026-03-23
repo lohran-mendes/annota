@@ -56,6 +56,8 @@ describe('ProgressService', () => {
   // ----------------------------------------------------------------
 
   describe('getGlobalProgress', () => {
+    const userId = 'user-id-1';
+
     // Configura os mocks do userAnswerModel para o cenário de "sem respostas"
     const setupEmptyAnswers = () => {
       userAnswerModel.countDocuments
@@ -75,7 +77,7 @@ describe('ProgressService', () => {
     it('deve retornar zeros quando não há respostas', async () => {
       setupEmptyAnswers();
 
-      const result = await service.getGlobalProgress();
+      const result = await service.getGlobalProgress(userId);
 
       expect(result.totalAnswered).toBe(0);
       expect(result.totalCorrect).toBe(0);
@@ -101,7 +103,7 @@ describe('ProgressService', () => {
       userAnswerModel.aggregate.mockResolvedValue([]);
       subjectModel.find.mockReturnValue({ exec: jest.fn().mockResolvedValue([]) });
 
-      const result = await service.getGlobalProgress();
+      const result = await service.getGlobalProgress(userId);
 
       expect(result.totalAnswered).toBe(10);
       expect(result.totalCorrect).toBe(7);
@@ -133,7 +135,7 @@ describe('ProgressService', () => {
         ]),
       });
 
-      const result = await service.getGlobalProgress();
+      const result = await service.getGlobalProgress(userId);
 
       expect(result.bySubject).toHaveLength(1);
       expect(result.bySubject[0].subjectId).toBe('sub-1');
@@ -162,7 +164,7 @@ describe('ProgressService', () => {
       // Nenhuma matéria retornada — subjectMap fica vazio
       subjectModel.find.mockReturnValue({ exec: jest.fn().mockResolvedValue([]) });
 
-      const result = await service.getGlobalProgress();
+      const result = await service.getGlobalProgress(userId);
 
       expect(result.bySubject[0].subjectName).toBe('Desconhecida');
       expect(result.bySubject[0].color).toBe('#999');
@@ -174,6 +176,7 @@ describe('ProgressService', () => {
   // ----------------------------------------------------------------
 
   describe('getExamProgress', () => {
+    const userId = 'user-id-1';
     const examId = 'exam-id-1';
 
     // Monta o cenário básico de um exam válido com todas as consultas derivadas
@@ -201,8 +204,8 @@ describe('ProgressService', () => {
     it('deve lançar NotFoundException se o exam não existir', async () => {
       examModel.findById.mockReturnValue({ exec: jest.fn().mockResolvedValue(null) });
 
-      await expect(service.getExamProgress('nonexistent-id')).rejects.toThrow(NotFoundException);
-      await expect(service.getExamProgress('nonexistent-id')).rejects.toThrow(
+      await expect(service.getExamProgress(userId, 'nonexistent-id')).rejects.toThrow(NotFoundException);
+      await expect(service.getExamProgress(userId, 'nonexistent-id')).rejects.toThrow(
         'Exam with id nonexistent-id not found',
       );
     });
@@ -211,7 +214,7 @@ describe('ProgressService', () => {
       const examDoc = { _id: examId, questionIds: [] };
       setupExamProgress(examDoc, []);
 
-      const result = await service.getExamProgress(examId);
+      const result = await service.getExamProgress(userId, examId);
 
       expect(result.examId).toBe(examId);
       expect(result.totalAnswered).toBe(0);
@@ -241,11 +244,11 @@ describe('ProgressService', () => {
       userAnswerModel.aggregate.mockResolvedValue([]);
       topicModel.find.mockReturnValue({ exec: jest.fn().mockResolvedValue([]) });
 
-      const result = await service.getExamProgress(examId);
+      const result = await service.getExamProgress(userId, examId);
 
-      // Verifica que o filtro com examId foi passado para countDocuments
-      expect(countDocSpy).toHaveBeenCalledWith({ examId });
-      expect(countDocSpy).toHaveBeenCalledWith({ examId, correct: true });
+      // Verifica que o filtro com userId e examId foi passado para countDocuments
+      expect(countDocSpy).toHaveBeenCalledWith({ userId, examId });
+      expect(countDocSpy).toHaveBeenCalledWith({ userId, examId, correct: true });
       expect(result.totalAnswered).toBe(3);
       expect(result.totalCorrect).toBe(2);
     });
@@ -260,7 +263,7 @@ describe('ProgressService', () => {
       ];
       setupExamProgress(examDoc, answers);
 
-      const result = await service.getExamProgress(examId);
+      const result = await service.getExamProgress(userId, examId);
 
       // streak para em false: 2 corretas
       expect(result.streak).toBe(2);
@@ -270,7 +273,7 @@ describe('ProgressService', () => {
       const examDoc = { _id: examId, questionIds: [] };
       setupExamProgress(examDoc);
 
-      const result = await service.getExamProgress(examId);
+      const result = await service.getExamProgress(userId, examId);
 
       expect(result).toHaveProperty('bySubject');
       expect(result).toHaveProperty('byTopic');

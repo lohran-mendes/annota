@@ -8,12 +8,15 @@ import {
   Query,
   HttpCode,
   HttpStatus,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { MockExamService } from './mock-exam.service';
 import { StartSessionDto } from './dto/start-session.dto';
 import { SubmitMockExamDto } from './dto/submit-mock-exam.dto';
 import { FilterSessionDto } from './dto/filter-session.dto';
 import { ParseObjectIdPipe } from '../common/pipes/parse-object-id.pipe';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import {
   ApiTags,
   ApiOperation,
@@ -21,10 +24,13 @@ import {
   ApiParam,
   ApiQuery,
   ApiBody,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 
 @ApiTags('Mock Exam Sessions (Student)')
+@ApiBearerAuth()
 @Controller('mock-exam-sessions')
+@UseGuards(JwtAuthGuard)
 export class MockExamSessionController {
   constructor(private readonly mockExamService: MockExamService) {}
 
@@ -37,8 +43,8 @@ export class MockExamSessionController {
     description: 'Filter sessions by mock exam ObjectId',
   })
   @ApiResponse({ status: 200, description: 'List of mock exam sessions' })
-  async listSessions(@Query('mockExamId') mockExamId?: string) {
-    const sessions = await this.mockExamService.listSessions(mockExamId);
+  async listSessions(@Req() req: any, @Query('mockExamId') mockExamId?: string) {
+    const sessions = await this.mockExamService.listSessions(req.user.sub, mockExamId);
     return { data: sessions, total: sessions.length };
   }
 
@@ -51,8 +57,8 @@ export class MockExamSessionController {
   })
   @ApiResponse({ status: 400, description: 'Mock exam is not published' })
   @ApiResponse({ status: 404, description: 'Mock exam not found' })
-  async startSession(@Body() dto: StartSessionDto) {
-    const sessionData = await this.mockExamService.startSession(dto);
+  async startSession(@Req() req: any, @Body() dto: StartSessionDto) {
+    const sessionData = await this.mockExamService.startSession(req.user.sub, dto);
     return { data: sessionData };
   }
 
@@ -110,8 +116,8 @@ export class MockExamSessionController {
   @ApiParam({ name: 'id', description: 'Mock exam session ObjectId' })
   @ApiResponse({ status: 200, description: 'Session found with questions (no answers)' })
   @ApiResponse({ status: 404, description: 'Session not found' })
-  async getSession(@Param('id', ParseObjectIdPipe) id: string) {
-    const sessionData = await this.mockExamService.getSession(id);
+  async getSession(@Req() req: any, @Param('id', ParseObjectIdPipe) id: string) {
+    const sessionData = await this.mockExamService.getSession(req.user.sub, id);
     return { data: sessionData };
   }
 
@@ -123,10 +129,11 @@ export class MockExamSessionController {
   @ApiResponse({ status: 400, description: 'Invalid submission payload' })
   @ApiResponse({ status: 404, description: 'Session not found' })
   async submitSession(
+    @Req() req: any,
     @Param('id', ParseObjectIdPipe) id: string,
     @Body() dto: SubmitMockExamDto,
   ) {
-    const result = await this.mockExamService.submitSession(id, dto);
+    const result = await this.mockExamService.submitSession(req.user.sub, id, dto);
     return { data: result };
   }
 
@@ -135,8 +142,8 @@ export class MockExamSessionController {
   @ApiParam({ name: 'id', description: 'Mock exam session ObjectId' })
   @ApiResponse({ status: 200, description: 'Result retrieved successfully' })
   @ApiResponse({ status: 404, description: 'Result not found' })
-  async getSessionResult(@Param('id', ParseObjectIdPipe) id: string) {
-    const result = await this.mockExamService.getSessionResult(id);
+  async getSessionResult(@Req() req: any, @Param('id', ParseObjectIdPipe) id: string) {
+    const result = await this.mockExamService.getSessionResult(req.user.sub, id);
     return { data: result };
   }
 }

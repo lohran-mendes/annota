@@ -23,15 +23,16 @@ export class ProgressService {
     private questionModel: Model<QuestionDocument>,
   ) {}
 
-  async getGlobalProgress(): Promise<UserProgress> {
-    const totalAnswered = await this.userAnswerModel.countDocuments().exec();
+  async getGlobalProgress(userId: string): Promise<UserProgress> {
+    const userFilter = { userId };
+    const totalAnswered = await this.userAnswerModel.countDocuments(userFilter).exec();
     const totalCorrect = await this.userAnswerModel
-      .countDocuments({ correct: true })
+      .countDocuments({ ...userFilter, correct: true })
       .exec();
 
     // Calcular streak
     const recentAnswers = await this.userAnswerModel
-      .find()
+      .find(userFilter)
       .sort({ createdAt: -1 })
       .limit(100)
       .exec();
@@ -47,6 +48,7 @@ export class ProgressService {
 
     // Progresso por materia
     const bySubjectAgg = await this.userAnswerModel.aggregate([
+      { $match: { userId: { $eq: userId } } },
       {
         $group: {
           _id: '$subjectId',
@@ -75,14 +77,14 @@ export class ProgressService {
     return { totalAnswered, totalCorrect, streak, bySubject };
   }
 
-  async getExamProgress(examId: string): Promise<ExamProgress> {
+  async getExamProgress(userId: string, examId: string): Promise<ExamProgress> {
     // Buscar exam para validar e obter subjects derivados
     const exam = await this.examModel.findById(examId).exec();
     if (!exam) {
       throw new NotFoundException(`Exam with id ${examId} not found`);
     }
 
-    const filter = { examId };
+    const filter = { userId, examId };
     const totalAnswered = await this.userAnswerModel
       .countDocuments(filter)
       .exec();
@@ -120,7 +122,7 @@ export class ProgressService {
 
     // Por materia
     const bySubjectAgg = await this.userAnswerModel.aggregate([
-      { $match: { examId: { $eq: examId } } },
+      { $match: { userId: { $eq: userId }, examId: { $eq: examId } } },
       {
         $group: {
           _id: '$subjectId',
@@ -143,7 +145,7 @@ export class ProgressService {
 
     // Por topico
     const byTopicAgg = await this.userAnswerModel.aggregate([
-      { $match: { examId: { $eq: examId } } },
+      { $match: { userId: { $eq: userId }, examId: { $eq: examId } } },
       {
         $group: {
           _id: '$topicId',

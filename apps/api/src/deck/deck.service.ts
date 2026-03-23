@@ -15,9 +15,9 @@ export class DeckService {
     private flashcardModel: Model<FlashcardDocument>,
   ) {}
 
-  async findAll(): Promise<Deck[]> {
+  async findAll(userId: string): Promise<Deck[]> {
     const decks = await this.deckModel
-      .find()
+      .find({ userId })
       .sort({ createdAt: -1 })
       .exec();
 
@@ -39,8 +39,8 @@ export class DeckService {
     return decksWithDueCount as unknown as Deck[];
   }
 
-  async findOne(id: string): Promise<Deck> {
-    const deck = await this.deckModel.findById(id).exec();
+  async findOne(userId: string, id: string): Promise<Deck> {
+    const deck = await this.deckModel.findOne({ _id: id, userId }).exec();
     if (!deck) {
       throw new NotFoundException(`Deck with id ${id} not found`);
     }
@@ -54,17 +54,18 @@ export class DeckService {
     return { ...json, dueCount } as unknown as Deck;
   }
 
-  async create(dto: CreateDeckDto): Promise<Deck> {
+  async create(userId: string, dto: CreateDeckDto): Promise<Deck> {
     const deck = new this.deckModel({
+      userId,
       name: dto.name,
       description: dto.description ?? '',
     });
     return deck.save();
   }
 
-  async update(id: string, dto: UpdateDeckDto): Promise<Deck> {
+  async update(userId: string, id: string, dto: UpdateDeckDto): Promise<Deck> {
     const deck = await this.deckModel
-      .findByIdAndUpdate(id, dto, { new: true })
+      .findOneAndUpdate({ _id: id, userId }, dto, { new: true })
       .exec();
     if (!deck) {
       throw new NotFoundException(`Deck with id ${id} not found`);
@@ -72,16 +73,16 @@ export class DeckService {
     return deck;
   }
 
-  async remove(id: string): Promise<void> {
-    const result = await this.deckModel.findByIdAndDelete(id).exec();
+  async remove(userId: string, id: string): Promise<void> {
+    const result = await this.deckModel.findOneAndDelete({ _id: id, userId }).exec();
     if (!result) {
       throw new NotFoundException(`Deck with id ${id} not found`);
     }
     await this.flashcardModel.deleteMany({ deckId: id }).exec();
   }
 
-  async getStats(id: string): Promise<DeckStats> {
-    const deck = await this.deckModel.findById(id).lean().exec();
+  async getStats(userId: string, id: string): Promise<DeckStats> {
+    const deck = await this.deckModel.findOne({ _id: id, userId }).lean().exec();
     if (!deck) {
       throw new NotFoundException(`Deck with id ${id} not found`);
     }

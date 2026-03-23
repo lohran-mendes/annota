@@ -72,18 +72,20 @@ const buildSessionModel = () => {
     duration: 60,
     status: 'in_progress',
   });
+  const sessionSave = jest.fn();
   const SessionConstructor = jest.fn().mockImplementation((data: any) => {
     const instance: any = {
       ...data,
       toJSON: defaultToJSON,
     };
-    instance.save = jest.fn().mockResolvedValue(instance);
+    instance.save = sessionSave.mockResolvedValue(instance);
     return instance;
   });
   SessionConstructor.findById = jest.fn();
+  SessionConstructor.findOne = jest.fn();
   SessionConstructor.find = jest.fn();
   SessionConstructor.findByIdAndUpdate = jest.fn();
-  return { SessionConstructor };
+  return { SessionConstructor, sessionSave };
 };
 
 // Fábrica do modelo MockExamResult
@@ -103,9 +105,12 @@ const buildResultModel = () => {
 // ----------------------------------------------------------------
 
 describe('MockExamService', () => {
+  const userId = 'user-id-1';
+
   let service: MockExamService;
   let MockExamConstructor: any;
   let SessionConstructor: any;
+  let sessionSave: jest.Mock;
   let ResultConstructor: any;
   let resultSave: jest.Mock;
   let questionModel: { find: jest.Mock; countDocuments: jest.Mock };
@@ -116,6 +121,7 @@ describe('MockExamService', () => {
     MockExamConstructor = buildMockExamModel();
     const builtSession = buildSessionModel();
     SessionConstructor = builtSession.SessionConstructor;
+    sessionSave = builtSession.sessionSave;
 
     const builtResult = buildResultModel();
     ResultConstructor = builtResult.ResultConstructor;
@@ -258,7 +264,7 @@ describe('MockExamService', () => {
       });
 
       await expect(
-        service.startSession({ mockExamId: 'nonexistent-id' }),
+        service.startSession(userId, { mockExamId: 'nonexistent-id' }),
       ).rejects.toThrow(NotFoundException);
     });
 
@@ -269,7 +275,7 @@ describe('MockExamService', () => {
       });
 
       await expect(
-        service.startSession({ mockExamId: 'some-id' }),
+        service.startSession(userId, { mockExamId: 'some-id' }),
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -288,7 +294,7 @@ describe('MockExamService', () => {
         lean: () => ({ exec: jest.fn().mockResolvedValue(questions) }),
       });
 
-      const result = await service.startSession({
+      const result = await service.startSession(userId, {
         mockExamId: mockExamDoc._id.toString(),
       });
 
@@ -332,12 +338,12 @@ describe('MockExamService', () => {
     };
 
     it('deve lançar NotFoundException se a session não existir', async () => {
-      SessionConstructor.findById.mockReturnValue({
+      SessionConstructor.findOne.mockReturnValue({
         exec: jest.fn().mockResolvedValue(null),
       });
 
       await expect(
-        service.submitSession('nonexistent-id', { answers: [], timeSpent: 0 } as any),
+        service.submitSession(userId, 'nonexistent-id', { answers: [], timeSpent: 0 } as any),
       ).rejects.toThrow(NotFoundException);
     });
 
@@ -349,7 +355,7 @@ describe('MockExamService', () => {
         { correct: false },
       ]);
 
-      SessionConstructor.findById.mockReturnValue({
+      SessionConstructor.findOne.mockReturnValue({
         exec: jest.fn().mockResolvedValue(sessionDoc),
       });
       questionModel.find.mockReturnValue({
@@ -363,7 +369,7 @@ describe('MockExamService', () => {
       });
       resultSave.mockResolvedValue({});
 
-      const result = await service.submitSession(sessionId, dto);
+      const result = await service.submitSession(userId, sessionId, dto);
 
       expect(result.correctCount).toBe(2);
       expect(result.score).toBe(50);
@@ -391,7 +397,7 @@ describe('MockExamService', () => {
         timeSpent: 600,
       };
 
-      SessionConstructor.findById.mockReturnValue({
+      SessionConstructor.findOne.mockReturnValue({
         exec: jest.fn().mockResolvedValue(sessionDoc),
       });
       questionModel.find.mockReturnValue({
@@ -405,7 +411,7 @@ describe('MockExamService', () => {
       });
       resultSave.mockResolvedValue({});
 
-      const result = await service.submitSession(sessionId, dto);
+      const result = await service.submitSession(userId, sessionId, dto);
 
       expect(result.bySubject).toHaveLength(2);
       const sub1 = result.bySubject.find((s) => s.subjectId === 'sub-1');
@@ -417,7 +423,7 @@ describe('MockExamService', () => {
     it('deve atualizar o status da session para completed', async () => {
       const { sessionDoc, questions, dto } = buildScenario([{ correct: true }]);
 
-      SessionConstructor.findById.mockReturnValue({
+      SessionConstructor.findOne.mockReturnValue({
         exec: jest.fn().mockResolvedValue(sessionDoc),
       });
       questionModel.find.mockReturnValue({
@@ -431,7 +437,7 @@ describe('MockExamService', () => {
       });
       resultSave.mockResolvedValue({});
 
-      await service.submitSession(sessionId, dto);
+      await service.submitSession(userId, sessionId, dto);
 
       expect(SessionConstructor.findByIdAndUpdate).toHaveBeenCalledWith(
         sessionId,
@@ -442,7 +448,7 @@ describe('MockExamService', () => {
     it('deve salvar o resultado detalhado no banco', async () => {
       const { sessionDoc, questions, dto } = buildScenario([{ correct: true }]);
 
-      SessionConstructor.findById.mockReturnValue({
+      SessionConstructor.findOne.mockReturnValue({
         exec: jest.fn().mockResolvedValue(sessionDoc),
       });
       questionModel.find.mockReturnValue({
@@ -456,7 +462,7 @@ describe('MockExamService', () => {
       });
       resultSave.mockResolvedValue({});
 
-      await service.submitSession(sessionId, dto);
+      await service.submitSession(userId, sessionId, dto);
 
       expect(ResultConstructor).toHaveBeenCalledTimes(1);
       expect(resultSave).toHaveBeenCalledTimes(1);
@@ -484,11 +490,12 @@ describe('MockExamService', () => {
         exec: jest.fn().mockResolvedValue(savedResult),
       });
 
-      const result = await service.getSessionResult('session-id-1');
+      const result = await service.getSessionResult(userId, 'session-id-1');
 
       expect(result).toBeDefined();
       expect(ResultConstructor.findOne).toHaveBeenCalledWith({
         sessionId: 'session-id-1',
+        userId,
       });
     });
 
@@ -497,7 +504,7 @@ describe('MockExamService', () => {
         exec: jest.fn().mockResolvedValue(null),
       });
 
-      await expect(service.getSessionResult('nonexistent-id')).rejects.toThrow(
+      await expect(service.getSessionResult(userId, 'nonexistent-id')).rejects.toThrow(
         NotFoundException,
       );
     });
