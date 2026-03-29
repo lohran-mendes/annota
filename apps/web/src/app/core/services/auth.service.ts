@@ -1,7 +1,7 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs';
-import type { ApiResponse, AuthResponse, LoginDto } from '@annota/shared';
+import type { ApiResponse, AuthResponse, LoginDto, RegisterDto } from '@annota/shared';
 
 const TOKEN_KEY = 'annota_token';
 const USER_KEY = 'annota_user';
@@ -21,6 +21,18 @@ export class AuthService {
     return this.http
       .post<ApiResponse<AuthResponse>>(`${this.apiUrl}/auth/login`, dto)
       .pipe(tap((res) => this.saveSession(res.data)));
+  }
+
+  register(dto: RegisterDto) {
+    return this.http
+      .post<ApiResponse<AuthResponse>>(`${this.apiUrl}/auth/register`, dto)
+      .pipe(tap((res) => this.saveSession(res.data)));
+  }
+
+  getMe() {
+    return this.http
+      .get<ApiResponse<AuthResponse['user']>>(`${this.apiUrl}/auth/me`)
+      .pipe(tap((res) => this._user.set(res.data)));
   }
 
   logout() {

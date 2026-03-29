@@ -3,10 +3,31 @@
     <div class="login-header">
       <img src="annota-icon.svg" alt="Annota" class="login-logo" />
       <h1 class="login-brand">Annota</h1>
-      <p class="login-subtitle">Entre para continuar estudando</p>
+      <p class="login-subtitle">
+        @if (mode() === 'login') {
+          Entre para continuar estudando
+        } @else {
+          Crie sua conta para começar
+        }
+      </p>
     </div>
 
     <form (ngSubmit)="submit()" class="login-form">
+      @if (mode() === 'register') {
+        <mat-form-field appearance="outline">
+          <mat-label>Nome</mat-label>
+          <input
+            matInput
+            [(ngModel)]="name"
+            name="name"
+            type="text"
+            placeholder="Seu nome"
+            required
+          />
+          <mat-icon matPrefix>person</mat-icon>
+        </mat-form-field>
+      }
+
       <mat-form-field appearance="outline">
         <mat-label>Email</mat-label>
         <input
@@ -62,11 +83,26 @@
             </span>
         } @else {
             <span class="login-submit-content">
-            <mat-icon>login</mat-icon>
-            Entrar
+              @if (mode() === 'login') {
+                <mat-icon>login</mat-icon>
+                Entrar
+              } @else {
+                <mat-icon>person_add</mat-icon>
+                Criar conta
+              }
             </span>
         }
       </button>
     </form>
+
+    <div class="login-footer">
+      @if (mode() === 'login') {
+        <span>Não tem conta?</span>
+        <button mat-button class="toggle-btn" type="button" (click)="toggleMode()">Criar conta</button>
+      } @else {
+        <span>Já tem conta?</span>
+        <button mat-button class="toggle-btn" type="button" (click)="toggleMode()">Entrar</button>
+      }
+    </div>
   </div>
 </div>

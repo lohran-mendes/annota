@@ -27,18 +27,30 @@ export class Login {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
+  mode = signal<'login' | 'register'>('login');
   loading = signal(false);
   error = signal('');
   hidePassword = signal(true);
 
+  name = '';
   email = '';
   password = '';
+
+  toggleMode() {
+    this.mode.update((m) => (m === 'login' ? 'register' : 'login'));
+    this.error.set('');
+  }
 
   submit() {
     this.error.set('');
     this.loading.set(true);
 
-    this.authService.login({ email: this.email, password: this.password }).subscribe({
+    const request =
+      this.mode() === 'login'
+        ? this.authService.login({ email: this.email, password: this.password })
+        : this.authService.register({ name: this.name, email: this.email, password: this.password });
+
+    request.subscribe({
       next: () => {
         this.loading.set(false);
         this.router.navigate(['/']);

@@ -39,6 +39,7 @@ export type {
   DeckStats,
   CreateAccessLogDto,
   AccessLogStreak,
+  RegisterDto,
   LoginDto,
   AuthResponse,
   SaveScheduleDto,

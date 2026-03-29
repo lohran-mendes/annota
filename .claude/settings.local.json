@@ -7,7 +7,12 @@
       "Bash(find /c/Users/Asus/Desktop/annota/apps/web/src/app/features/admin -type f -name *.ts)",
       "Bash(node -e \"const m = require\\(''mongoose''\\); console.log\\(typeof m.FilterQuery\\); console.log\\(Object.keys\\(m\\).filter\\(k => k.toLowerCase\\(\\).includes\\(''filter''\\)\\)\\)\")",
       "Bash(node -e \"const m = require\\(''mongoose''\\); console.log\\(typeof m.RootFilterQuery\\)\")",
-      "Bash(npx ng:*)"
+      "Bash(npx ng:*)",
+      "Bash(grep -r auth/register /c/Users/Asus/Desktop/annota/apps/web/src --include=*.ts)",
+      "Bash(xargs ls:*)",
+      "Bash(xargs grep:*)",
+      "Bash(find /c/Users/Asus/Desktop/annota/apps/web/src -type f -name *.ts -path *shared*)",
+      "Bash(grep -r HttpClient /c/Users/Asus/Desktop/annota/apps/web/src/app/features --include=*.ts)"
     ]
   }
 }
