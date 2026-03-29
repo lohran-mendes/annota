@@ -41,6 +41,8 @@ export type {
   AccessLogStreak,
   LoginDto,
   AuthResponse,
+  SaveScheduleDto,
+  AdminSaveScheduleDto,
 } from './api-contracts';
 
 export interface Exam {
@@ -141,6 +143,48 @@ export interface MockExamSessionConfig {
   timeSpent?: number;
   completedAt?: string;
   createdAt?: string;
+}
+
+// === Schedule ===
+
+export interface ScheduleActivity {
+  subject: string;
+  description: string;
+  type: 'study' | 'review' | 'practice' | 'mock-exam';
+  duration: number;
+}
+
+export interface ScheduleDay {
+  dayOfWeek: string;
+  activities: ScheduleActivity[];
+}
+
+export interface ScheduleWeek {
+  weekNumber: number;
+  label: string;
+  days: ScheduleDay[];
+}
+
+export interface Schedule {
+  id: string;
+  examId: string;
+  userId?: string;
+  weeks: ScheduleWeek[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface UserScheduleSummary {
+  userId: string;
+  userName: string;
+  userEmail: string;
+  schedules: {
+    id: string;
+    examId: string;
+    examName: string;
+    weekCount: number;
+    updatedAt?: string;
+  }[];
 }
 
 // === User ===

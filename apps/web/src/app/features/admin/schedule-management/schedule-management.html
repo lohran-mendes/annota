@@ -1,0 +1,194 @@
+<div class="page-header animate-fade-in-up">
+  <div>
+    <h1>Cronogramas dos Alunos</h1>
+    <p class="page-subtitle">Visualize e edite os cronogramas personalizados de cada aluno</p>
+  </div>
+</div>
+
+@if (activeUserId()) {
+  <!-- Schedule detail view -->
+  <div class="schedule-detail animate-fade-in-up">
+    <div class="detail-header">
+      <button mat-icon-button (click)="closeSchedule()" matTooltip="Voltar à lista">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="detail-info">
+        <h2>{{ activeUserName() }}</h2>
+        <p class="detail-subtitle">
+          <mat-icon class="inline-icon">school</mat-icon>
+          {{ activeExamName() }}
+        </p>
+      </div>
+      <div class="detail-actions">
+        <button
+          mat-stroked-button
+          (click)="toggleEditing()"
+          [class.editing-active]="editing()"
+          matTooltip="{{ editing() ? 'Sair do modo de edição' : 'Editar cronograma' }}"
+        >
+          <mat-icon>{{ editing() ? 'check' : 'edit' }}</mat-icon>
+          {{ editing() ? 'Concluir' : 'Editar' }}
+        </button>
+        <button
+          mat-stroked-button
+          color="warn"
+          (click)="deleteSchedule()"
+          matTooltip="Excluir cronograma"
+        >
+          <mat-icon>delete</mat-icon>
+          Excluir
+        </button>
+      </div>
+    </div>
+
+    @if (loadingSchedule()) {
+      <div class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+    } @else if (activeSchedule().length === 0) {
+      <mat-card class="empty-state">
+        <mat-card-content>
+          <mat-icon>event_busy</mat-icon>
+          <p>Este aluno não possui cronograma salvo para esta prova.</p>
+        </mat-card-content>
+      </mat-card>
+    } @else {
+      <div class="legend-row">
+        <div class="legend-item">
+          <mat-icon class="legend-icon type-study">auto_stories</mat-icon>
+          <span>Estudo</span>
+        </div>
+        <div class="legend-item">
+          <mat-icon class="legend-icon type-review">refresh</mat-icon>
+          <span>Revisão</span>
+        </div>
+        <div class="legend-item">
+          <mat-icon class="legend-icon type-practice">edit_note</mat-icon>
+          <span>Prática</span>
+        </div>
+        <div class="legend-item">
+          <mat-icon class="legend-icon type-mock-exam">timer</mat-icon>
+          <span>Simulado</span>
+        </div>
+      </div>
+
+      <mat-accordion class="schedule-accordion" multi>
+        @for (week of activeSchedule(); track week.weekNumber; let wi = $index) {
+          <mat-expansion-panel [expanded]="wi === 0" class="week-panel">
+            <mat-expansion-panel-header>
+              <mat-panel-title class="week-panel__title">
+                <span class="week-badge">S{{ week.weekNumber }}</span>
+                {{ week.label }}
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+
+            <div class="days-grid">
+              @for (day of week.days; track day.dayOfWeek; let di = $index) {
+                <div class="day-column">
+                  <p class="day-label">{{ day.dayOfWeek }}</p>
+                  <div class="activities-list">
+                    @for (activity of day.activities; track $index; let ai = $index) {
+                      <div
+                        class="activity-item activity-item--{{ activity.type }}"
+                        [class.activity-item--editable]="editing()"
+                        (click)="editing() && openActivityDialog(wi, di, ai)"
+                      >
+                        <div class="activity-item__header">
+                          <mat-icon class="activity-icon">{{ getActivityIcon(activity.type) }}</mat-icon>
+                          <span class="activity-subject">{{ activity.subject }}</span>
+                          @if (editing()) {
+                            <button
+                              mat-icon-button
+                              class="activity-remove-btn"
+                              matTooltip="Remover atividade"
+                              (click)="removeActivity(wi, di, ai); $event.stopPropagation()"
+                            >
+                              <mat-icon>close</mat-icon>
+                            </button>
+                          }
+                        </div>
+                        <p class="activity-description">{{ activity.description }}</p>
+                        <div class="activity-footer">
+                          <mat-chip class="duration-chip">{{ formatDuration(activity.duration) }}</mat-chip>
+                          <span class="activity-type-label">{{ getActivityTypeLabel(activity.type) }}</span>
+                        </div>
+                      </div>
+                    }
+
+                    @if (editing()) {
+                      <button
+                        class="add-activity-btn"
+                        (click)="openActivityDialog(wi, di)"
+                        matTooltip="Adicionar atividade"
+                      >
+                        <mat-icon>add</mat-icon>
+                        <span>Adicionar</span>
+                      </button>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </mat-expansion-panel>
+        }
+      </mat-accordion>
+    }
+  </div>
+} @else {
+  <!-- Users list view -->
+  @if (loading()) {
+    <div class="loading-container">
+      <mat-spinner diameter="48"></mat-spinner>
+    </div>
+  } @else if (users().length === 0) {
+    <mat-card class="empty-state">
+      <mat-card-content>
+        <mat-icon>calendar_month</mat-icon>
+        <p>Nenhum aluno criou um cronograma personalizado ainda.</p>
+      </mat-card-content>
+    </mat-card>
+  } @else {
+    <div class="users-grid animate-fade-in-up">
+      @for (user of users(); track user.userId) {
+        <mat-card class="user-card">
+          <mat-card-content>
+            <div class="user-header">
+              <div class="user-avatar">
+                {{ user.userName.charAt(0).toUpperCase() }}
+              </div>
+              <div class="user-info">
+                <span class="user-name">{{ user.userName }}</span>
+                <span class="user-email">{{ user.userEmail }}</span>
+              </div>
+            </div>
+
+            <div class="schedule-list">
+              @for (schedule of user.schedules; track schedule.id) {
+                <div
+                  class="schedule-entry"
+                  (click)="openSchedule(user, schedule)"
+                  tabindex="0"
+                  (keydown.enter)="openSchedule(user, schedule)"
+                >
+                  <div class="schedule-entry__info">
+                    <mat-icon class="schedule-entry__icon">description</mat-icon>
+                    <div>
+                      <span class="schedule-entry__exam">{{ schedule.examName }}</span>
+                      <span class="schedule-entry__meta">
+                        {{ schedule.weekCount }} semanas
+                        @if (schedule.updatedAt) {
+                          · Atualizado em {{ schedule.updatedAt | date:'dd/MM/yyyy' }}
+                        }
+                      </span>
+                    </div>
+                  </div>
+                  <mat-icon class="schedule-entry__arrow">chevron_right</mat-icon>
+                </div>
+              }
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+  }
+}

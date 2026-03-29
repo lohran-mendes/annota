@@ -43,4 +43,11 @@ export const adminRoutes: Routes = [
         (m) => m.MockExamManagement,
       ),
   },
+  {
+    path: 'schedules',
+    loadComponent: () =>
+      import('./schedule-management/schedule-management').then(
+        (m) => m.ScheduleManagement,
+      ),
+  },
 ];

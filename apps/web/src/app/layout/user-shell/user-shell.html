@@ -69,6 +69,15 @@
         <mat-icon matListItemIcon>style</mat-icon>
         <span>Cartões</span>
       </a>
+      <a
+        mat-list-item
+        routerLink="/schedule"
+        routerLinkActive="active-link"
+        (click)="closeSidenavOnMobile()"
+      >
+        <mat-icon matListItemIcon>calendar_month</mat-icon>
+        <span>Cronograma</span>
+      </a>
     </mat-nav-list>
 
     <div class="sidenav-footer">

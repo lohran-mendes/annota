@@ -3,7 +3,7 @@
 // No NestJS, os DTOs devem ser classes que implementam estas interfaces
 // e adicionam decorators de validacao (class-validator).
 
-import type { Alternative, MockExamSessionConfig, SubjectProgress } from './index';
+import type { Alternative, MockExamSessionConfig, ScheduleWeek, SubjectProgress } from './index';
 
 // ============================================================
 // API Response Wrapper
@@ -304,6 +304,19 @@ export interface DeckStats {
 }
 
 // ============================================================
+// Schedule DTOs
+// ============================================================
+
+export interface SaveScheduleDto {
+  examId: string;
+  weeks: ScheduleWeek[];
+}
+
+export interface AdminSaveScheduleDto {
+  weeks: ScheduleWeek[];
+}
+
+// ============================================================
 // Auth DTOs
 // ============================================================
 
@@ -420,6 +433,17 @@ export interface AccessLogStreak {
 //   PUT    /api/flashcards/:id                     → ApiResponse<Flashcard>
 //   DELETE /api/flashcards/:id                     → 204
 //   POST   /api/flashcards/:id/review              → ApiResponse<ReviewResult>
+//
+// Schedules (Student - requires auth):
+//   GET    /api/schedules/:examId                → ApiResponse<Schedule>
+//   PUT    /api/schedules/:examId                → ApiResponse<Schedule>
+//   DELETE /api/schedules/:examId                → 204
+//
+// Schedules (Admin):
+//   GET    /api/schedules/admin/users             → ApiResponse<UserScheduleSummary[]>
+//   GET    /api/schedules/admin/users/:userId/:examId → ApiResponse<Schedule>
+//   PUT    /api/schedules/admin/users/:userId/:examId → ApiResponse<Schedule>
+//   DELETE /api/schedules/admin/users/:userId/:examId → 204
 //
 // Access Logs:
 //   POST   /api/access-logs                          → ApiResponse<AccessLog>

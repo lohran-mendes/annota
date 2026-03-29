@@ -45,6 +45,13 @@ export const routes: Routes = [
             (m) => m.flashcardsRoutes,
           ),
       },
+      {
+        path: 'schedule',
+        loadChildren: () =>
+          import('./features/schedule/schedule.routes').then(
+            (m) => m.scheduleRoutes,
+          ),
+      },
     ],
   },
   {

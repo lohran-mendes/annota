@@ -11,6 +11,7 @@ import { MockExamModule } from './mock-exam/mock-exam.module';
 import { DeckModule } from './deck/deck.module';
 import { FlashcardModule } from './flashcard/flashcard.module';
 import { AccessLogModule } from './access-log/access-log.module';
+import { ScheduleModule } from './schedule/schedule.module';
 import { AuthModule } from './auth/auth.module';
 
 @Module({
@@ -39,6 +40,7 @@ import { AuthModule } from './auth/auth.module';
     DeckModule,
     FlashcardModule,
     AccessLogModule,
+    ScheduleModule,
     AuthModule,
   ],
 })

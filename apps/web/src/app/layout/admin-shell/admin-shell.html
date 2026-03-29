@@ -80,6 +80,15 @@
         <mat-icon matListItemIcon>assignment</mat-icon>
         <span>Simulados</span>
       </a>
+      <a
+        mat-list-item
+        routerLink="/admin/schedules"
+        routerLinkActive="active-link"
+        (click)="closeSidenavOnMobile()"
+      >
+        <mat-icon matListItemIcon>calendar_month</mat-icon>
+        <span>Cronogramas</span>
+      </a>
     </mat-nav-list>
   </mat-sidenav>
 
