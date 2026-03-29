@@ -34,3 +34,9 @@ paths:
 - Component: `feature-name.ts`, `feature-name.html`, `feature-name.scss`
 - Service: `feature-name.service.ts`
 - Routes: `feature-name.routes.ts`
+
+## Auth & Guards
+- `authGuard` protects all user routes, `adminGuard` protects admin routes (in `app.routes.ts`)
+- `authInterceptor` adds JWT Bearer token to all HTTP requests automatically
+- Auth state managed by `AuthService` in `core/services/auth.service.ts`
+- Login/register pages are public (no guard)

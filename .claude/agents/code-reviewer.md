@@ -32,6 +32,12 @@ You are a thorough code reviewer for the Annota project.
 - ParseObjectIdPipe for ID parameters
 - Proper error responses (NotFoundException, etc.)
 
+### Auth
+- Protected routes use appropriate guards (`authGuard` for students, `adminGuard` for admin)
+- JWT token is not logged or exposed in error messages
+- Auth interceptor is not bypassed accidentally
+- New endpoints that need protection use `JwtAuthGuard`
+
 ### General
 - TypeScript strict typing (no `any` unless justified)
 - Code in English, comments in Portuguese when needed

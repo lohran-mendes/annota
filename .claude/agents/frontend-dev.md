@@ -43,6 +43,8 @@ You are a senior Angular 21 developer working on the Annota frontend (`apps/web/
 - Mobile-first responsive design
 
 ## Before making changes
-1. Read existing files in the same feature area
-2. Check `libs/shared/src/` for available types
-3. Follow patterns from existing components
+1. Read an existing feature in the same category (admin vs student) for patterns
+2. Check `app.routes.ts` for route registration and guard requirements
+3. Check if a service already exists in `core/services/` for the data you need
+4. Check `libs/shared/src/` for available types
+5. Determine if this is an admin feature (`AdminShell`, `adminGuard`) or student feature (`UserShell`, `authGuard`)

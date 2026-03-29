@@ -54,4 +54,7 @@ module-name/
 ## Before making changes
 1. Read the existing module closest to what you're building
 2. Check `libs/shared/src/api-contracts.ts` for API contract types
-3. Register new modules in `apps/api/src/app.module.ts`
+3. Check if auth guards are needed for the new endpoints (`JwtAuthGuard`)
+4. Register new modules in `apps/api/src/app.module.ts`
+5. Check if `apps/api/src/seed.ts` needs updating with test data for the new module
+6. Update `libs/shared/src/index.ts` and `api-contracts.ts` with new types

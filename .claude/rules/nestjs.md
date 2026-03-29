@@ -35,3 +35,10 @@ Register every new module in `apps/api/src/app.module.ts`.
 ## Validation
 - Global ValidationPipe is configured in main.ts (whitelist, transform, forbidNonWhitelisted)
 - MongoExceptionFilter handles duplicate key errors globally
+
+## Auth
+- Auth module uses JWT with Passport (`@nestjs/passport`, `@nestjs/jwt`)
+- `JwtAuthGuard` protects authenticated routes — apply to controllers/routes that need auth
+- User schema is in `auth/user.schema.ts` (not a separate user module)
+- Passwords hashed with bcrypt (salt rounds 10)
+- Roles: `admin` | `student` — check role in guards when needed
