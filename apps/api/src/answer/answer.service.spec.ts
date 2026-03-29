@@ -5,8 +5,6 @@ import { Types } from 'mongoose';
 import { AnswerService } from './answer.service';
 import { UserAnswer } from './answer.schema';
 import { QuestionService } from '../question/question.service';
-import { TopicService } from '../topic/topic.service';
-import { SubjectService } from '../subject/subject.service';
 import { SubmitAnswerDto } from './dto/submit-answer.dto';
 
 // Helpers para construir objetos de teste reutilizáveis
@@ -45,8 +43,6 @@ describe('AnswerService', () => {
   let MockUserAnswerModel: any;
   let mockSave: jest.Mock;
   let questionService: jest.Mocked<QuestionService>;
-  let topicService: jest.Mocked<TopicService>;
-  let subjectService: jest.Mocked<SubjectService>;
 
   beforeEach(async () => {
     const built = buildUserAnswerModel();
@@ -66,25 +62,11 @@ describe('AnswerService', () => {
             findOne: jest.fn(),
           },
         },
-        {
-          provide: TopicService,
-          useValue: {
-            incrementCompletedCount: jest.fn(),
-          },
-        },
-        {
-          provide: SubjectService,
-          useValue: {
-            incrementCompletedCount: jest.fn(),
-          },
-        },
       ],
     }).compile();
 
     service = module.get<AnswerService>(AnswerService);
     questionService = module.get(QuestionService);
-    topicService = module.get(TopicService);
-    subjectService = module.get(SubjectService);
   });
 
   afterEach(() => {
@@ -134,48 +116,6 @@ describe('AnswerService', () => {
       const result = await service.submitAnswer(userId, { ...dto, selectedIndex: 0 });
 
       expect(result.correct).toBe(false);
-    });
-
-    it('deve incrementar completedCount de topic e subject na primeira resposta', async () => {
-      const question = makeQuestion();
-      questionService.findOne.mockResolvedValue(question as any);
-      // null indica que ainda não foi respondida
-      MockUserAnswerModel.findOne.mockReturnValue({ exec: jest.fn().mockResolvedValue(null) });
-      mockSave.mockResolvedValue({});
-      MockUserAnswerModel.find.mockReturnValue({
-        sort: jest.fn().mockReturnThis(),
-        limit: jest.fn().mockReturnThis(),
-        exec: jest.fn().mockResolvedValue([]),
-      });
-      topicService.incrementCompletedCount.mockResolvedValue(undefined);
-      subjectService.incrementCompletedCount.mockResolvedValue(undefined);
-
-      await service.submitAnswer(userId, dto);
-
-      expect(topicService.incrementCompletedCount).toHaveBeenCalledTimes(1);
-      expect(topicService.incrementCompletedCount).toHaveBeenCalledWith('topic-id-1', 1);
-      expect(subjectService.incrementCompletedCount).toHaveBeenCalledTimes(1);
-      expect(subjectService.incrementCompletedCount).toHaveBeenCalledWith('subject-id-1', 1);
-    });
-
-    it('NÃO deve incrementar completedCount em respostas subsequentes para a mesma questão', async () => {
-      const question = makeQuestion();
-      questionService.findOne.mockResolvedValue(question as any);
-      // Documento existente indica resposta anterior
-      MockUserAnswerModel.findOne.mockReturnValue({
-        exec: jest.fn().mockResolvedValue({ _id: 'existing-answer' }),
-      });
-      mockSave.mockResolvedValue({});
-      MockUserAnswerModel.find.mockReturnValue({
-        sort: jest.fn().mockReturnThis(),
-        limit: jest.fn().mockReturnThis(),
-        exec: jest.fn().mockResolvedValue([]),
-      });
-
-      await service.submitAnswer(userId, dto);
-
-      expect(topicService.incrementCompletedCount).not.toHaveBeenCalled();
-      expect(subjectService.incrementCompletedCount).not.toHaveBeenCalled();
     });
 
     it('deve lançar NotFoundException se a questão não existir', async () => {

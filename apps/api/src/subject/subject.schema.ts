@@ -14,9 +14,6 @@ export class Subject {
   @Prop({ default: 0 })
   questionCount: number;
 
-  @Prop({ default: 0 })
-  completedCount: number;
-
   @Prop({ required: true })
   color: string;
 }

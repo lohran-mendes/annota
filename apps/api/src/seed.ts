@@ -19,7 +19,6 @@ const SubjectSchema = new mongoose.Schema({
   name: String,
   icon: String,
   questionCount: { type: Number, default: 0 },
-  completedCount: { type: Number, default: 0 },
   color: String,
 });
 
@@ -27,7 +26,6 @@ const TopicSchema = new mongoose.Schema({
   subjectId: mongoose.Schema.Types.ObjectId,
   name: String,
   questionCount: { type: Number, default: 0 },
-  completedCount: { type: Number, default: 0 },
 });
 
 const AlternativeSchema = new mongoose.Schema(
@@ -157,35 +155,30 @@ async function seed() {
       name: 'Matemática',
       icon: 'calculate',
       questionCount: 4,
-      completedCount: 0,
       color: '#E91E63',
     },
     {
       name: 'Português',
       icon: 'menu_book',
       questionCount: 1,
-      completedCount: 0,
       color: '#9C27B0',
     },
     {
       name: 'Ciências',
       icon: 'science',
       questionCount: 1,
-      completedCount: 0,
       color: '#00BCD4',
     },
     {
       name: 'História',
       icon: 'history_edu',
       questionCount: 1,
-      completedCount: 0,
       color: '#FF7043',
     },
     {
       name: 'Geografia',
       icon: 'public',
       questionCount: 1,
-      completedCount: 0,
       color: '#66BB6A',
     },
   ]);
@@ -196,24 +189,24 @@ async function seed() {
   // === TOPICS ===
   const topics = await Topic.insertMany([
     // Matematica
-    { subjectId: mat._id, name: 'Equações do 1º grau', questionCount: 2, completedCount: 0 },
-    { subjectId: mat._id, name: 'Porcentagem e Juros', questionCount: 1, completedCount: 0 },
-    { subjectId: mat._id, name: 'Geometria Básica', questionCount: 1, completedCount: 0 },
-    { subjectId: mat._id, name: 'Razão e Proporção', questionCount: 0, completedCount: 0 },
+    { subjectId: mat._id, name: 'Equações do 1º grau', questionCount: 2 },
+    { subjectId: mat._id, name: 'Porcentagem e Juros', questionCount: 1 },
+    { subjectId: mat._id, name: 'Geometria Básica', questionCount: 1 },
+    { subjectId: mat._id, name: 'Razão e Proporção', questionCount: 0 },
     // Portugues
-    { subjectId: por._id, name: 'Interpretação de Texto', questionCount: 1, completedCount: 0 },
-    { subjectId: por._id, name: 'Gramática', questionCount: 0, completedCount: 0 },
-    { subjectId: por._id, name: 'Figuras de Linguagem', questionCount: 0, completedCount: 0 },
+    { subjectId: por._id, name: 'Interpretação de Texto', questionCount: 1 },
+    { subjectId: por._id, name: 'Gramática', questionCount: 0 },
+    { subjectId: por._id, name: 'Figuras de Linguagem', questionCount: 0 },
     // Ciencias
-    { subjectId: cie._id, name: 'Corpo Humano', questionCount: 1, completedCount: 0 },
-    { subjectId: cie._id, name: 'Ecologia', questionCount: 0, completedCount: 0 },
-    { subjectId: cie._id, name: 'Química Básica', questionCount: 0, completedCount: 0 },
+    { subjectId: cie._id, name: 'Corpo Humano', questionCount: 1 },
+    { subjectId: cie._id, name: 'Ecologia', questionCount: 0 },
+    { subjectId: cie._id, name: 'Química Básica', questionCount: 0 },
     // Historia
-    { subjectId: his._id, name: 'Brasil Colônia', questionCount: 1, completedCount: 0 },
-    { subjectId: his._id, name: 'Era Vargas', questionCount: 0, completedCount: 0 },
+    { subjectId: his._id, name: 'Brasil Colônia', questionCount: 1 },
+    { subjectId: his._id, name: 'Era Vargas', questionCount: 0 },
     // Geografia
-    { subjectId: geo._id, name: 'Regiões do Brasil', questionCount: 1, completedCount: 0 },
-    { subjectId: geo._id, name: 'Clima e Vegetação', questionCount: 0, completedCount: 0 },
+    { subjectId: geo._id, name: 'Regiões do Brasil', questionCount: 1 },
+    { subjectId: geo._id, name: 'Clima e Vegetação', questionCount: 0 },
   ]);
 
   console.log(`Topics created: ${topics.length}`);

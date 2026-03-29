@@ -14,9 +14,6 @@ export class Topic {
 
   @Prop({ default: 0 })
   questionCount: number;
-
-  @Prop({ default: 0 })
-  completedCount: number;
 }
 
 export const TopicSchema = SchemaFactory.createForClass(Topic);

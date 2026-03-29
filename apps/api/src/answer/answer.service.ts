@@ -4,8 +4,6 @@ import { Model, Types } from 'mongoose';
 import { UserAnswer, UserAnswerDocument } from './answer.schema';
 import { SubmitAnswerDto } from './dto/submit-answer.dto';
 import { QuestionService } from '../question/question.service';
-import { TopicService } from '../topic/topic.service';
-import { SubjectService } from '../subject/subject.service';
 import type { AnswerResult } from '@annota/shared';
 
 @Injectable()
@@ -14,8 +12,6 @@ export class AnswerService {
     @InjectModel(UserAnswer.name)
     private userAnswerModel: Model<UserAnswerDocument>,
     private readonly questionService: QuestionService,
-    private readonly topicService: TopicService,
-    private readonly subjectService: SubjectService,
   ) {}
 
   async submitAnswer(userId: string, dto: SubmitAnswerDto): Promise<AnswerResult> {
@@ -41,18 +37,6 @@ export class AnswerService {
     }
     const userAnswer = new this.userAnswerModel(answerData);
     await userAnswer.save();
-
-    // Atualizar completedCount se primeira resposta para esta questao
-    if (!alreadyAnswered) {
-      await this.topicService.incrementCompletedCount(
-        question.topicId.toString(),
-        1,
-      );
-      await this.subjectService.incrementCompletedCount(
-        question.subjectId.toString(),
-        1,
-      );
-    }
 
     const streak = await this.getStreak(userId);
 

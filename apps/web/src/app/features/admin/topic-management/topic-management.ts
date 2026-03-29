@@ -100,7 +100,7 @@ export class TopicManagement implements OnInit {
   openEditDialog(topic: TopicRow) {
     const ref = this.dialog.open(TopicDialog, {
       data: {
-        topic: { id: topic.id, subjectId: topic.subjectId, name: topic.name, questionCount: topic.questionCount, completedCount: 0 },
+        topic: { id: topic.id, subjectId: topic.subjectId, name: topic.name, questionCount: topic.questionCount },
         subjects: this.subjects(),
       },
     });

@@ -65,9 +65,4 @@ export class TopicService {
       .exec();
   }
 
-  async incrementCompletedCount(id: string, delta: number): Promise<void> {
-    await this.topicModel
-      .findByIdAndUpdate(id, { $inc: { completedCount: delta } })
-      .exec();
-  }
 }

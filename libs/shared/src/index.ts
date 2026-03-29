@@ -63,7 +63,6 @@ export interface Subject {
   name: string;
   icon: string;
   questionCount: number;
-  completedCount: number;
   color: string;
 }
 
@@ -87,7 +86,6 @@ export interface Topic {
   subjectId: string;
   name: string;
   questionCount: number;
-  completedCount: number;
 }
 
 export interface Alternative {

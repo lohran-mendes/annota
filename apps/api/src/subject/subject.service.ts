@@ -59,9 +59,4 @@ export class SubjectService {
       .exec();
   }
 
-  async incrementCompletedCount(id: string, delta: number): Promise<void> {
-    await this.subjectModel
-      .findByIdAndUpdate(id, { $inc: { completedCount: delta } })
-      .exec();
-  }
 }

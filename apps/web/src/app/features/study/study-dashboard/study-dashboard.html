@@ -45,17 +45,28 @@
           </mat-card-header>
 
           <mat-card-content>
+            <div class="subject-progress">
+              <div class="progress-label">
+                <span>Progresso</span>
+                <span>{{ getSubjectProgress(subject) }}%</span>
+              </div>
+              <mat-progress-bar mode="determinate" [value]="getSubjectProgress(subject)"></mat-progress-bar>
+            </div>
+
             <mat-accordion>
               @for (topic of subject.topics; track topic.id) {
                 <mat-expansion-panel>
                   <mat-expansion-panel-header>
                     <mat-panel-title>{{ topic.name }}</mat-panel-title>
                     <mat-panel-description>
-                      {{ topic.questionCount }} questões
+                      {{ topic.questionCount }} questões · {{ getTopicProgress(topic) }}%
                     </mat-panel-description>
                   </mat-expansion-panel-header>
 
                   <div class="topic-content">
+                    <div class="topic-progress">
+                      <mat-progress-bar mode="determinate" [value]="getTopicProgress(topic)"></mat-progress-bar>
+                    </div>
                     <a
                       mat-flat-button
                       color="primary"
