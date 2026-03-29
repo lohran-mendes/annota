@@ -6,12 +6,14 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatDialog } from '@angular/material/dialog';
 import { ExamService } from '../../../core/services/exam.service';
 import { ScheduleService } from '../../../core/services/schedule.service';
 import { ActivityDialog } from '../activity-dialog';
+import { WeekDialog } from '../week-dialog';
 import type { ScheduleActivity } from '../activity-dialog';
-import type { Exam, ExamSubject, ScheduleWeek } from '@annota/shared';
+import type { Exam, ScheduleWeek } from '@annota/shared';
 
 export type { ScheduleActivity };
 
@@ -20,7 +22,7 @@ interface ScheduleDay {
   activities: ScheduleActivity[];
 }
 
-const WEEKDAYS = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+const WEEKDAYS = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
 
 @Component({
   selector: 'annota-schedule-dashboard',
@@ -32,6 +34,7 @@ const WEEKDAYS = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
     MatExpansionModule,
     MatChipsModule,
     MatTooltipModule,
+    MatButtonToggleModule,
   ],
   templateUrl: './schedule-dashboard.html',
   styleUrl: './schedule-dashboard.scss',
@@ -49,12 +52,24 @@ export class ScheduleDashboard implements OnInit {
   error = signal(false);
   editing = signal(false);
   hasCustomSchedule = signal(false);
+  viewMode = signal<'week' | 'month'>('week');
+  expandedWeekIndex = signal<number | null>(0);
 
   selectedExam = computed(() =>
     this.exams().find((e) => e.id === this.selectedExamId()) ?? null,
   );
 
-  private subjectNames: string[] = [];
+  monthGroups = computed(() => {
+    const weeks = this.schedule();
+    const groups: { label: string; weeks: ScheduleWeek[] }[] = [];
+    for (let i = 0; i < weeks.length; i += 4) {
+      groups.push({
+        label: `Mês ${groups.length + 1}`,
+        weeks: weeks.slice(i, i + 4),
+      });
+    }
+    return groups;
+  });
 
   ngOnInit(): void {
     this.loadExams();
@@ -76,6 +91,59 @@ export class ScheduleDashboard implements OnInit {
     this.editing.update((v) => !v);
   }
 
+  // ── Week CRUD ──────────────────────────────────────────────────────────────
+
+  addWeek(): void {
+    const dialogRef = this.dialog.open(WeekDialog, {
+      data: {},
+      width: '440px',
+    });
+
+    dialogRef.afterClosed().subscribe((label: string | undefined) => {
+      if (!label) return;
+
+      const updated = structuredClone(this.schedule());
+      const newWeek: ScheduleWeek = {
+        weekNumber: updated.length + 1,
+        label,
+        days: WEEKDAYS.map((day) => ({ dayOfWeek: day, activities: [] })),
+      };
+      updated.push(newWeek);
+      this.schedule.set(updated);
+      this.expandedWeekIndex.set(updated.length - 1);
+      this.saveToApi();
+    });
+  }
+
+  editWeekLabel(weekIndex: number): void {
+    const week = this.schedule()[weekIndex];
+    const dialogRef = this.dialog.open(WeekDialog, {
+      data: { label: week.label },
+      width: '440px',
+    });
+
+    dialogRef.afterClosed().subscribe((label: string | undefined) => {
+      if (!label) return;
+      const updated = structuredClone(this.schedule());
+      updated[weekIndex].label = label;
+      this.schedule.set(updated);
+      this.saveToApi();
+    });
+  }
+
+  removeWeek(weekIndex: number): void {
+    const updated = structuredClone(this.schedule());
+    updated.splice(weekIndex, 1);
+    updated.forEach((w, i) => (w.weekNumber = i + 1));
+    this.schedule.set(updated);
+    this.saveToApi();
+  }
+
+  goToWeek(weekNumber: number): void {
+    this.viewMode.set('week');
+    this.expandedWeekIndex.set(weekNumber - 1);
+  }
+
   // ── Activity CRUD ──────────────────────────────────────────────────────────
 
   openActivityDialog(weekIndex: number, dayIndex: number, activityIndex?: number): void {
@@ -86,7 +154,7 @@ export class ScheduleDashboard implements OnInit {
     const dialogRef = this.dialog.open(ActivityDialog, {
       data: {
         activity: existingActivity,
-        subjects: this.subjectNames,
+        subjects: this.collectSubjects(),
       },
       width: '480px',
     });
@@ -110,24 +178,6 @@ export class ScheduleDashboard implements OnInit {
     updated[weekIndex].days[dayIndex].activities.splice(activityIndex, 1);
     this.schedule.set(updated);
     this.saveToApi();
-  }
-
-  resetSchedule(): void {
-    const examId = this.selectedExamId();
-    if (!examId) return;
-
-    this.scheduleService.delete(examId).subscribe({
-      next: () => {
-        this.hasCustomSchedule.set(false);
-        this.editing.set(false);
-        this.loadScheduleForExam(examId);
-      },
-      error: () => {
-        this.hasCustomSchedule.set(false);
-        this.editing.set(false);
-        this.loadScheduleForExam(examId);
-      },
-    });
   }
 
   // ── API persistence ────────────────────────────────────────────────────────
@@ -167,167 +217,41 @@ export class ScheduleDashboard implements OnInit {
     this.scheduleService.getByExam(examId).subscribe({
       next: (res) => {
         if (res.data) {
-          this.schedule.set(res.data.weeks);
+          this.schedule.set(this.normalizeWeeks(res.data.weeks));
           this.hasCustomSchedule.set(true);
-          this.loadSubjectNames(examId);
-          this.loadingSchedule.set(false);
         } else {
+          this.schedule.set([]);
           this.hasCustomSchedule.set(false);
-          this.generateFromApi(examId);
         }
+        this.expandedWeekIndex.set(0);
+        this.loadingSchedule.set(false);
       },
       error: () => {
+        this.schedule.set([]);
         this.hasCustomSchedule.set(false);
-        this.generateFromApi(examId);
-      },
-    });
-  }
-
-  private generateFromApi(examId: string): void {
-    this.examService.getExamSubjects(examId).subscribe({
-      next: (res) => {
-        this.subjectNames = res.data.map((s) => s.name);
-        const generated = this.generateSchedule(res.data);
-        this.schedule.set(generated);
-        this.loadingSchedule.set(false);
-      },
-      error: () => {
-        const exam = this.exams().find((e) => e.id === examId);
-        const fallback = this.generateFallbackSchedule(exam);
-        this.schedule.set(fallback);
         this.loadingSchedule.set(false);
       },
     });
   }
 
-  private loadSubjectNames(examId: string): void {
-    this.examService.getExamSubjects(examId).subscribe({
-      next: (res) => {
-        this.subjectNames = res.data.map((s) => s.name);
-      },
-      error: () => {
-        this.subjectNames = ['Matemática', 'Português', 'Ciências', 'História'];
-      },
+  private normalizeWeeks(weeks: ScheduleWeek[]): ScheduleWeek[] {
+    return weeks.map((week) => {
+      const existingDays = new Map(week.days.map((d) => [d.dayOfWeek, d]));
+      const days = WEEKDAYS.map((day) => existingDays.get(day) ?? { dayOfWeek: day, activities: [] });
+      return { ...week, days };
     });
   }
 
-  // ── Schedule generation ────────────────────────────────────────────────────
-
-  generateSchedule(subjects: ExamSubject[]): ScheduleWeek[] {
-    const totalWeeks = subjects.length <= 3 ? 4 : subjects.length <= 6 ? 6 : 8;
-    const weeks: ScheduleWeek[] = [];
-
-    const subjectNames = subjects.map((s) => s.name);
-    this.subjectNames = subjectNames;
-    const coreSubjects = subjectNames.slice(0, 2);
-    const remainingSubjects = subjectNames.slice(2);
-
-    for (let w = 1; w <= totalWeeks; w++) {
-      const days: ScheduleDay[] = WEEKDAYS.map((day) => ({
-        dayOfWeek: day,
-        activities: this.buildActivitiesForDay(
-          w,
-          totalWeeks,
-          day,
-          coreSubjects,
-          remainingSubjects,
-          subjectNames,
-        ),
-      }));
-
-      weeks.push({
-        weekNumber: w,
-        label: this.weekLabel(w, totalWeeks),
-        days,
-      });
-    }
-
-    return weeks;
-  }
-
-  private generateFallbackSchedule(exam: Exam | undefined): ScheduleWeek[] {
-    const fallbackSubjects: ExamSubject[] = [
-      { id: '1', name: 'Matemática', icon: 'calculate', color: '#e91e63', questionCount: 0, topics: [] },
-      { id: '2', name: 'Português', icon: 'menu_book', color: '#9c27b0', questionCount: 0, topics: [] },
-      { id: '3', name: 'Ciências', icon: 'science', color: '#2196f3', questionCount: 0, topics: [] },
-      { id: '4', name: 'História', icon: 'history_edu', color: '#ff9800', questionCount: 0, topics: [] },
-    ];
-    return this.generateSchedule(fallbackSubjects);
-  }
-
-  private buildActivitiesForDay(
-    week: number,
-    totalWeeks: number,
-    day: string,
-    coreSubjects: string[],
-    remainingSubjects: string[],
-    allSubjects: string[],
-  ): ScheduleActivity[] {
-    const isSaturday = day === 'Sábado';
-    const phase = this.getPhase(week, totalWeeks);
-
-    if (phase === 'mock') {
-      if (isSaturday) {
-        return [{ subject: 'Simulado Completo', description: 'Realize um simulado completo para medir sua preparação', type: 'mock-exam', duration: 180 }];
+  private collectSubjects(): string[] {
+    const set = new Set<string>();
+    for (const week of this.schedule()) {
+      for (const day of week.days) {
+        for (const activity of day.activities) {
+          set.add(activity.subject);
+        }
       }
-      const subj = allSubjects[(week + WEEKDAYS.indexOf(day)) % allSubjects.length] ?? allSubjects[0];
-      return [{ subject: subj, description: 'Revisão final e resolução de questões', type: 'review', duration: 40 }];
     }
-
-    if (phase === 'practice') {
-      const subj = allSubjects[(WEEKDAYS.indexOf(day)) % allSubjects.length] ?? allSubjects[0];
-      if (isSaturday) {
-        return [
-          { subject: subj, description: 'Exercícios de fixação', type: 'practice', duration: 60 },
-          { subject: allSubjects[(WEEKDAYS.indexOf(day) + 1) % allSubjects.length] ?? allSubjects[0], description: 'Revisão dos principais tópicos', type: 'review', duration: 30 },
-        ];
-      }
-      return [{ subject: subj, description: 'Resolução de exercícios práticos', type: 'practice', duration: 45 }];
-    }
-
-    if (phase === 'science') {
-      const subj = remainingSubjects.length > 0
-        ? remainingSubjects[(WEEKDAYS.indexOf(day)) % remainingSubjects.length]
-        : allSubjects[(WEEKDAYS.indexOf(day)) % allSubjects.length];
-      if (isSaturday) {
-        return [
-          { subject: subj ?? allSubjects[0], description: 'Revisão da semana', type: 'review', duration: 60 },
-          { subject: coreSubjects[0] ?? allSubjects[0], description: 'Exercícios de reforço', type: 'practice', duration: 30 },
-        ];
-      }
-      return [{ subject: subj ?? allSubjects[0], description: 'Estudo dos principais conceitos', type: 'study', duration: 50 }];
-    }
-
-    // core phase
-    const subj = coreSubjects.length > 0
-      ? coreSubjects[WEEKDAYS.indexOf(day) % coreSubjects.length]
-      : allSubjects[0];
-    if (isSaturday) {
-      return [
-        { subject: subj ?? allSubjects[0], description: 'Exercícios práticos de fixação', type: 'practice', duration: 60 },
-        { subject: coreSubjects[1] ?? coreSubjects[0] ?? allSubjects[0], description: 'Revisão dos conteúdos da semana', type: 'review', duration: 30 },
-      ];
-    }
-    return [{ subject: subj ?? allSubjects[0], description: 'Estudo dos fundamentos e teoria', type: 'study', duration: 45 }];
-  }
-
-  private getPhase(week: number, totalWeeks: number): 'core' | 'science' | 'practice' | 'mock' {
-    const ratio = week / totalWeeks;
-    if (ratio <= 0.25) return 'core';
-    if (ratio <= 0.5) return 'science';
-    if (ratio <= 0.75) return 'practice';
-    return 'mock';
-  }
-
-  private weekLabel(week: number, totalWeeks: number): string {
-    const phase = this.getPhase(week, totalWeeks);
-    const phaseLabels: Record<string, string> = {
-      core: 'Fundamentos',
-      science: 'Aprofundamento',
-      practice: 'Prática intensiva',
-      mock: 'Simulados e revisão final',
-    };
-    return `Semana ${week} — ${phaseLabels[phase]}`;
+    return Array.from(set);
   }
 
   // ── Display helpers ────────────────────────────────────────────────────────
@@ -357,5 +281,9 @@ export class ScheduleDashboard implements OnInit {
     const h = Math.floor(minutes / 60);
     const m = minutes % 60;
     return m > 0 ? `${h}h ${m}min` : `${h}h`;
+  }
+
+  getDayActivityCount(day: ScheduleDay): number {
+    return day.activities.length;
   }
 }

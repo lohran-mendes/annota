@@ -12,8 +12,11 @@ import { DatePipe } from '@angular/common';
 import { ScheduleService } from '../../../core/services/schedule.service';
 import { ConfirmDialog } from '../dialogs/confirm-dialog';
 import { ActivityDialog } from '../../schedule/activity-dialog';
+import { WeekDialog } from '../../schedule/week-dialog';
 import type { ScheduleActivity } from '../../schedule/activity-dialog';
-import type { UserScheduleSummary, Schedule, ScheduleWeek } from '@annota/shared';
+import type { UserScheduleSummary, ScheduleWeek } from '@annota/shared';
+
+const WEEKDAYS = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
 
 @Component({
   selector: 'annota-schedule-management',
@@ -46,8 +49,6 @@ export class ScheduleManagement implements OnInit {
   activeSchedule = signal<ScheduleWeek[]>([]);
   loadingSchedule = signal(false);
   editing = signal(false);
-
-  private subjectNames: string[] = [];
 
   ngOnInit(): void {
     this.loadUsers();
@@ -86,6 +87,52 @@ export class ScheduleManagement implements OnInit {
     this.editing.update((v) => !v);
   }
 
+  // ── Week CRUD ─────────────────────────────────────────────────────────────
+
+  addWeek(): void {
+    const dialogRef = this.dialog.open(WeekDialog, {
+      data: {},
+      width: '440px',
+    });
+
+    dialogRef.afterClosed().subscribe((label: string | undefined) => {
+      if (!label) return;
+      const updated = structuredClone(this.activeSchedule());
+      const newWeek: ScheduleWeek = {
+        weekNumber: updated.length + 1,
+        label,
+        days: WEEKDAYS.map((day) => ({ dayOfWeek: day, activities: [] })),
+      };
+      updated.push(newWeek);
+      this.activeSchedule.set(updated);
+      this.saveSchedule();
+    });
+  }
+
+  editWeekLabel(weekIndex: number): void {
+    const week = this.activeSchedule()[weekIndex];
+    const dialogRef = this.dialog.open(WeekDialog, {
+      data: { label: week.label },
+      width: '440px',
+    });
+
+    dialogRef.afterClosed().subscribe((label: string | undefined) => {
+      if (!label) return;
+      const updated = structuredClone(this.activeSchedule());
+      updated[weekIndex].label = label;
+      this.activeSchedule.set(updated);
+      this.saveSchedule();
+    });
+  }
+
+  removeWeek(weekIndex: number): void {
+    const updated = structuredClone(this.activeSchedule());
+    updated.splice(weekIndex, 1);
+    updated.forEach((w, i) => (w.weekNumber = i + 1));
+    this.activeSchedule.set(updated);
+    this.saveSchedule();
+  }
+
   // ── Activity CRUD (admin editing) ──────────────────────────────────────────
 
   openActivityDialog(weekIndex: number, dayIndex: number, activityIndex?: number): void {
@@ -94,7 +141,7 @@ export class ScheduleManagement implements OnInit {
     const existing = activityIndex !== undefined ? day.activities[activityIndex] : undefined;
 
     const dialogRef = this.dialog.open(ActivityDialog, {
-      data: { activity: existing, subjects: this.subjectNames },
+      data: { activity: existing, subjects: this.collectSubjects() },
       width: '480px',
     });
 
@@ -173,8 +220,7 @@ export class ScheduleManagement implements OnInit {
     this.loadingSchedule.set(true);
     this.scheduleService.adminGetSchedule(userId, examId).subscribe({
       next: (res) => {
-        this.activeSchedule.set(res.data?.weeks ?? []);
-        this.collectSubjects(res.data?.weeks ?? []);
+        this.activeSchedule.set(this.normalizeWeeks(res.data?.weeks ?? []));
         this.loadingSchedule.set(false);
       },
       error: () => {
@@ -184,16 +230,24 @@ export class ScheduleManagement implements OnInit {
     });
   }
 
-  private collectSubjects(weeks: ScheduleWeek[]): void {
+  private normalizeWeeks(weeks: ScheduleWeek[]): ScheduleWeek[] {
+    return weeks.map((week) => {
+      const existingDays = new Map(week.days.map((d) => [d.dayOfWeek, d]));
+      const days = WEEKDAYS.map((day) => existingDays.get(day) ?? { dayOfWeek: day, activities: [] });
+      return { ...week, days };
+    });
+  }
+
+  private collectSubjects(): string[] {
     const set = new Set<string>();
-    for (const week of weeks) {
+    for (const week of this.activeSchedule()) {
       for (const day of week.days) {
         for (const activity of day.activities) {
           set.add(activity.subject);
         }
       }
     }
-    this.subjectNames = Array.from(set);
+    return Array.from(set);
   }
 
   private saveSchedule(): void {

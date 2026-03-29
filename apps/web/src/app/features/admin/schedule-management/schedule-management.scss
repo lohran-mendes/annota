@@ -249,6 +249,33 @@
   flex-shrink: 0;
 }
 
+.week-actions {
+  display: inline-flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+.week-action-btn {
+  width: 28px !important;
+  height: 28px !important;
+  line-height: 28px !important;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: var(--annota-text-light);
+  }
+
+  &:hover mat-icon {
+    color: var(--annota-pink-500);
+  }
+
+  &--danger:hover mat-icon {
+    color: #f44336;
+  }
+}
+
 .days-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));

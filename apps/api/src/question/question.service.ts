@@ -64,7 +64,7 @@ export class QuestionService {
 
   async update(id: string, dto: UpdateQuestionDto): Promise<Question> {
     const question = await this.questionModel
-      .findByIdAndUpdate(id, dto, { new: true })
+      .findByIdAndUpdate(id, dto, { returnDocument: 'after' })
       .exec();
     if (!question) {
       throw new NotFoundException(`Question with id ${id} not found`);

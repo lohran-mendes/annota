@@ -56,7 +56,7 @@ export class ExamService {
 
   async update(id: string, dto: UpdateExamDto): Promise<Exam> {
     const exam = await this.examModel
-      .findByIdAndUpdate(id, dto, { new: true })
+      .findByIdAndUpdate(id, dto, { returnDocument: 'after' })
       .exec();
     if (!exam) {
       throw new NotFoundException(`Exam with id ${id} not found`);

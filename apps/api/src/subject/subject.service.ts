@@ -38,7 +38,7 @@ export class SubjectService {
 
   async update(id: string, dto: UpdateSubjectDto): Promise<Subject> {
     const subject = await this.subjectModel
-      .findByIdAndUpdate(id, dto, { new: true })
+      .findByIdAndUpdate(id, dto, { returnDocument: 'after' })
       .exec();
     if (!subject) {
       throw new NotFoundException(`Subject with id ${id} not found`);

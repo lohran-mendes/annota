@@ -32,7 +32,7 @@ class ScheduleActivityDto {
 
 class ScheduleDayDto {
   @IsString()
-  @IsNotEmpty()
+  @IsIn(['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'])
   dayOfWeek: string;
 
   @IsArray()

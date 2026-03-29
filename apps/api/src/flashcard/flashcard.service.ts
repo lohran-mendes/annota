@@ -109,7 +109,7 @@ export class FlashcardService {
 
   async update(id: string, dto: UpdateFlashcardDto): Promise<Flashcard> {
     const flashcard = await this.flashcardModel
-      .findByIdAndUpdate(id, dto, { new: true })
+      .findByIdAndUpdate(id, dto, { returnDocument: 'after' })
       .exec();
     if (!flashcard) {
       throw new NotFoundException(`Flashcard with id ${id} not found`);

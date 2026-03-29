@@ -68,6 +68,20 @@
             </p>
           </div>
           <div class="schedule-actions">
+            <mat-button-toggle-group
+              [value]="viewMode()"
+              (change)="viewMode.set($event.value)"
+              class="view-toggle"
+            >
+              <mat-button-toggle value="week">
+                <mat-icon>view_agenda</mat-icon>
+                Semanas
+              </mat-button-toggle>
+              <mat-button-toggle value="month">
+                <mat-icon>calendar_month</mat-icon>
+                Mensal
+              </mat-button-toggle>
+            </mat-button-toggle-group>
             <button
               mat-stroked-button
               (click)="toggleEditing()"
@@ -77,14 +91,14 @@
               <mat-icon>{{ editing() ? 'check' : 'edit' }}</mat-icon>
               {{ editing() ? 'Concluir' : 'Editar' }}
             </button>
-            @if (hasCustomSchedule()) {
+            @if (editing()) {
               <button
                 mat-stroked-button
-                (click)="resetSchedule()"
-                matTooltip="Restaurar cronograma gerado automaticamente"
+                (click)="addWeek()"
+                matTooltip="Adicionar nova semana ao cronograma"
               >
-                <mat-icon>restart_alt</mat-icon>
-                Restaurar
+                <mat-icon>add</mat-icon>
+                Adicionar Semana
               </button>
             }
           </div>
@@ -94,8 +108,20 @@
       @if (loadingSchedule()) {
         <div class="loading-container">
           <mat-spinner diameter="40"></mat-spinner>
-          <p>Gerando cronograma...</p>
+          <p>Carregando cronograma...</p>
         </div>
+      } @else if (schedule().length === 0) {
+        <mat-card class="empty-state-card">
+          <mat-card-content>
+            <mat-icon class="empty-icon">event_note</mat-icon>
+            <h2>Nenhuma semana cadastrada</h2>
+            <p>Comece criando sua primeira semana de estudos personalizada.</p>
+            <button mat-flat-button color="primary" (click)="addWeek()">
+              <mat-icon>add</mat-icon>
+              Criar primeira semana
+            </button>
+          </mat-card-content>
+        </mat-card>
       } @else {
         <div class="legend-row">
           <div class="legend-item">
@@ -116,66 +142,127 @@
           </div>
         </div>
 
-        <mat-accordion class="schedule-accordion" multi>
-          @for (week of schedule(); track week.weekNumber; let wi = $index) {
-            <mat-expansion-panel [expanded]="wi === 0" class="week-panel">
-              <mat-expansion-panel-header>
-                <mat-panel-title class="week-panel__title">
-                  <span class="week-badge">S{{ week.weekNumber }}</span>
-                  {{ week.label }}
-                </mat-panel-title>
-              </mat-expansion-panel-header>
-
-              <div class="days-grid">
-                @for (day of week.days; track day.dayOfWeek; let di = $index) {
-                  <div class="day-column">
-                    <p class="day-label">{{ day.dayOfWeek }}</p>
-                    <div class="activities-list">
-                      @for (activity of day.activities; track $index; let ai = $index) {
-                        <div
-                          class="activity-item activity-item--{{ activity.type }}"
-                          [class.activity-item--editable]="editing()"
-                          (click)="editing() && openActivityDialog(wi, di, ai)"
+        @if (viewMode() === 'week') {
+          <mat-accordion class="schedule-accordion" multi>
+            @for (week of schedule(); track week.weekNumber; let wi = $index) {
+              <mat-expansion-panel [expanded]="expandedWeekIndex() === wi" class="week-panel">
+                <mat-expansion-panel-header>
+                  <mat-panel-title class="week-panel__title">
+                    <span class="week-badge">S{{ week.weekNumber }}</span>
+                    {{ week.label }}
+                    @if (editing()) {
+                      <span class="week-actions">
+                        <button
+                          mat-icon-button
+                          class="week-action-btn"
+                          matTooltip="Renomear semana"
+                          (click)="editWeekLabel(wi); $event.stopPropagation()"
                         >
-                          <div class="activity-item__header">
-                            <mat-icon class="activity-icon">{{ getActivityIcon(activity.type) }}</mat-icon>
-                            <span class="activity-subject">{{ activity.subject }}</span>
-                            @if (editing()) {
-                              <button
-                                mat-icon-button
-                                class="activity-remove-btn"
-                                matTooltip="Remover atividade"
-                                (click)="removeActivity(wi, di, ai); $event.stopPropagation()"
-                              >
-                                <mat-icon>close</mat-icon>
-                              </button>
+                          <mat-icon>edit</mat-icon>
+                        </button>
+                        <button
+                          mat-icon-button
+                          class="week-action-btn week-action-btn--danger"
+                          matTooltip="Excluir semana"
+                          (click)="removeWeek(wi); $event.stopPropagation()"
+                        >
+                          <mat-icon>delete</mat-icon>
+                        </button>
+                      </span>
+                    }
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+
+                <div class="days-grid">
+                  @for (day of week.days; track day.dayOfWeek; let di = $index) {
+                    <div class="day-column">
+                      <p class="day-label">{{ day.dayOfWeek }}</p>
+                      <div class="activities-list">
+                        @for (activity of day.activities; track $index; let ai = $index) {
+                          <div
+                            class="activity-item activity-item--{{ activity.type }}"
+                            [class.activity-item--editable]="editing()"
+                            (click)="editing() && openActivityDialog(wi, di, ai)"
+                          >
+                            <div class="activity-item__header">
+                              <mat-icon class="activity-icon">{{ getActivityIcon(activity.type) }}</mat-icon>
+                              <span class="activity-subject">{{ activity.subject }}</span>
+                              @if (editing()) {
+                                <button
+                                  mat-icon-button
+                                  class="activity-remove-btn"
+                                  matTooltip="Remover atividade"
+                                  (click)="removeActivity(wi, di, ai); $event.stopPropagation()"
+                                >
+                                  <mat-icon>close</mat-icon>
+                                </button>
+                              }
+                            </div>
+                            <p class="activity-description">{{ activity.description }}</p>
+                            <div class="activity-footer">
+                              <mat-chip class="duration-chip">{{ formatDuration(activity.duration) }}</mat-chip>
+                              <span class="activity-type-label">{{ getActivityTypeLabel(activity.type) }}</span>
+                            </div>
+                          </div>
+                        }
+
+                        @if (editing()) {
+                          <button
+                            class="add-activity-btn"
+                            (click)="openActivityDialog(wi, di)"
+                            matTooltip="Adicionar atividade"
+                          >
+                            <mat-icon>add</mat-icon>
+                            <span>Adicionar</span>
+                          </button>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+              </mat-expansion-panel>
+            }
+          </mat-accordion>
+        }
+
+        @if (viewMode() === 'month') {
+          <div class="month-view">
+            @for (month of monthGroups(); track month.label) {
+              <div class="month-section">
+                <h3 class="month-title">{{ month.label }}</h3>
+                <div class="month-grid">
+                  @for (week of month.weeks; track week.weekNumber) {
+                    <div
+                      class="month-week-column"
+                      (click)="goToWeek(week.weekNumber)"
+                      tabindex="0"
+                      (keydown.enter)="goToWeek(week.weekNumber)"
+                    >
+                      <p class="month-week-label">
+                        <span class="week-badge week-badge--small">S{{ week.weekNumber }}</span>
+                        {{ week.label }}
+                      </p>
+                      <div class="month-days-grid">
+                        @for (day of week.days; track day.dayOfWeek) {
+                          <div
+                            class="month-day-cell"
+                            [class.has-activities]="day.activities.length > 0"
+                            [matTooltip]="day.dayOfWeek + ': ' + day.activities.length + ' atividade(s)'"
+                          >
+                            <span class="month-day-name">{{ day.dayOfWeek.substring(0, 3) }}</span>
+                            @if (day.activities.length > 0) {
+                              <span class="month-day-count">{{ day.activities.length }}</span>
                             }
                           </div>
-                          <p class="activity-description">{{ activity.description }}</p>
-                          <div class="activity-footer">
-                            <mat-chip class="duration-chip">{{ formatDuration(activity.duration) }}</mat-chip>
-                            <span class="activity-type-label">{{ getActivityTypeLabel(activity.type) }}</span>
-                          </div>
-                        </div>
-                      }
-
-                      @if (editing()) {
-                        <button
-                          class="add-activity-btn"
-                          (click)="openActivityDialog(wi, di)"
-                          matTooltip="Adicionar atividade"
-                        >
-                          <mat-icon>add</mat-icon>
-                          <span>Adicionar</span>
-                        </button>
-                      }
+                        }
+                      </div>
                     </div>
-                  </div>
-                }
+                  }
+                </div>
               </div>
-            </mat-expansion-panel>
-          }
-        </mat-accordion>
+            }
+          </div>
+        }
       }
     </section>
   }

@@ -28,7 +28,7 @@ export class ScheduleService {
     const schedule = await this.scheduleModel.findOneAndUpdate(
       { examId: dto.examId, userId },
       { examId: dto.examId, userId, weeks: dto.weeks },
-      { new: true, upsert: true },
+      { returnDocument: 'after', upsert: true },
     ).exec();
     return schedule!;
   }
@@ -94,7 +94,7 @@ export class ScheduleService {
     const schedule = await this.scheduleModel.findOneAndUpdate(
       { examId, userId },
       { examId, userId, weeks },
-      { new: true, upsert: true },
+      { returnDocument: 'after', upsert: true },
     ).exec();
     return schedule!;
   }

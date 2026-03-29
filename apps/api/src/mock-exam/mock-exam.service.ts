@@ -122,7 +122,7 @@ export class MockExamService {
     }
 
     const updated = await this.mockExamModel
-      .findByIdAndUpdate(id, dto, { new: true })
+      .findByIdAndUpdate(id, dto, { returnDocument: 'after' })
       .exec();
     if (!updated) {
       throw new NotFoundException(`MockExam with id ${id} not found`);

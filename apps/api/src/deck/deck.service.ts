@@ -65,7 +65,7 @@ export class DeckService {
 
   async update(userId: string, id: string, dto: UpdateDeckDto): Promise<Deck> {
     const deck = await this.deckModel
-      .findOneAndUpdate({ _id: id, userId }, dto, { new: true })
+      .findOneAndUpdate({ _id: id, userId }, dto, { returnDocument: 'after' })
       .exec();
     if (!deck) {
       throw new NotFoundException(`Deck with id ${id} not found`);

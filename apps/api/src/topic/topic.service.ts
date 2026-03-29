@@ -44,7 +44,7 @@ export class TopicService {
 
   async update(id: string, dto: UpdateTopicDto): Promise<Topic> {
     const topic = await this.topicModel
-      .findByIdAndUpdate(id, dto, { new: true })
+      .findByIdAndUpdate(id, dto, { returnDocument: 'after' })
       .exec();
     if (!topic) {
       throw new NotFoundException(`Topic with id ${id} not found`);

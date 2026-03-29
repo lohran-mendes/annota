@@ -29,6 +29,16 @@
           <mat-icon>{{ editing() ? 'check' : 'edit' }}</mat-icon>
           {{ editing() ? 'Concluir' : 'Editar' }}
         </button>
+        @if (editing()) {
+          <button
+            mat-stroked-button
+            (click)="addWeek()"
+            matTooltip="Adicionar nova semana"
+          >
+            <mat-icon>add</mat-icon>
+            Adicionar Semana
+          </button>
+        }
         <button
           mat-stroked-button
           color="warn"
@@ -49,7 +59,13 @@
       <mat-card class="empty-state">
         <mat-card-content>
           <mat-icon>event_busy</mat-icon>
-          <p>Este aluno não possui cronograma salvo para esta prova.</p>
+          <p>Este aluno não possui semanas cadastradas neste cronograma.</p>
+          @if (editing()) {
+            <button mat-flat-button color="primary" (click)="addWeek()">
+              <mat-icon>add</mat-icon>
+              Adicionar Semana
+            </button>
+          }
         </mat-card-content>
       </mat-card>
     } @else {
@@ -79,6 +95,26 @@
               <mat-panel-title class="week-panel__title">
                 <span class="week-badge">S{{ week.weekNumber }}</span>
                 {{ week.label }}
+                @if (editing()) {
+                  <span class="week-actions">
+                    <button
+                      mat-icon-button
+                      class="week-action-btn"
+                      matTooltip="Renomear semana"
+                      (click)="editWeekLabel(wi); $event.stopPropagation()"
+                    >
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button
+                      mat-icon-button
+                      class="week-action-btn week-action-btn--danger"
+                      matTooltip="Excluir semana"
+                      (click)="removeWeek(wi); $event.stopPropagation()"
+                    >
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </span>
+                }
               </mat-panel-title>
             </mat-expansion-panel-header>
 
