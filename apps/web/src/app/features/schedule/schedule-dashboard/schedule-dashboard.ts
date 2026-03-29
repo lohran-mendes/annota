@@ -8,8 +8,10 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ExamService } from '../../../core/services/exam.service';
 import { ScheduleService } from '../../../core/services/schedule.service';
+import { ConfirmDialog } from '../../admin/dialogs/confirm-dialog';
 import { ActivityDialog } from '../activity-dialog';
 import { WeekDialog } from '../week-dialog';
 import type { ScheduleActivity } from '../activity-dialog';
@@ -43,6 +45,7 @@ export class ScheduleDashboard implements OnInit {
   private readonly examService = inject(ExamService);
   private readonly scheduleService = inject(ScheduleService);
   private readonly dialog = inject(MatDialog);
+  private readonly snackBar = inject(MatSnackBar);
 
   exams = signal<Exam[]>([]);
   selectedExamId = signal<string | null>(null);
@@ -132,11 +135,23 @@ export class ScheduleDashboard implements OnInit {
   }
 
   removeWeek(weekIndex: number): void {
-    const updated = structuredClone(this.schedule());
-    updated.splice(weekIndex, 1);
-    updated.forEach((w, i) => (w.weekNumber = i + 1));
-    this.schedule.set(updated);
-    this.saveToApi();
+    const week = this.schedule()[weekIndex];
+    const dialogRef = this.dialog.open(ConfirmDialog, {
+      data: {
+        title: 'Excluir semana',
+        message: `Tem certeza que deseja excluir "${week.label}"? Todas as atividades desta semana serão perdidas.`,
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((confirmed: boolean) => {
+      if (!confirmed) return;
+      const updated = structuredClone(this.schedule());
+      updated.splice(weekIndex, 1);
+      updated.forEach((w, i) => (w.weekNumber = i + 1));
+      this.schedule.set(updated);
+      this.saveToApi();
+      this.snackBar.open('Semana excluída com sucesso', 'OK', { duration: 3000 });
+    });
   }
 
   goToWeek(weekNumber: number): void {
@@ -186,9 +201,26 @@ export class ScheduleDashboard implements OnInit {
     const examId = this.selectedExamId();
     if (!examId) return;
 
-    this.scheduleService.save({ examId, weeks: this.schedule() }).subscribe({
+    const weeks = this.stripMongoIds(this.schedule());
+    this.scheduleService.save({ examId, weeks }).subscribe({
       next: () => this.hasCustomSchedule.set(true),
     });
+  }
+
+  private stripMongoIds(weeks: ScheduleWeek[]): ScheduleWeek[] {
+    return weeks.map((w) => ({
+      weekNumber: w.weekNumber,
+      label: w.label,
+      days: w.days.map((d) => ({
+        dayOfWeek: d.dayOfWeek,
+        activities: d.activities.map((a) => ({
+          subject: a.subject,
+          description: a.description,
+          type: a.type,
+          duration: a.duration,
+        })),
+      })),
+    }));
   }
 
   // ── Data loading ───────────────────────────────────────────────────────────

@@ -253,12 +253,17 @@
   display: inline-flex;
   align-items: center;
   margin-left: auto;
+  gap: 2px;
 }
 
 .week-action-btn {
   width: 28px !important;
   height: 28px !important;
   line-height: 28px !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 
   mat-icon {
     font-size: 16px;

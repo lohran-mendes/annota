@@ -126,11 +126,23 @@ export class ScheduleManagement implements OnInit {
   }
 
   removeWeek(weekIndex: number): void {
-    const updated = structuredClone(this.activeSchedule());
-    updated.splice(weekIndex, 1);
-    updated.forEach((w, i) => (w.weekNumber = i + 1));
-    this.activeSchedule.set(updated);
-    this.saveSchedule();
+    const week = this.activeSchedule()[weekIndex];
+    const dialogRef = this.dialog.open(ConfirmDialog, {
+      data: {
+        title: 'Excluir semana',
+        message: `Tem certeza que deseja excluir "${week.label}"? Todas as atividades desta semana serão perdidas.`,
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((confirmed: boolean) => {
+      if (!confirmed) return;
+      const updated = structuredClone(this.activeSchedule());
+      updated.splice(weekIndex, 1);
+      updated.forEach((w, i) => (w.weekNumber = i + 1));
+      this.activeSchedule.set(updated);
+      this.saveSchedule();
+      this.snackBar.open('Semana excluída com sucesso', 'OK', { duration: 3000 });
+    });
   }
 
   // ── Activity CRUD (admin editing) ──────────────────────────────────────────
@@ -250,13 +262,29 @@ export class ScheduleManagement implements OnInit {
     return Array.from(set);
   }
 
+  private stripMongoIds(weeks: ScheduleWeek[]): ScheduleWeek[] {
+    return weeks.map((w) => ({
+      weekNumber: w.weekNumber,
+      label: w.label,
+      days: w.days.map((d) => ({
+        dayOfWeek: d.dayOfWeek,
+        activities: d.activities.map((a) => ({
+          subject: a.subject,
+          description: a.description,
+          type: a.type,
+          duration: a.duration,
+        })),
+      })),
+    }));
+  }
+
   private saveSchedule(): void {
     const userId = this.activeUserId();
     const examId = this.activeExamId();
     if (!userId || !examId) return;
 
     this.scheduleService
-      .adminSaveSchedule(userId, examId, this.activeSchedule())
+      .adminSaveSchedule(userId, examId, this.stripMongoIds(this.activeSchedule()))
       .subscribe({
         next: () => {
           this.snackBar.open('Cronograma salvo', 'OK', { duration: 2000 });

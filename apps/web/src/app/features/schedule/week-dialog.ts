@@ -47,6 +47,7 @@ export interface WeekDialogData {
       display: flex;
       flex-direction: column;
       min-width: 360px;
+      padding-top: 8px;
     }
     @media (max-width: 599px) {
       .dialog-form { min-width: unset; }

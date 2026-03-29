@@ -82,9 +82,10 @@
   border-radius: 6px; padding: 2px 8px; flex-shrink: 0;
   &--small { font-size: 0.7rem; padding: 1px 6px; }
 }
-.week-actions { display: inline-flex; align-items: center; margin-left: auto; }
+.week-actions { display: inline-flex; align-items: center; margin-left: auto; gap: 2px; }
 .week-action-btn {
   width: 28px !important; height: 28px !important; line-height: 28px !important;
+  padding: 0 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important;
   mat-icon { font-size: 16px; width: 16px; height: 16px; color: var(--annota-text-light); }
   &:hover mat-icon { color: var(--annota-pink-500); }
   &--danger:hover mat-icon { color: #f44336; }
