@@ -1,14 +1,18 @@
 <div class="welcome-section animate-fade-in-up">
   <div class="welcome-top">
     <div class="welcome-intro">
-      <img [src]="userAvatar()" [alt]="userName() + ' segurando livros'" class="anna-avatar" />
+      @if (userAvatar()) {
+        <img [src]="userAvatar()!" [alt]="userName() + ' segurando livros'" class="anna-avatar" />
+      }
       <div class="welcome-content">
         <h1 class="welcome-title">Oi, {{ userFirstName() }}!</h1>
         <p class="welcome-subtitle">{{ welcomeSubtitle() }}</p>
-        <p class="welcome-signature">
-          <mat-icon>favorite</mat-icon>
-          {{ welcomeSignature() }}
-        </p>
+        @if (welcomeSignature()) {
+          <p class="welcome-signature">
+            <mat-icon>favorite</mat-icon>
+            {{ welcomeSignature() }}
+          </p>
+        }
       </div>
     </div>
     <div class="quick-stats">

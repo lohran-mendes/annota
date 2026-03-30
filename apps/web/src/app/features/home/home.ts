@@ -31,19 +31,23 @@ export class Home implements OnInit {
     const name = this.userName().toLowerCase();
     if (name.includes('maria')) return 'maria-com-livros.png';
     if (name.includes('anna')) return 'anna-com-livros.png';
-    return 'anna-com-livros.png';
+    return null;
   });
   readonly welcomeSubtitle = computed(() => {
     const name = this.userName().toLowerCase();
     if (name.includes('maria')) {
       return 'Você é uma pessoa incrível e muito capaz! Tenho certeza que com dedicação e esforço, você pode alcançar tudo o que deseja. Estarei com você em cada passo!';
     }
-    return 'Acredito no seu potencial. Você é inteligente, dedicada e capaz de conquistar tudo o que quiser. Este app foi feito especialmente pra te ajudar a brilhar nos seus próximos desafios!';
+    if (name.includes('anna')) {
+      return 'Acredito no seu potencial. Você é inteligente, dedicada e capaz de conquistar tudo o que quiser. Este app foi feito especialmente pra te ajudar a brilhar nos seus próximos desafios!';
+    }
+    return 'Bem-vindo ao Annota! Pratique questões, acompanhe seu progresso e conquiste sua aprovação.';
   });
   readonly welcomeSignature = computed(() => {
     const name = this.userName().toLowerCase();
     if (name.includes('maria')) return 'Com amor, do seu Nego';
-    return 'Com todo o amor, do seu irmão';
+    if (name.includes('anna')) return 'Com todo o amor, do seu irmão';
+    return null;
   });
 
   exams = signal<Exam[]>([]);
